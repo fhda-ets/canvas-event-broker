@@ -1,0 +1,4 @@
+config/local*.js
+node_modules
+*.log
+*.log.gz
