@@ -64,18 +64,21 @@ function getPendingEvents(autoReschedule=Config.eventmanager.enabled) {
  * @return {Promise} Resolved when the event has been processed
  */
 function handleEvent(event) {
+    // Match event to a college
+    let college = getCollegeForTerm(event.term);
+
     // Identify type of event, and delegate to the appropriate handler
     if(event.type === TYPE_SYNC_PERSON) {
-        return SyncPerson(getCollegeForTerm(event.term), event);
+        return SyncPerson(college, event);
     }
     else if(event.type === TYPE_ENROLL_STUDENT) {
-        return EnrollStudent(getCollegeForTerm(event.term), event);
+        return EnrollStudent(college, event);
     }
     else if(event.type === TYPE_DROP_STUDENT) {
-        return DropStudent(getCollegeForTerm(event.term), event);
+        return DropStudent(college, event);
     }
     else if(event.type === TYPE_CANCEL_SECTION) {
-        return CancelCourseSection(getCollegeForTerm(event.term), event);
+        return CancelCourseSection(college, event);
     }
     else {
         Logger.warn(`Ignoring event due to an unsupported type`, event);
