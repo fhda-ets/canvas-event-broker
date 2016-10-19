@@ -93,10 +93,14 @@ module.exports = class College {
 
     deleteSection(term, crn, progress) {
         let college = this;
+        let trackedSection;
 
         // Verify if the request refers to a tracked Banner course section
         return BannerOperations.isSectionTracked(term, crn)
             .then(section => {
+                // Retain section
+                trackedSection = section;
+
                 // Lookup enrollments in Canvas
                 return college.canvasApi.getSectionEnrollment(section.sectionId);
             })
@@ -121,9 +125,9 @@ module.exports = class College {
                     college.logger.info(`Successfully deleted student from Canvas section`, [{term: term, crn: crn}, enrollment]);
                 });
             }, Common.concurrency.MULTI)
-            .then(enrollmentChanges => {
+            .then(() => {
                 // Delete the section from Canvas
-                return college.canvasApi.deleteSection(enrollmentChanges[0][0].course_section_id);
+                return college.canvasApi.deleteSection(trackedSection.sectionId);
             })
             .then(formerSection => {
                 // Untrack section in Banner

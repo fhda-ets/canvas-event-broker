@@ -32,7 +32,8 @@ module.exports = function (data, respond) {
         respond({status: 'done'});
     })
     .catch(error => {
-        Logger.error(`A serious error occurred while handling a delete sections websocket event`, [error, data]);
+        Logger.error(`A serious error occurred while handling a section delete websocket event`, [error, data]);
+        respond({status: 'error', message: 'A serious error occurred while handling a section delete websocket event'});
         return Promise.reject(error);
     });
 };

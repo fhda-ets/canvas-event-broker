@@ -1,4 +1,4 @@
-select
+select distinct
     spriden_id as "campusId",
     spriden_pidm as "pidm",
     nvl(spbpers_pref_first_name, spriden_first_name) as "firstName",

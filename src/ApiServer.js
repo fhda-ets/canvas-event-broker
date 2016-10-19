@@ -15,11 +15,6 @@ let SocketIoJwt = require('socketio-jwt');
 HttpServer.listen(Config.listenPort);
 Logger.info(`Created API server on port ${Config.listenPort}`);
 
-// Create static route for testing
-Express.get('/', (request, response) => {
-    response.sendFile('index.html', {root: 'src/static-web'});
-});
-
 // Configure Socket.io JWT authentication
 SocketIo.use(SocketIoJwt.authorize({
   secret: Config.jwtSecret,
@@ -32,6 +27,7 @@ SocketIo.on('connection', function (socket) {
 
     // Register handlers for web socket events
     socket.on('banner:getInstructorSchedule', require('./websocket-handlers/banner/GetInstructorSchedule.js').bind(socket));
+    socket.on('canvas:getCourses', require('./websocket-handlers/canvas/GetCourses.js').bind(socket));
     socket.on('canvas:createCourse', require('./websocket-handlers/canvas/CreateCourse.js').bind(socket));
     socket.on('canvas:deleteCourse', require('./websocket-handlers/canvas/DeleteCourse.js').bind(socket));
     socket.on('canvas:deleteSections', require('./websocket-handlers/canvas/DeleteSections.js').bind(socket));

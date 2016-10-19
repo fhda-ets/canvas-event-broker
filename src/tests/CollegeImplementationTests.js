@@ -111,11 +111,11 @@ for(let collegeId in Colleges) {
                 this.timeout(180000);
 
                 // Handle mock request
+                // eslint-disable-next-line
                 return WsCreateCourse.bind(mockWebsocket)(mockCreateRequest, result => {
-                    if(result.status === 'done') {
-                        courseContext = result.finalContext;
-                        // done();
-                    }
+                })
+                .then(context => {
+                    courseContext = context;
                 });
             });
 
