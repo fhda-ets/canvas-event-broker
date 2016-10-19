@@ -8,7 +8,7 @@ module.exports = {
 
     apiserver: {
         enabled: true,
-        listenPort: 9080
+        listenPort: 8080
     },
 
     eventmanager: {
