@@ -7,6 +7,7 @@ let RandomItem = require('random-item');
 let Should = require('should');
 
 // Load WS handler modules
+let WsCreateCanvAttribute = require('../websocket-handlers/banner/CreateCanvAttribute.js');
 let WsCreateCourse = require('../websocket-handlers/canvas/CreateCourse.js');
 let WsDeleteSections = require('../websocket-handlers/canvas/DeleteSections.js');
 let WsDeleteCourse = require('../websocket-handlers/canvas/DeleteCourse.js');
@@ -61,6 +62,21 @@ for(let collegeId in Colleges) {
             };
 
             let courseContext = undefined;
+
+            it.only('Can create CANV faculty attributes for one or more IDs', function() {
+                // Configure test
+                this.timeout(180000);
+
+                // Create mock websocket request
+                let mockRequest = {
+                    campusIds: ['10716429']
+                };
+
+                // Handle mock request
+                return WsCreateCanvAttribute.bind(mockWebsocket)(mockRequest, result => {
+                    Logger.info('Updated CANV attributes for persons', result);
+                });
+            });
 
             it('Lookup test courses', function() {
                 // Configure test

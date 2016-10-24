@@ -164,7 +164,9 @@ module.exports = class CanvasApiClient {
             });
     }
 
-    getCoursesForUser(termCode, campusId) {
+    getCoursesForUser(termCode, campusId, withSections=false) {
+        let parent = this;
+
         return Promise.all([
             this.getEnrollmentTermBySisId(termCode),
             this.client({
@@ -172,7 +174,6 @@ module.exports = class CanvasApiClient {
                 uri: `/users/sis_login_id:${campusId}/courses`,
                 useQuerystring: true,
                 qs: {
-                    'include[]': ['sections'],
                     'state[]': ['unpublished', 'available'],
                     'per_page': '250',
                 }
@@ -182,6 +183,22 @@ module.exports = class CanvasApiClient {
             return courses.filter(course => {
                 return course.enrollment_term_id === enrollmentTerm.id;
             });
+        })
+        .map(course => {
+            // Skip section transform if not requested
+            if(!(withSections)) {
+                return course;
+            }
+
+            // Add promise to be fufilled with info about course sections
+            // Filter objects that do not have an SIS ID (these are typically the root course in the site)
+            course.sections = parent.client
+                .get(`/courses/${course.id}/sections`)
+                .promise()
+                .filter(section => section.sis_section_id !== null);
+
+            // Transform course with pending promises
+            return Promise.props(course);
         });
     }
 
@@ -296,7 +313,8 @@ module.exports = class CanvasApiClient {
                 'enrollment[user_id]': userId,
                 'enrollment[type]': 'StudentEnrollment',
                 'enrollment[enrollment_state]': 'active',
-                'enrollment[notify]': 'false'
+                'enrollment[notify]': 'false',
+                'enrollment[limit_privileges_to_course_section]': 'true'
             }
         })
         .promise()

@@ -2,6 +2,7 @@
 let BannerOperations = require('./BannerOperations.js');
 let CanvasApiClient = require('./CanvasApiClient.js');
 let Common = require('./Common.js');
+let Lodash = require('lodash');
 // TEMP let Errors = require('./Errors.js');
 
 module.exports = class College {
@@ -206,6 +207,7 @@ module.exports = class College {
 
     syncStudent(term, person) {
         let college = this;
+        let syncOps = [];
 
         college.logger.info(`Checking student enrollment synchronization`, [person, {term: term}]);
 
@@ -215,18 +217,41 @@ module.exports = class College {
             college.canvasApi.getCoursesForUser(term, person.campusId)])
 
         .spread((bannerEnrollments, canvasEnrollments) => {
+            // Are there more enrollments in Banner than in Canvas?
             if(canvasEnrollments.length < bannerEnrollments.length) {
-                college.logger.warn(`It appears that Canvas student enrollments are not in sync with Banner`, [person, {
+                college.logger.warn(`It appears that Canvas student adds are not in sync with Banner`, [person, {
                     term: term,
                     bannerCount: bannerEnrollments.length,
                     canvasCount: canvasEnrollments.length}]);
 
                 // Iterate each Banner enrollment and manually force enroll the student in Canvas
                 return Promise.each(bannerEnrollments, enrollment => {
+                    syncOps.push(`Added missing student to course (Canvas course = ${enrollment.course_id}, term = ${term}, crn = ${enrollment.crn})`);
                     return college.canvasApi.enrollStudent(enrollment.sectionId, enrollment.userId);
                 });
             }
+            else if(canvasEnrollments.length > bannerEnrollments.length) {
+                college.logger.warn(`It appears that Canvas student drops are not in sync with Banner`, [person, {
+                    term: term,
+                    bannerCount: bannerEnrollments.length,
+                    canvasCount: canvasEnrollments.length}]);
+
+                // Iterate each Canvas enrollment, but filter to only those not found in Banner
+                return Promise.filter(canvasEnrollments, enrollment => {
+                    return Lodash.find(bannerEnrollments, ['section_id', enrollment.id]) !== undefined;
+                })
+                // Iterate revised list of Canvas enrollments
+                .each(enrollment => {
+                    // Drop student from Canvas course
+                    syncOps.push(`Dropped student from course (Canvas course = ${enrollment.course_id}, term = ${term}, crn = ${enrollment.crn})`);
+                    return college.canvasApi.dropStudent(enrollment);
+                });
+            }
             college.logger.warn(`Student enrollment checks passed, and appear to be in sync`, [person, {term: term}]);
+        })
+        .then(() => {
+            syncOps.push(`Sync completed for ${person.firstName} ${person.lastName}`);
+            return syncOps;
         });
     }
 

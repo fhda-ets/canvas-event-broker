@@ -5,6 +5,7 @@ let Jetpack = require('fs-jetpack');
 let Logger = require('fhda-logging').getLogger('banner-operations');
 
 // Load SQL statements
+const sqlCreateCanvasFacultyAttribute = Jetpack.read('src/sql/InsertCanvasFacultyAttribute.sql');
 const sqlDeleteEvent = Jetpack.read('src/sql/DeleteEvent.sql');
 const sqlGetCourse = Jetpack.read('src/sql/Course.sql');
 const sqlGetCourseSection = Jetpack.read('src/sql/CourseSection.sql');
@@ -25,6 +26,21 @@ const sqlUntrackCourse = Jetpack.read('src/sql/UntrackCourse.sql');
 const sqlUntrackCourseSection = Jetpack.read('src/sql/UntrackCourseSection.sql');
 const sqlUntrackEnrollment = Jetpack.read('src/sql/UntrackEnrollment.sql');
 const sqlUntrackTeacherEnrollments = Jetpack.read('src/sql/UntrackTeacherEnrollments.sql');
+
+function createCanvasFacultyAttribute(pidm) {
+    return Banner
+        .sql(sqlCreateCanvasFacultyAttribute, {pidm: pidm})
+        .then(() => {
+            Logger.info(`Created Canvas CANV faculty attribute for PIDM ${pidm}`);
+        })
+        .catch(error => {
+            if(error.message.includes('ORA-00001')) {
+                Logger.warn(`Did not create CANV faculty attribute for PIDM ${pidm} because it already existed`);
+                return Promise.resolve();
+            }
+            return Promise.reject(error);
+        });
+}
 
 function deleteEvent(eventId) {
     return Banner
@@ -202,7 +218,7 @@ function untrackCourseSection(sectionId) {
         });
 }
 
-function untrackEnrollment(enrollment) {    
+function untrackEnrollment(enrollment) {
     // Create parameter payload
     let params = {
         enrollmentId: enrollment.id
@@ -230,6 +246,7 @@ function untrackTeacherEnrollments(course) {
 
 // Module exports
 module.exports = {
+    createCanvasFacultyAttribute: createCanvasFacultyAttribute,
     deleteEvent: deleteEvent,
     getCourse: getCourse,
     getCourseSection: getCourseSection,

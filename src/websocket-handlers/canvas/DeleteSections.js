@@ -2,6 +2,7 @@
 let CollegeManager = require('../../CollegeManager.js');
 let Logger = require('fhda-logging').getLogger('ws-action-delete-sections');
 let ProgressMonitor = require('../../ProgressMonitor.js');
+let WebsocketUtils = require('../../WebsocketUtils.js');
 
 module.exports = function (data, respond) {
     // Create an alternate reference to the web socket
@@ -31,9 +32,10 @@ module.exports = function (data, respond) {
         socket.emit('ui:progress:hide');
         respond({status: 'done'});
     })
-    .catch(error => {
-        Logger.error(`A serious error occurred while handling a section delete websocket event`, [error, data]);
-        respond({status: 'error', message: 'A serious error occurred while handling a section delete websocket event'});
-        return Promise.reject(error);
-    });
+    .catch(WebsocketUtils.handleError.bind(
+        this,
+        'A serious error occurred while attempting to delete a course section from Canvas',
+        Logger,
+        respond
+    ));
 };

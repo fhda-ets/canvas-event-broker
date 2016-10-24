@@ -8,7 +8,7 @@ let Logger = require('fhda-logging').getLogger('ws-action-create-course');
 let Pipeline = require('pipep');
 let ProgressMonitor = require('../../ProgressMonitor.js');
 let Random = require('random-gen');
-let Util = require('util');
+let WebsocketUtils = require('../../WebsocketUtils.js');
 
 module.exports = function (data, respond) {
 
@@ -52,11 +52,12 @@ module.exports = function (data, respond) {
             respond({status: 'done'});
             return context;
         })
-        .catch(error => {
-            Logger.error(`A serious error occurred while handling a create course websocket event`, [error]);
-            respond({status: 'error', message: 'A serious error occurred while trying to create the requested Canvas course site'});
-            return Promise.reject(error);
-        });
+        .catch(WebsocketUtils.handleError.bind(
+            this,
+            'A serious error occurred while attempting to create a new Canvas course',
+            Logger,
+            respond
+        ));
 };
 
 function createCourseSite(context) {
