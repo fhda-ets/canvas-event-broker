@@ -1,31 +1,8 @@
 /**
- * Copyright (c) 2016, Foothill-De Anza Community College District
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its contributors
- * may be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
- * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Separates the higher-level work of loading SQL statements into memory, and
+ * the useful functions for executing those statements safely with bind parameters.
+ * @license BSD-3-Clause
+ * @module
  */
 
 'use strict';
@@ -47,9 +24,6 @@ const sqlGetSectionEnrollment = Jetpack.read('src/sql/SectionEnrollment.sql');
 const sqlGetTrackedEnrollments = Jetpack.read('src/sql/TrackedEnrollments.sql');
 const sqlIsEnrollmentTracked = Jetpack.read('src/sql/IsEnrollmentTracked.sql');
 const sqlIsSectionTracked = Jetpack.read('src/sql/IsSectionTracked.sql');
-// const sqlLookupTestCourses = Jetpack.read('src/sql/LookupTestCourses.sql');
-// const sqlRandomInstructors = Jetpack.read('src/sql/RandomInstructors.sql');
-// const sqlRandomCanvasInstructors = Jetpack.read('src/sql/RandomCanvasInstructors.sql');
 const sqlTrackCourseSection = Jetpack.read('src/sql/TrackCourseSection.sql');
 const sqlTrackEnrollment = Jetpack.read('src/sql/TrackEnrollment.sql');
 const sqlUntrackCourse = Jetpack.read('src/sql/UntrackCourse.sql');
@@ -57,6 +31,12 @@ const sqlUntrackCourseSection = Jetpack.read('src/sql/UntrackCourseSection.sql')
 const sqlUntrackEnrollment = Jetpack.read('src/sql/UntrackEnrollment.sql');
 const sqlUntrackTeacherEnrollments = Jetpack.read('src/sql/UntrackTeacherEnrollments.sql');
 
+/**
+ * Create a CANV attribute in the Banner baseline table SIRATTR to indicate
+ * that the instructor has received college approved Canvas training.
+ * @param  {Number} pidm Banner PIDM identity for the instructor
+ * @return {Promise} Resolved with database statement is completed
+ */
 function createCanvasFacultyAttribute(pidm) {
     return Banner
         .sql(sqlCreateCanvasFacultyAttribute, {pidm: pidm})
@@ -72,6 +52,11 @@ function createCanvasFacultyAttribute(pidm) {
         });
 }
 
+/**
+ * Delete a sync event from the CANVASLMS_EVENTS table.
+ * @param  {Number} eventId ID of the event to delete
+ * @return {Promise} Resolved with database statement is completed
+ */
 function deleteEvent(eventId) {
     return Banner
         .sql(sqlDeleteEvent, {eventId: eventId})
@@ -80,6 +65,12 @@ function deleteEvent(eventId) {
         });
 }
 
+/**
+ * Get a course object from Banner (join across SSBSECT and SCBCRSE)
+ * @param  {String} term Banner term code
+ * @param  {String} crn Banner CRN
+ * @return {Promise} Resolved with database statement is completed
+ */
 function getCourse(term, crn) {
     return Banner
         .sql(sqlGetCourse, {term: term, crn: crn})
@@ -89,6 +80,12 @@ function getCourse(term, crn) {
         });
 }
 
+/**
+ * Get a section object from Banner (exclusively SSBSECT)
+ * @param  {String} term Banner term code
+ * @param  {String} crn Banner CRN
+ * @return {Promise} Resolved with database statement is completed
+ */
 function getCourseSection(term, crn) {
     return Banner
         .sql(sqlGetCourseSection, {term: term, crn: crn})
@@ -98,12 +95,24 @@ function getCourseSection(term, crn) {
         });
 }
 
+/**
+ * Get a list of the instructors scheduled to teach a section in Banner.
+ * @param  {String} term Banner term code
+ * @param  {String} crn Banner CRN
+ * @return {Promise} Resolved with database statement is completed
+ */
 function getInstructors(term, crn) {
     return Banner
         .sql(sqlGetInstructors, {term: term, crn: crn})
         .then(Banner.unwrapRows);
 }
 
+/**
+ * Get a list of scheduled teaching assignments for a specific instructor in Banner.
+ * @param  {String} term Banner term code
+ * @param  {String} instructorId SPRIDEN_ID for the instructor
+ * @return {Promise} Resolved with database statement is completed
+ */
 function getInstructorSchedule(term, instructorId) {
     return Banner
         .sql(sqlGetInstructorSchedule, {instructorId: instructorId, term: term})
@@ -116,6 +125,15 @@ function getInstructorSchedule(term, instructorId) {
         });
 }
 
+/**
+ * Get a person object from Banner. Different types of identity specifications
+ * can be passed in making this versatile function.
+ * @param  {Object|Number} identity If number, then treated as a Banner PIDM. If
+ * an object, then it is checked first for a pidm property, and or a campusId
+ * property with a Banner SPRIDEN_ID.
+ * @return {Promise} Resolved with a person object if found, when the
+ * database statement is completed.
+ */
 function getPerson(identity) {
     // Check the type of identity provided
     if(Number.isInteger(identity)) {
@@ -138,24 +156,51 @@ function getPerson(identity) {
     }
 }
 
+/**
+ * Get a list of the events waiting to be processed from the CANVASLMS_EVENTS
+ * custom table.
+ * @return {Promise} Resolved with an array of event objects
+ */
 function getPendingEvents() {
     return Banner
         .sql(sqlGetPendingEvents)
         .then(Banner.unwrapRows);
 }
 
+/**
+ * Get a list of the enrolled students in a section from baseline table SFRSTCR.
+ * @param  {String} term Banner term code
+ * @param  {String} crn Banner CRN
+ * @return {Promise} Resolved with an array of enrolled students in the section
+ */
 function getSectionEnrollment(term, crn) {
     return Banner
         .sql(sqlGetSectionEnrollment, {term: term, crn: crn})
         .then(Banner.unwrapRows);
 }
 
+/**
+ * Get a list of the tracked Canvas enrollments from the CANVASLMS_ENROLLMENTS
+ * custom table.
+ * @param  {String} term Banner term code
+ * @param  {String} crn Banner CRN
+ * @return {Promise} Resolved with an array of enrolled students in the section
+ */
 function getTrackedEnrollments(term, pidm) {
     return Banner
         .sql(sqlGetTrackedEnrollments, {term: term, pidm: pidm})
         .then(Banner.unwrapRows);
 }
 
+/**
+ * Checks the CANVASLMS_ENROLLMENTS custom table to see if an enrollment is
+ * tracked.
+ * @param  {String} term Banner term code
+ * @param  {String} crn Banner CRN
+ * @param  {Number} pidm Banner PIDM for the student or instructor
+ * @return {Promise} Resolved with the enrollment object if found, or rejected
+ * with an UntrackedEnrollment error.
+ */
 function isEnrollmentTracked(term, crn, pidm) {
     return Banner
         .sql(sqlIsEnrollmentTracked, {term: term, crn: crn, pidm: pidm})
@@ -169,6 +214,15 @@ function isEnrollmentTracked(term, crn, pidm) {
         });
 }
 
+/**
+ * Checks the CANVASLMS_SECTIONS custom table to see if a section is
+ * tracked as being part of a Canvas course.
+ * @param  {String} term Banner term code
+ * @param  {String} crn Banner CRN
+ * @param  {Boolean} [rejectOnUntracked=true] If true, function will return a
+ * rejected promise if not found. If false, function will resolve with a null value;
+ * @return {Promise} Resolved with database statement is completed
+ */
 function isSectionTracked(term, crn, rejectOnUntracked=true) {
     return Banner
         .sql(sqlIsSectionTracked, {term: term, crn: crn})
@@ -185,6 +239,14 @@ function isSectionTracked(term, crn, rejectOnUntracked=true) {
         });
 }
 
+/**
+ * Create a new record to track a section in the CANVASLMS_SECTIONS custom table.
+ * @param  {String} term Banner term code
+ * @param  {String} crn Banner CRN
+ * @param  {Number} courseId Canvas course ID
+ * @param  {Number} sectionId Canvas section ID
+ * @return {Promise} Resolved when the insert is completed
+ */
 function trackCourseSection(term, crn, courseId, sectionId) {
     // Create parameter payload
     let params = {
@@ -201,6 +263,20 @@ function trackCourseSection(term, crn, courseId, sectionId) {
         });
 }
 
+/**
+ * Create a new record to track a Canvas enrollment (instructor or students)
+ * in the CANVASLMS_ENROLLMENTS custom table.
+ * @param  {Object} college College object related to the enrollment
+ * @param  {String} term Banner term code
+ * @param  {String} crn Banner CRN
+ * @param  {Number} pidm Banner PIDM identity for the person
+ * @param  {Number} userId Canvas user ID
+ * @param  {String} enrollmentType Type of Canvas enrollment
+ * @param  {Number} enrollmentId Canvas enrollment ID
+ * @param  {Number} courseId Canvas course ID
+ * @param  {Number} sectionId Canvas section ID
+ * @return {Promise} Resolved when the insert is completed
+ */
 function trackEnrollment(college, term, crn, pidm, userId, enrollmentType, enrollmentId, courseId, sectionId) {
     // Create parameter payload
     let params = {
@@ -222,6 +298,11 @@ function trackEnrollment(college, term, crn, pidm, userId, enrollmentType, enrol
         });
 }
 
+/**
+ * Remove all records for a tracked course from the CANVASLMS_SECTIONS custom table
+ * @param  {Object} course Canvas course object
+ * @return {Promise} Resolved when the delete is completed
+ */
 function untrackCourse(course) {
     // Create parameter payload
     let params = {
@@ -235,6 +316,11 @@ function untrackCourse(course) {
         });
 }
 
+/**
+ * Remove a record for a tracked section from the CANVASLMS_SECTIONS custom table
+ * @param  {String|Number} sectionId
+ * @return {Promise} Resolved when the delete is completed
+ */
 function untrackCourseSection(sectionId) {
     // Create parameter payload
     let params = {
@@ -248,6 +334,11 @@ function untrackCourseSection(sectionId) {
         });
 }
 
+/**
+ * Remove a record for a tracked enrollment from the CANVASLMS_ENROLLMENTS custom table
+ * @param  {Object} enrollment Canvas enrollment object
+ * @return {Promise} Resolved when the delete is completed
+ */
 function untrackEnrollment(enrollment) {
     // Create parameter payload
     let params = {
@@ -261,6 +352,12 @@ function untrackEnrollment(enrollment) {
         });
 }
 
+/**
+ * Remove all records for tracked instructor enrollments from the CANVALMS_ENROLLMENTS
+ * custom table.
+ * @param  {Object} course Canvas course object
+ * @return {Promise} Resolved when the delete is completed
+ */
 function untrackTeacherEnrollments(course) {
     // Create parameter payload
     let params = {

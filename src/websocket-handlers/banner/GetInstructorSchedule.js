@@ -33,6 +33,13 @@ let BannerOperations = require('../../BannerOperations.js');
 let Logger = require('fhda-logging').getLogger('ws-action-get-ins-sched');
 let WebsocketUtils = require('../../WebsocketUtils.js');
 
+/**
+ * Handle a websocket request to get the teaching schedule for the identified
+ * user from Banner.
+ * @param  {Object} data Event data payload
+ * @param  {Function} respond Callback function to send a response back to the client
+ * @return {Promise} Resolved when the operation is complete
+ */
 module.exports = function (data, respond) {
     BannerOperations
         .getInstructorSchedule(data.termCode, this.decoded_token.aud)

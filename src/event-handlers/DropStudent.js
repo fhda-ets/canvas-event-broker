@@ -33,6 +33,14 @@ let BannerOperations = require('../BannerOperations.js');
 let Errors = require('../Errors.js');
 let Logger = require('fhda-logging').getLogger('event-handler-drop-student');
 
+/**
+ * Handle a student drop event from Banner.
+ * @license BSD-3-Clause
+ * @module
+ * @param  {String} college College identifier ('deanza' or 'foothill')
+ * @param  {Object} event An event object
+ * @return {Promise} Resolved when the operation is complete
+ */
 module.exports = function(college, event) {
     Logger.info('Handling student drop event', event);
 

@@ -34,6 +34,12 @@ let CollegeManager = require('../../CollegeManager.js');
 let Logger = require('fhda-logging').getLogger('ws-action-delete-sections');
 let WebsocketUtils = require('../../WebsocketUtils.js');
 
+/**
+ * Handle a websocket request to delete a Canvas course site/classroom.
+ * @param  {Object} data Event data payload
+ * @param  {Function} respond Callback function to send a response back to the client
+ * @return {Promise} Resolved when the operation is complete
+ */
 module.exports = function (data, respond) {
     // Create an alternate reference to the web socket
     let socket = this;

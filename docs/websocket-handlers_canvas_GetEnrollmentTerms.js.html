@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>websocket-handlers/canvas/GetEnrollmentTerms.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CanvasApiClient.html">CanvasApiClient</a><ul class='methods'><li data-type='method'><a href="CanvasApiClient.html#createCourse">createCourse</a></li><li data-type='method'><a href="CanvasApiClient.html#createSection">createSection</a></li><li data-type='method'><a href="CanvasApiClient.html#deleteCourse">deleteCourse</a></li><li data-type='method'><a href="CanvasApiClient.html#deleteSection">deleteSection</a></li><li data-type='method'><a href="CanvasApiClient.html#deleteSectionEnrollments">deleteSectionEnrollments</a></li><li data-type='method'><a href="CanvasApiClient.html#deleteStudent">deleteStudent</a></li><li data-type='method'><a href="CanvasApiClient.html#dropStudent">dropStudent</a></li><li data-type='method'><a href="CanvasApiClient.html#enrollInstructor">enrollInstructor</a></li><li data-type='method'><a href="CanvasApiClient.html#enrollStudent">enrollStudent</a></li><li data-type='method'><a href="CanvasApiClient.html#getCourse">getCourse</a></li><li data-type='method'><a href="CanvasApiClient.html#getCoursesForUser">getCoursesForUser</a></li><li data-type='method'><a href="CanvasApiClient.html#getEnrollment">getEnrollment</a></li><li data-type='method'><a href="CanvasApiClient.html#getEnrollmentTermBySisId">getEnrollmentTermBySisId</a></li><li data-type='method'><a href="CanvasApiClient.html#getEnrollmentTerms">getEnrollmentTerms</a></li><li data-type='method'><a href="CanvasApiClient.html#getSection">getSection</a></li><li data-type='method'><a href="CanvasApiClient.html#getSectionEnrollment">getSectionEnrollment</a></li><li data-type='method'><a href="CanvasApiClient.html#getUser">getUser</a></li><li data-type='method'><a href="CanvasApiClient.html#syncUser">syncUser</a></li></ul></li><li><a href="College.html">College</a><ul class='methods'><li data-type='method'><a href="College.html#createSection">createSection</a></li><li data-type='method'><a href="College.html#deleteSection">deleteSection</a></li><li data-type='method'><a href="College.html#dropStudent">dropStudent</a></li><li data-type='method'><a href="College.html#enrollStudent">enrollStudent</a></li><li data-type='method'><a href="College.html#syncStudent">syncStudent</a></li></ul></li><li><a href="module-Errors-DuplicateSectionsError.html">DuplicateSectionsError</a></li><li><a href="module-Errors-UntrackedEnrollmentError.html">UntrackedEnrollmentError</a></li><li><a href="module-Errors-UntrackedSectionError.html">UntrackedSectionError</a></li><li><a href="ProgressMonitor.html">ProgressMonitor</a><ul class='methods'><li data-type='method'><a href="ProgressMonitor.html#addTasks">addTasks</a></li><li data-type='method'><a href="ProgressMonitor.html#completeTask">completeTask</a></li><li data-type='method'><a href="ProgressMonitor.html#getPercentComplete">getPercentComplete</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-ApiServer.html">ApiServer</a></li><li><a href="module-BannerDatabase.html">BannerDatabase</a><ul class='methods'><li data-type='method'><a href="module-BannerDatabase.html#~getConnection">getConnection</a></li><li data-type='method'><a href="module-BannerDatabase.html#~sql">sql</a></li><li data-type='method'><a href="module-BannerDatabase.html#~unwrapObject">unwrapObject</a></li><li data-type='method'><a href="module-BannerDatabase.html#~unwrapRows">unwrapRows</a></li></ul></li><li><a href="module-BannerOperations.html">BannerOperations</a><ul class='methods'><li data-type='method'><a href="module-BannerOperations.html#~createCanvasFacultyAttribute">createCanvasFacultyAttribute</a></li><li data-type='method'><a href="module-BannerOperations.html#~deleteEvent">deleteEvent</a></li><li data-type='method'><a href="module-BannerOperations.html#~getCourse">getCourse</a></li><li data-type='method'><a href="module-BannerOperations.html#~getCourseSection">getCourseSection</a></li><li data-type='method'><a href="module-BannerOperations.html#~getInstructors">getInstructors</a></li><li data-type='method'><a href="module-BannerOperations.html#~getInstructorSchedule">getInstructorSchedule</a></li><li data-type='method'><a href="module-BannerOperations.html#~getPendingEvents">getPendingEvents</a></li><li data-type='method'><a href="module-BannerOperations.html#~getPerson">getPerson</a></li><li data-type='method'><a href="module-BannerOperations.html#~getSectionEnrollment">getSectionEnrollment</a></li><li data-type='method'><a href="module-BannerOperations.html#~getTrackedEnrollments">getTrackedEnrollments</a></li><li data-type='method'><a href="module-BannerOperations.html#~isEnrollmentTracked">isEnrollmentTracked</a></li><li data-type='method'><a href="module-BannerOperations.html#~isSectionTracked">isSectionTracked</a></li><li data-type='method'><a href="module-BannerOperations.html#~trackCourseSection">trackCourseSection</a></li><li data-type='method'><a href="module-BannerOperations.html#~trackEnrollment">trackEnrollment</a></li><li data-type='method'><a href="module-BannerOperations.html#~untrackCourse">untrackCourse</a></li><li data-type='method'><a href="module-BannerOperations.html#~untrackCourseSection">untrackCourseSection</a></li><li data-type='method'><a href="module-BannerOperations.html#~untrackEnrollment">untrackEnrollment</a></li><li data-type='method'><a href="module-BannerOperations.html#~untrackTeacherEnrollments">untrackTeacherEnrollments</a></li></ul></li><li><a href="module-CollegeManager.html">CollegeManager</a></li><li><a href="module-Common.html">Common</a><ul class='methods'><li data-type='method'><a href="module-Common.html#~abbreviateTermCode">abbreviateTermCode</a></li><li data-type='method'><a href="module-Common.html#~sanitizeCourseNumber">sanitizeCourseNumber</a></li><li data-type='method'><a href="module-Common.html#~sanitizeSubjectCode">sanitizeSubjectCode</a></li></ul></li><li><a href="module-Errors.html">Errors</a></li><li><a href="module-event-handlers_CancelCourseSection.html">event-handlers/CancelCourseSection</a></li><li><a href="module-event-handlers_DropStudent.html">event-handlers/DropStudent</a></li><li><a href="module-event-handlers_EnrollStudent.html">event-handlers/EnrollStudent</a></li><li><a href="module-event-handlers_SyncPerson.html">event-handlers/SyncPerson</a></li><li><a href="module-EventManager.html">EventManager</a><ul class='methods'><li data-type='method'><a href="module-EventManager.html#~getCollegeForTerm">getCollegeForTerm</a></li><li data-type='method'><a href="module-EventManager.html#~getPendingEvents">getPendingEvents</a></li><li data-type='method'><a href="module-EventManager.html#~handleEvent">handleEvent</a></li></ul></li><li><a href="module-Main.html">Main</a></li><li><a href="module-WebsocketUtils.html">WebsocketUtils</a><ul class='methods'><li data-type='method'><a href="module-WebsocketUtils.html#~handleError">handleError</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">websocket-handlers/canvas/GetEnrollmentTerms.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Copyright (c) 2016, Foothill-De Anza Community College District
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation and/or
+ * other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+'use strict';
+let CollegeManager = require('../../CollegeManager.js');
+let Logger = require('fhda-logging').getLogger('ws-action-get-enrollment-terms');
+let WebsocketUtils = require('../../WebsocketUtils.js');
+
+/**
+ * Handle a websocket request to get a list of enrollment terms from Canvas.
+ * @param  {Object} data Event data payload
+ * @param  {Function} respond Callback function to send a response back to the client
+ * @return {Promise} Resolved when the operation is complete
+ */
+module.exports = function (data, respond) {
+    return CollegeManager[data.college]
+        .canvasApi
+        .getEnrollmentTerms()
+        .tap(respond)
+        .catch(WebsocketUtils.handleError.bind(
+            this,
+            'A serious error occurred while attempting to lookup enrollment terms in Canvas',
+            Logger,
+            respond
+        ));
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Nov 02 2016 14:28:20 GMT-0700 (PDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

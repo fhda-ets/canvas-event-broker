@@ -1,41 +1,21 @@
-/**
- * Copyright (c) 2016, Foothill-De Anza Community College District
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its contributors
- * may be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
- * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 'use strict';
 let Common = require('./Common.js');
 let Logger = require('fhda-logging').getLogger('canvas-api-client');
 let Random = require('random-gen');
 let Request = require('request-promise');
 
-module.exports = class CanvasApiClient {
+/**
+ * Provides a high-level wrapper around the Canvas REST API.
+ * See also https://api.instructure.com
+ * @license BSD-3-Clause
+ */
+class CanvasApiClient {
 
+    /**
+     * Create a new API client instance
+     * @param {String} baseUrl Root URL of the Canvas instance
+     * @param {String} apiKey Permanent OAuth API key to use for authenticating requests
+     */
     constructor(baseUrl, apiKey) {
         // Create the Request HTTP client
         this.client = Request.defaults({
@@ -63,6 +43,11 @@ module.exports = class CanvasApiClient {
      * User accounts
      */
 
+    /**
+     * Lookup a user account profile in Canvas.
+     * @param {String} sisLoginId Banner login identity for the person
+     * @returns {Promise} Resolved with the Canvas user profile object
+     */
     getUser(sisLoginId) {
         return this.client
             .get(`/users/sis_login_id:${sisLoginId}/profile`)
@@ -76,6 +61,17 @@ module.exports = class CanvasApiClient {
             });
     }
 
+    /**
+     * Create or update a user account in Canvas with the minimum viable
+     * attributes for the SIS login ID, first name, last name, and a contact
+     * e-mail address. Tries to avoid unnecessary operations if the Canvas
+     * account already appears to be in sync with the values provided.
+     * @param {String} sisLoginId Banner login identity for the person
+     * @param {String} firstName First name from Banner
+     * @param {String} lastName Last name from Banner
+     * @param {String} email Contact e-mail address from Banner
+     * @returns {Promise} Resolved with the Canvas user profile object after the update
+     */
     syncUser(sisLoginId, firstName, lastName, email) {
         let parent = this;
 
@@ -159,12 +155,23 @@ module.exports = class CanvasApiClient {
      * Courses
      */
 
-    getCourse(courseId) {
+    /**
+     * Get a course object from Canvas by its unique ID
+     * @param {String|Number} id Canvas course ID
+     * @returns {Promise} Resolved with the requested object
+     */
+    getCourse(id) {
         return this.client
-            .get(`/courses/${courseId}`)
+            .get(`/courses/${id}`)
             .promise();
     }
 
+    /**
+     * Create a new course in Canvas with parameters set by the provided
+     * object map.
+     * @param {Object} payload Object of key-value properties following the Instructure API documentation
+     * @returns {Promise} Resolved with the newly created Canvas course object
+     */
     createCourse(payload) {
         return this.client({
             method: `POST`,
@@ -177,8 +184,13 @@ module.exports = class CanvasApiClient {
         });
     }
 
-    deleteCourse(courseId) {
-        return this.getCourse(courseId)
+    /**
+     * Delete an existing course in Canvas by its unique ID.
+     * @param {String|Number} id Canvas course ID
+     * @returns {Promise} Resolved with the now deleted Canvas course object
+     */
+    deleteCourse(id) {
+        return this.getCourse(id)
             .tap(course => {
                 return this.client({
                     method: `DELETE`,
@@ -194,14 +206,23 @@ module.exports = class CanvasApiClient {
             });
     }
 
-    getCoursesForUser(termCode, campusId, withSections=false) {
+    /**
+     * Get a list of the Canvas courses that a user is associated with,
+     * filtered by the SIS ID for a specific enrollment term.
+     * @param {String} termCode Banner term code
+     * @param {String} sisLoginId Banner login identity for the person
+     * @param {Boolean} [withSections=false] If true, perform a secondary lookup and get the Canvas section objects for the course
+     * @returns {Promise} Resolved with an array of Course objects
+     *
+     */
+    getCoursesForUser(termCode, sisLoginId, withSections=false) {
         let parent = this;
 
         return Promise.all([
             this.getEnrollmentTermBySisId(termCode),
             this.client({
                 method: 'GET',
-                uri: `/users/sis_login_id:${campusId}/courses`,
+                uri: `/users/sis_login_id:${sisLoginId}/courses`,
                 useQuerystring: true,
                 qs: {
                     'state[]': ['unpublished', 'available'],
@@ -236,12 +257,22 @@ module.exports = class CanvasApiClient {
      * Enrollment Terms
      */
 
+    /**
+     * Get all enrollment terms defined in a Canvas college account.
+     * @returns {Promise} Resolved with an array of EnrollmentTerm objects
+     *
+     */
     getEnrollmentTerms() {
         return this.client
             .get(`/accounts/1/terms`)
             .then(response => { return response.enrollment_terms; });
     }
 
+    /**
+     * Get a specific Canvas enrollment term by its SIS ID.
+     * @param {String} sisId Banner term code
+     * @returns {Promise} Resolved with the matching EnrollmentTerm object, or an empty array if not found
+     */
     getEnrollmentTermBySisId(sisId) {
         return this
             .getEnrollmentTerms()
@@ -257,18 +288,31 @@ module.exports = class CanvasApiClient {
      * Sections
      */
 
-    getSection(sectionId) {
+    /**
+     * Get a Canvas section by its unique ID
+     * @param {String|Number} id Canvas section ID
+     * @returns {Promise} Resolved with the Section object if found
+     */
+    getSection(id) {
         return this.client
-            .get(`/sections/${sectionId}`)
+            .get(`/sections/${id}`)
             .catch(error => {
                 if(error.statusCode === 404) {
-                    Logger.verbose(`Could not find section ${sectionId} in Canvas`);
+                    Logger.verbose(`Could not find section ${id} in Canvas`);
                     return null;
                 }
                 return Promise.reject(error);
             });
     }
 
+    /**
+     * Create a new Canvas section in an existing course.
+     * @param {String|Number} courseId ID for the Canvas course where the section will be created
+     * @param {String} name Name of the section (will be visible to users)
+     * @param {String} term Banner term (used in the SIS section ID)
+     * @param {String} crn Banner section CRN (used in the SIS section ID)
+     * @returns {Promise} Resolved with the newly created Section object
+     */
     createSection(courseId, name, term, crn) {
         return this.client({
             method: `POST`,
@@ -286,9 +330,16 @@ module.exports = class CanvasApiClient {
         });
     }
 
-    deleteSection(sectionId) {
+    /**
+     * Delete an existing Canvas section. <em>Note: this function does not take
+     * care of any enrolled students in the section. These must be deleted
+     * from the section prior to calling this API.</em>
+     * @param {String|Number} id Canvas section ID
+     * @returns {Promise} Resolved with the now deleted Section object
+     */
+    deleteSection(id) {
         return this.client
-            .del(`/sections/${sectionId}`)
+            .del(`/sections/${id}`)
             .promise()
             .tap(section => {
                 // Audit log
@@ -300,24 +351,41 @@ module.exports = class CanvasApiClient {
      * Enrollments
      */
 
-    getEnrollment(enrollmentId) {
+    /**
+     * Get an Enrollment object from Canvas.
+     * @param {String|Number} id Canvas enrollment ID
+     * @returns {Promise} Resolved with the Enrollment object if found
+     */
+    getEnrollment(id) {
         return this.client
-            .get(`/accounts/1/enrollments/${enrollmentId}`)
+            .get(`/accounts/1/enrollments/${id}`)
             .promise();
     }
 
-    getSectionEnrollment(sectionId) {
+    /**
+     * Get all student Enrollment objects for an existing Canvas section.
+     * @param {String|Number} id Canvas section ID
+     * @param {String|Number} [perPage=250] Number of records to return in a single page
+     * @returns {Promise} Resolved with an array of Enrollment objects
+     */
+    getSectionEnrollment(id, perPage=250) {
         return this.client({
             method: 'GET',
-            uri: `/sections/${sectionId}/enrollments`,
+            uri: `/sections/${id}/enrollments`,
             useQuerystring: true,
             qs: {
-                'per_page': '250',
+                'per_page': `${perPage}`,
                 'type[]': 'StudentEnrollment'
             }
         });
     }
 
+    /**
+     * Enroll an instructor into an existing Canvas course.
+     * @param {String|Number} courseId Canvas course ID
+     * @param {String|Number} userId Canvas user account ID
+     * @returns {Promise} Resolved with the new instructor Enrollment object
+     */
     enrollInstructor(courseId, userId) {
         return this.client({
             method: `POST`,
@@ -335,6 +403,12 @@ module.exports = class CanvasApiClient {
         });
     }
 
+    /**
+     * Enroll a student into an existing Canvas section.
+     * @param {String|Number} sectionId Canvas section ID
+     * @param {String|Number} userId Canvas user account ID
+     * @returns {Promise} Resolved with the new student Enrollment object
+     */
     enrollStudent(sectionId, userId) {
         return this.client({
             method: `POST`,
@@ -353,6 +427,13 @@ module.exports = class CanvasApiClient {
         });
     }
 
+    /**
+     * Drop a student from an existing Canvas section. Dropping a student means
+     * inactivating their enrollment in Canvas. This leaves the door open for
+     * a student to be re-enrolled in the class without losing any prior work.
+     * @param {Object} enrollment The Enrollment in Canvas to inactivate
+     * @returns {Promise} Resolved with now inactivated student Enrollment object
+     */
     dropStudent(enrollment) {
         // Execute enrollment inactivate API call
         return this.client
@@ -363,6 +444,13 @@ module.exports = class CanvasApiClient {
             });
     }
 
+    /**
+     * Delete a student from an existing Canvas section. Deleting a student
+     * means any of record of them in the section, including prior work, is
+     * completely removed and cannot be restored.
+     * @param {Object} enrollment The Enrollment in Canvas to delete
+     * @returns {Promise} Resolved with now deleted student Enrollment object
+     */
     deleteStudent(enrollment) {
         // Execute enrollment delete API call
         return this.client
@@ -374,16 +462,16 @@ module.exports = class CanvasApiClient {
     }
 
     /**
-     * Perform a complete removal of all student enrollments in a Canvas course section.
-     * Typically this is a precursor to deleting the section from an existing
-     * Canvas course.
-     * @param {String} sectionId Canvas section object ID
+     * Helper function to look up and delete all active student enrollments
+     * from an existing Canvas section.
+     * @param {String} id Canvas section object ID
+     * @returns {Promise} Resolved with an array of the deleted student Enrollment objects
      */
-    deleteSectionEnrollments(sectionId) {
+    deleteSectionEnrollments(id) {
         let parent = this;
 
         // Step 1: List all student enrollments for the section
-        return this.getSectionEnrollment(sectionId)
+        return this.getSectionEnrollment(id)
             .promise()
 
             // Step 2: Remove each enrollment from the section
@@ -404,4 +492,6 @@ module.exports = class CanvasApiClient {
             });
     }
 
-};
+}
+
+module.exports = CanvasApiClient;

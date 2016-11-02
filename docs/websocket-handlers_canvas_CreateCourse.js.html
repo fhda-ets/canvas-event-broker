@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>websocket-handlers/canvas/CreateCourse.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CanvasApiClient.html">CanvasApiClient</a><ul class='methods'><li data-type='method'><a href="CanvasApiClient.html#createCourse">createCourse</a></li><li data-type='method'><a href="CanvasApiClient.html#createSection">createSection</a></li><li data-type='method'><a href="CanvasApiClient.html#deleteCourse">deleteCourse</a></li><li data-type='method'><a href="CanvasApiClient.html#deleteSection">deleteSection</a></li><li data-type='method'><a href="CanvasApiClient.html#deleteSectionEnrollments">deleteSectionEnrollments</a></li><li data-type='method'><a href="CanvasApiClient.html#deleteStudent">deleteStudent</a></li><li data-type='method'><a href="CanvasApiClient.html#dropStudent">dropStudent</a></li><li data-type='method'><a href="CanvasApiClient.html#enrollInstructor">enrollInstructor</a></li><li data-type='method'><a href="CanvasApiClient.html#enrollStudent">enrollStudent</a></li><li data-type='method'><a href="CanvasApiClient.html#getCourse">getCourse</a></li><li data-type='method'><a href="CanvasApiClient.html#getCoursesForUser">getCoursesForUser</a></li><li data-type='method'><a href="CanvasApiClient.html#getEnrollment">getEnrollment</a></li><li data-type='method'><a href="CanvasApiClient.html#getEnrollmentTermBySisId">getEnrollmentTermBySisId</a></li><li data-type='method'><a href="CanvasApiClient.html#getEnrollmentTerms">getEnrollmentTerms</a></li><li data-type='method'><a href="CanvasApiClient.html#getSection">getSection</a></li><li data-type='method'><a href="CanvasApiClient.html#getSectionEnrollment">getSectionEnrollment</a></li><li data-type='method'><a href="CanvasApiClient.html#getUser">getUser</a></li><li data-type='method'><a href="CanvasApiClient.html#syncUser">syncUser</a></li></ul></li><li><a href="College.html">College</a><ul class='methods'><li data-type='method'><a href="College.html#createSection">createSection</a></li><li data-type='method'><a href="College.html#deleteSection">deleteSection</a></li><li data-type='method'><a href="College.html#dropStudent">dropStudent</a></li><li data-type='method'><a href="College.html#enrollStudent">enrollStudent</a></li><li data-type='method'><a href="College.html#syncStudent">syncStudent</a></li></ul></li><li><a href="module-Errors-DuplicateSectionsError.html">DuplicateSectionsError</a></li><li><a href="module-Errors-UntrackedEnrollmentError.html">UntrackedEnrollmentError</a></li><li><a href="module-Errors-UntrackedSectionError.html">UntrackedSectionError</a></li><li><a href="ProgressMonitor.html">ProgressMonitor</a><ul class='methods'><li data-type='method'><a href="ProgressMonitor.html#addTasks">addTasks</a></li><li data-type='method'><a href="ProgressMonitor.html#completeTask">completeTask</a></li><li data-type='method'><a href="ProgressMonitor.html#getPercentComplete">getPercentComplete</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-ApiServer.html">ApiServer</a></li><li><a href="module-BannerDatabase.html">BannerDatabase</a><ul class='methods'><li data-type='method'><a href="module-BannerDatabase.html#~getConnection">getConnection</a></li><li data-type='method'><a href="module-BannerDatabase.html#~sql">sql</a></li><li data-type='method'><a href="module-BannerDatabase.html#~unwrapObject">unwrapObject</a></li><li data-type='method'><a href="module-BannerDatabase.html#~unwrapRows">unwrapRows</a></li></ul></li><li><a href="module-BannerOperations.html">BannerOperations</a><ul class='methods'><li data-type='method'><a href="module-BannerOperations.html#~createCanvasFacultyAttribute">createCanvasFacultyAttribute</a></li><li data-type='method'><a href="module-BannerOperations.html#~deleteEvent">deleteEvent</a></li><li data-type='method'><a href="module-BannerOperations.html#~getCourse">getCourse</a></li><li data-type='method'><a href="module-BannerOperations.html#~getCourseSection">getCourseSection</a></li><li data-type='method'><a href="module-BannerOperations.html#~getInstructors">getInstructors</a></li><li data-type='method'><a href="module-BannerOperations.html#~getInstructorSchedule">getInstructorSchedule</a></li><li data-type='method'><a href="module-BannerOperations.html#~getPendingEvents">getPendingEvents</a></li><li data-type='method'><a href="module-BannerOperations.html#~getPerson">getPerson</a></li><li data-type='method'><a href="module-BannerOperations.html#~getSectionEnrollment">getSectionEnrollment</a></li><li data-type='method'><a href="module-BannerOperations.html#~getTrackedEnrollments">getTrackedEnrollments</a></li><li data-type='method'><a href="module-BannerOperations.html#~isEnrollmentTracked">isEnrollmentTracked</a></li><li data-type='method'><a href="module-BannerOperations.html#~isSectionTracked">isSectionTracked</a></li><li data-type='method'><a href="module-BannerOperations.html#~trackCourseSection">trackCourseSection</a></li><li data-type='method'><a href="module-BannerOperations.html#~trackEnrollment">trackEnrollment</a></li><li data-type='method'><a href="module-BannerOperations.html#~untrackCourse">untrackCourse</a></li><li data-type='method'><a href="module-BannerOperations.html#~untrackCourseSection">untrackCourseSection</a></li><li data-type='method'><a href="module-BannerOperations.html#~untrackEnrollment">untrackEnrollment</a></li><li data-type='method'><a href="module-BannerOperations.html#~untrackTeacherEnrollments">untrackTeacherEnrollments</a></li></ul></li><li><a href="module-CollegeManager.html">CollegeManager</a></li><li><a href="module-Common.html">Common</a><ul class='methods'><li data-type='method'><a href="module-Common.html#~abbreviateTermCode">abbreviateTermCode</a></li><li data-type='method'><a href="module-Common.html#~sanitizeCourseNumber">sanitizeCourseNumber</a></li><li data-type='method'><a href="module-Common.html#~sanitizeSubjectCode">sanitizeSubjectCode</a></li></ul></li><li><a href="module-Errors.html">Errors</a></li><li><a href="module-event-handlers_CancelCourseSection.html">event-handlers/CancelCourseSection</a></li><li><a href="module-event-handlers_DropStudent.html">event-handlers/DropStudent</a></li><li><a href="module-event-handlers_EnrollStudent.html">event-handlers/EnrollStudent</a></li><li><a href="module-event-handlers_SyncPerson.html">event-handlers/SyncPerson</a></li><li><a href="module-EventManager.html">EventManager</a><ul class='methods'><li data-type='method'><a href="module-EventManager.html#~getCollegeForTerm">getCollegeForTerm</a></li><li data-type='method'><a href="module-EventManager.html#~getPendingEvents">getPendingEvents</a></li><li data-type='method'><a href="module-EventManager.html#~handleEvent">handleEvent</a></li></ul></li><li><a href="module-Main.html">Main</a></li><li><a href="module-WebsocketUtils.html">WebsocketUtils</a><ul class='methods'><li data-type='method'><a href="module-WebsocketUtils.html#~handleError">handleError</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">websocket-handlers/canvas/CreateCourse.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Copyright (c) 2016, Foothill-De Anza Community College District
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation and/or
+ * other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+'use strict';
+let BannerOperations = require('../../BannerOperations.js');
+let Case = require('case');
+let CollegeManager = require('../../CollegeManager.js');
+let Common = require('../../Common.js');
+let Errors = require('../../Errors.js');
+let Logger = require('fhda-logging').getLogger('ws-action-create-course');
+let Pipeline = require('pipep');
+let ProgressMonitor = require('../../ProgressMonitor.js');
+let Random = require('random-gen');
+let WebsocketUtils = require('../../WebsocketUtils.js');
+
+/**
+ * Handle a websocket request to create a new Canvas course/site classroom.
+ * @param  {Object} data Event data payload
+ * @param  {Function} respond Callback function to send a response back to the client
+ * @return {Promise} Resolved when the operation is complete
+ */
+module.exports = function (data, respond) {
+
+    // Lookup college configuration
+    let college = CollegeManager[data.college];
+
+    // Create an execution context
+    let context = Object.assign(data, {
+        canvasApi: college.canvasApi,
+        canvasSections: {},
+        college: college,
+        enrollment: {},
+        instructors: [],
+        progress: new ProgressMonitor(),
+        ws: this
+    }, data);
+
+    // Attach an event handler to reporting progress changed back to the UI
+    context.progress.on('progressUpdated', function(data) {
+        context.ws.emit('ui:progress:setPercent', data);
+    });
+
+    // Create pipeline for coordinating course creation tasks
+    let pipeline = Pipeline(
+        getEnrollmentTerm,
+        validateSectionsDoNotExist,
+        getBannerCourse,
+        getBannerSections,
+        generateSectionNumberString,
+        generateCourseName,
+        generateCourseCode,
+        createCourseSite,
+        createSections,
+        enrollInstructors);
+
+    // start execution
+    return pipeline(context)
+        .then(context => {
+            Logger.info(`Completed creation of new Canvas course site`);
+            context.ws.emit('ui:progress:hide');
+            respond({status: 'done'});
+            return context;
+        })
+        .catch(WebsocketUtils.handleError.bind(
+            this,
+            'A serious error occurred while attempting to create a new Canvas course',
+            Logger,
+            respond
+        ));
+};
+
+function createCourseSite(context) {
+    context.ws.emit('ui:progress:setText', {text: 'Creating course'});
+
+    return context.canvasApi.createCourse({
+        'course[name]': context.generatedCourseName,
+        'course[course_code]': context.generatedCourseCode,
+        'course[term_id]': context.enrollmentTerm.id,
+        'course[sis_course_id]': `${context.parentTerm}:${context.sanitizedSubject}${context.sanitizedCourseNumber}:${Random.number(4)}`
+    })
+    .then(canvasCourse => {
+        // Add new Canvas course to the context;
+        context.canvasCourse = canvasCourse;
+
+        // Return context for chaining
+        return context;
+    });
+}
+
+function createSections(context) {
+    context.ws.emit('ui:progress:setText', {text: 'Creating sections, and enrolling students'});
+
+    return Promise.map(context.sections, section => {
+        return context.college.createSection(section.term, section.crn, context.canvasCourse.id, context.progress)
+        .tap(enrolledStudents => {
+            context.enrollment[section.crn] = enrolledStudents;
+        });
+    }, Common.concurrency.MULTI)
+    .return(context);
+}
+
+function enrollInstructors(context) {
+    return BannerOperations
+        .getInstructors(context.parentTerm, context.parentCrn)
+        .map(instructor => {
+            // Add instructor to context
+            context.instructors.push(instructor);
+
+            // Sync Canvas account
+            return context.canvasApi.syncUser(
+                instructor.campusId,
+                instructor.firstName,
+                instructor.lastName,
+                instructor.email)
+
+            // Enroll instructor in course
+            .then(profile => {
+                return [profile, context.canvasApi.enrollInstructor(
+                    context.canvasCourse.id,
+                    profile.id)];
+            })
+            .spread((profile, enrollment) => {
+                // Add tracked enrollment in Banner
+                return BannerOperations.trackEnrollment(
+                    context.college,
+                    context.parentTerm,
+                    context.parentCrn,
+                    instructor.pidm,
+                    profile.id,
+                    'TeacherEnrollment',
+                    enrollment.id,
+                    context.canvasCourse.id);
+            });
+        }, Common.concurrency.MULTI)
+        .return(context);
+}
+
+function generateCourseCode(context) {
+    context.generatedCourseCode = `${context.sanitizedSubject} ${context.sanitizedCourseNumber} (${context.sectionString})`;
+
+    // Return context for chaining
+    return context;
+}
+
+function generateCourseName(context) {
+    context.generatedCourseName = `${context.abbreviatedTermCode} ${Case.title(context.parentCourse.title)} Sections ${context.sectionString}`;
+
+    // Return context for chaining
+    return context;
+}
+
+function generateSectionNumberString(context) {
+    // Convert array of sections into comma delimited string
+    context.sectionString = context.sections.map(section =>{
+        return section.sectionNumber;
+    })
+    .join(', ');
+
+    // Return context for chaining
+    return context;
+}
+
+function getBannerCourse(context) {
+    return BannerOperations
+        .getCourse(context.parentTerm, context.parentCrn)
+        .tap(course => {
+            // Add the Banner course to the context
+            context.parentCourse = course;
+
+            // Perform some post-processing
+            context.abbreviatedTermCode = Common.abbreviateTermCode(context.parentTerm);
+            context.sanitizedSubject = Common.sanitizeSubjectCode(course.subjectCode);
+            context.sanitizedCourseNumber = Common.sanitizeCourseNumber(course.courseNumber);
+        })
+        .return(context);
+}
+
+function getBannerSections(context) {
+    return Promise.map(context.sections, section => {
+        // Map a requested section to a real Banner section record
+        return BannerOperations.getCourseSection(section.term, section.crn);
+    }, Common.concurrency.SINGLE)
+    .then(sections => {
+        // Add mapped Banner sections to the context
+        context.sections = sections;
+
+        // Return context for chaining
+        return context;
+    });
+}
+
+function getEnrollmentTerm(context) {
+    context.ws.emit('ui:progress:show', {text: 'Getting data from Banner'});
+
+    // Get enrollment term object from Canvas filtered by SIS ID
+    return context.canvasApi
+        .getEnrollmentTermBySisId(context.parentTerm)
+        .tap(enrollmentTerm => {
+            // Add Canvas enrollment term object to the context
+            context.enrollmentTerm = enrollmentTerm;
+            Logger.debug(`Looked up Canvas enrollment term by SIS ID ${context.parentTerm}`, enrollmentTerm);
+        })
+        .return(context);
+}
+
+function validateSectionsDoNotExist(context) {
+    return Promise.each(context.sections, section => {
+        return BannerOperations.isSectionTracked(section.term, section.crn)
+            .catch(Errors.UntrackedSection, () => {
+                // Safe to ignore
+            });
+    })
+    .return(context);
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Wed Nov 02 2016 14:28:20 GMT-0700 (PDT) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

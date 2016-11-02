@@ -32,6 +32,14 @@
 let BannerOperations = require('../BannerOperations.js');
 let Logger = require('fhda-logging').getLogger('event-handler-sync-person');
 
+/**
+ * Handle a person sync event from Banner.
+ * @license BSD-3-Clause
+ * @module
+ * @param  {String} college College identifier ('deanza' or 'foothill')
+ * @param  {Object} event An event object
+ * @return {Promise} Resolved when the operation is complete
+ */
 module.exports = function(college, event) {
     Logger.info('Handling person sync event', event);
 

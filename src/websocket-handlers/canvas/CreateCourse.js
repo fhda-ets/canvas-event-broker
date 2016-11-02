@@ -40,6 +40,12 @@ let ProgressMonitor = require('../../ProgressMonitor.js');
 let Random = require('random-gen');
 let WebsocketUtils = require('../../WebsocketUtils.js');
 
+/**
+ * Handle a websocket request to create a new Canvas course/site classroom.
+ * @param  {Object} data Event data payload
+ * @param  {Function} respond Callback function to send a response back to the client
+ * @return {Promise} Resolved when the operation is complete
+ */
 module.exports = function (data, respond) {
 
     // Lookup college configuration

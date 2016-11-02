@@ -34,6 +34,13 @@ let CollegeManager = require('../../CollegeManager.js');
 let Logger = require('fhda-logging').getLogger('ws-action-sync-student');
 let WebsocketUtils = require('../../WebsocketUtils.js');
 
+/**
+ * Handle a websocket request to synchronize student enrollment between Banner
+ * and Canvas (intended as a tool to help admins quickly resolve discrepancies).
+ * @param  {Object} data Event data payload
+ * @param  {Function} respond Callback function to send a response back to the client
+ * @return {Promise} Resolved when the operation is complete
+ */
 module.exports = function (data, respond) {
     // Lookup college configuration
     let college = CollegeManager[data.college];

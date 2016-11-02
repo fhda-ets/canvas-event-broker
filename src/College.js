@@ -1,42 +1,27 @@
-/**
- * Copyright (c) 2016, Foothill-De Anza Community College District
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * 3. Neither the name of the copyright holder nor the names of its contributors
- * may be used to endorse or promote products derived from this software without
- * specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
- * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
- * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
 'use strict';
 let BannerOperations = require('./BannerOperations.js');
 let CanvasApiClient = require('./CanvasApiClient.js');
 let Common = require('./Common.js');
 let Lodash = require('lodash');
-// TEMP let Errors = require('./Errors.js');
 
-module.exports = class College {
+/**
+ * College.js describes an object type (and really a framework) that associates
+ * a unique college specific configuration with the automation that needs to
+ * happen both in Banner and Canvas. Dispatching all Canvas operations through
+ * an instance of College ensures, among many things, that the correctly configured
+ * API client is used.
+ *
+ * <p>In addition, this object serves as the starting point to create derived
+ * objects through inheritance that can specify college implementations
+ * for a member function.</b>
+ * @license BSD-3-Clause
+ */
+class College {
 
+    /**
+     * Create a new instance of college
+     @ @param {String} name Configured name of college
+     */
     constructor(name) {
         // Load configuration by name
         this.config = require(`config`).get(`colleges.${name}`);
@@ -57,7 +42,7 @@ module.exports = class College {
     }
 
     /**
-     * Create a new Canvas section in an existing course site complete with
+     * Create a new Canvas section in an existing course complete with
      * adding the latest enrollment from Banner, and ensuring both the section
      * and all enrollment records are tracked.
      * @param term {String} Banner term for the section
@@ -122,6 +107,12 @@ module.exports = class College {
             });
     }
 
+    /**
+     * Delete a course section from an existing Canvas course.
+     * @param term {String} Banner term for the section
+     * @param crn {String} Banner CRN for the section
+     * @param progress {Function} Optional progress tracker for monitoring the job
+     */
     deleteSection(term, crn, progress) {
         let college = this;
         let trackedSection;
@@ -169,6 +160,12 @@ module.exports = class College {
             });
     }
 
+    /**
+     * Drop a student from an existing course.
+     * @param {String} term Banner term for the section
+     * @param {String} crn Banner CRN for the section
+     * @param {Number} pidm Banner PIDM of the student
+     */
     dropStudent(term, crn, pidm) {
         let college = this;
 
@@ -196,6 +193,9 @@ module.exports = class College {
     /**
      * Enroll a student into a Canvas course section, and add a tracked
      * enrollment record to Banner for reporting.
+     * @param {String} term Banner term for the section
+     * @param {String} crn Banner CRN for the section
+     * @param {Object} person Identity of the student to add
      */
     enrollStudent(term, crn, person) {
         let college = this;
@@ -235,6 +235,12 @@ module.exports = class College {
             });
     }
 
+    /**
+     * Synchronize the enrollments of a student already expected to be enrolled
+     * in one or more Canvas courses.
+     * @param {String} term Banner term
+     * @param {Object} person Identity of the student to check
+     */
     syncStudent(term, person) {
         let college = this;
         let syncOps = [];
@@ -285,4 +291,6 @@ module.exports = class College {
         });
     }
 
-};
+}
+
+module.exports = College;

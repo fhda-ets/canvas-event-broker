@@ -17,7 +17,7 @@ acorn-jsx@^3.0.0:
   dependencies:
     acorn "^3.0.4"
 
-acorn@^3.0.4:
+acorn@^3.0.4, acorn@^3.3.0:
   version "3.3.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/acorn/-/acorn-3.3.0.tgz#45e37fb39e8da3f25baee3ff5369e2bb5f22017a"
 
@@ -225,7 +225,7 @@ bluebird-chain@^0.1.0:
   version "0.1.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/bluebird-chain/-/bluebird-chain-0.1.0.tgz#cb60f889953871b0d71155f16d552df6c5afbde5"
 
-bluebird@^3.4.1, bluebird@^3.4.6:
+bluebird@^3.4.1, bluebird@^3.4.6, bluebird@~3.4.6:
   version "3.4.6"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/bluebird/-/bluebird-3.4.6.tgz#01da8d821d87813d158967e743d5fe6c62cf8c0f"
 
@@ -294,6 +294,12 @@ case@^1.4.1:
 caseless@~0.11.0:
   version "0.11.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/caseless/-/caseless-0.11.0.tgz#715b96ea9841593cc33067923f5ec60ebda4f7d7"
+
+catharsis@~0.8.8:
+  version "0.8.8"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/catharsis/-/catharsis-0.8.8.tgz#693479f43aac549d806bd73e924cd0d944951a06"
+  dependencies:
+    underscore-contrib "~0.3.0"
 
 chalk@^1.0.0, chalk@^1.1, chalk@^1.1.0, chalk@^1.1.1, chalk@^1.1.3, chalk@1.1.3:
   version "1.1.3"
@@ -529,6 +535,10 @@ diff@2.2.2:
   version "2.2.2"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/diff/-/diff-2.2.2.tgz#5f813f994a0caa1a2ef79200759c4b89ca233a81"
 
+docdash:
+  version "0.4.0"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/docdash/-/docdash-0.4.0.tgz#05c3a50d83189981699ee0c076d3a3950db7ec00"
+
 doctrine@^1.2.2:
   version "1.5.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/doctrine/-/doctrine-1.5.0.tgz#379dce730f6166f76cefa4e6707a159b02c5a6fa"
@@ -658,7 +668,7 @@ escape-regexp@0.0.1:
   version "0.0.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/escape-regexp/-/escape-regexp-0.0.1.tgz#f44bda12d45bbdf9cb7f862ee7e4827b3dd32254"
 
-escape-string-regexp@^1.0.2, escape-string-regexp@^1.0.5, escape-string-regexp@1.0.5:
+escape-string-regexp@^1.0.2, escape-string-regexp@^1.0.5, escape-string-regexp@~1.0.5, escape-string-regexp@1.0.5:
   version "1.0.5"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
 
@@ -714,6 +724,13 @@ espree@^3.3.1:
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/espree/-/espree-3.3.2.tgz#dbf3fadeb4ecb4d4778303e50103b3d36c88b89c"
   dependencies:
     acorn "^4.0.1"
+    acorn-jsx "^3.0.0"
+
+espree@~3.1.7:
+  version "3.1.7"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/espree/-/espree-3.1.7.tgz#fd5deec76a97a5120a9cd3a7cb1177a0923b11d2"
+  dependencies:
+    acorn "^3.3.0"
     acorn-jsx "^3.0.0"
 
 esprima@^2.6.0:
@@ -835,9 +852,9 @@ fclone@1.0.8:
   version "1.0.8"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/fclone/-/fclone-1.0.8.tgz#a0d4a73d983249978c0e0671a161520b996467eb"
 
-"fhda-logging@git+http://stash.ad.fhda.edu/scm/npmp/fhda-logging.git#3.2.0":
-  version "3.2.0"
-  resolved "git+http://stash.ad.fhda.edu/scm/npmp/fhda-logging.git#ee62fb9f8b12b03d8696beb0c6176f2a3d60f359"
+"fhda-logging@git+http://stash.ad.fhda.edu/scm/npmp/fhda-logging.git#3.3.0":
+  version "3.3.0"
+  resolved "git+http://stash.ad.fhda.edu/scm/npmp/fhda-logging.git#1a14d5866111c094852878d13adfb148bcdfbca0"
   dependencies:
     config "^1.20.1"
     request "^2.75.0"
@@ -994,18 +1011,6 @@ getpass@^0.1.1:
   dependencies:
     assert-plus "^1.0.0"
 
-"git+http://stash.ad.fhda.edu/scm/npmp/fhda-logging.git#3.3.0":
-  name fhda-logging
-  version "3.3.0"
-  resolved "git+http://stash.ad.fhda.edu/scm/npmp/fhda-logging.git#1a14d5866111c094852878d13adfb148bcdfbca0"
-  dependencies:
-    config "^1.20.1"
-    request "^2.75.0"
-    speed-date "^1.0.0"
-    stacky "^1.3.1"
-    winston "^2.2.0"
-    yn "^1.2.0"
-
 "gkt@http://tgz.pm2.io/gkt-1.0.0.tgz":
   version "1.0.0"
   resolved "http://tgz.pm2.io/gkt-1.0.0.tgz#405502b007f319c3f47175c4474527300f2ab5ad"
@@ -1067,7 +1072,7 @@ globby@^5.0.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
-graceful-fs@^4.1.2:
+graceful-fs@^4.1.2, graceful-fs@^4.1.9:
   version "4.1.9"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/graceful-fs/-/graceful-fs-4.1.9.tgz#baacba37d19d11f9d146d3578bc99958c3787e29"
 
@@ -1354,9 +1359,30 @@ js-yaml@^3.5.1:
     argparse "^1.0.7"
     esprima "^2.6.0"
 
+js2xmlparser@~1.0.0:
+  version "1.0.0"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/js2xmlparser/-/js2xmlparser-1.0.0.tgz#5a170f2e8d6476ce45405e04823242513782fe30"
+
 jsbn@~0.1.0:
   version "0.1.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/jsbn/-/jsbn-0.1.0.tgz#650987da0dd74f4ebf5a11377a2aa2d273e97dfd"
+
+jsdoc:
+  version "3.4.2"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/jsdoc/-/jsdoc-3.4.2.tgz#b43ca03e54a575dfff4448a3825e11c4db8f87a1"
+  dependencies:
+    bluebird "~3.4.6"
+    catharsis "~0.8.8"
+    escape-string-regexp "~1.0.5"
+    espree "~3.1.7"
+    js2xmlparser "~1.0.0"
+    klaw "~1.3.0"
+    marked "~0.3.6"
+    mkdirp "~0.5.1"
+    requizzle "~0.2.1"
+    strip-json-comments "~2.0.1"
+    taffydb "2.6.2"
+    underscore "~1.8.3"
 
 json-schema@0.2.3:
   version "0.2.3"
@@ -1429,6 +1455,12 @@ kind-of@^3.0.2:
   dependencies:
     is-buffer "^1.0.2"
 
+klaw@~1.3.0:
+  version "1.3.1"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/klaw/-/klaw-1.3.1.tgz#4088433b46b3b1ba259d78785d8e96f73ba02439"
+  optionalDependencies:
+    graceful-fs "^4.1.9"
+
 lazy@~1.0.11:
   version "1.0.11"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/lazy/-/lazy-1.0.11.tgz#daa068206282542c088288e975c297c1ae77b690"
@@ -1498,6 +1530,10 @@ lodash@^4.0.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.3.0:
 map-obj@^1.0.0:
   version "1.0.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
+
+marked@~0.3.6:
+  version "0.3.6"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/marked/-/marked-0.3.6.tgz#b2c6c618fccece4ef86c4fc6cb8a7cbf5aeda8d7"
 
 media-typer@0.3.0:
   version "0.3.0"
@@ -2119,6 +2155,12 @@ require-uncached@^1.0.2:
     caller-path "^0.1.0"
     resolve-from "^1.0.0"
 
+requizzle@~0.2.1:
+  version "0.2.1"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/requizzle/-/requizzle-0.2.1.tgz#6943c3530c4d9a7e46f1cddd51c158fc670cdbde"
+  dependencies:
+    underscore "~1.6.0"
+
 resolve-from@^1.0.0:
   version "1.0.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/resolve-from/-/resolve-from-1.0.1.tgz#26cbfe935d1aeeeabb29bc3fe5aeb01e93d44226"
@@ -2420,6 +2462,10 @@ strip-json-comments@~1.0.1, strip-json-comments@~1.0.4:
   version "1.0.4"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/strip-json-comments/-/strip-json-comments-1.0.4.tgz#1e15fbcac97d3ee99bf2d73b4c656b082bbafb91"
 
+strip-json-comments@~2.0.1:
+  version "2.0.1"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
+
 supports-color@^2.0.0:
   version "2.0.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/supports-color/-/supports-color-2.0.0.tgz#535d045ce6b6363fa40117084629995e9df324c7"
@@ -2440,6 +2486,10 @@ table@^3.7.8:
     lodash "^4.0.0"
     slice-ansi "0.0.4"
     string-width "^2.0.0"
+
+taffydb@2.6.2:
+  version "2.6.2"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/taffydb/-/taffydb-2.6.2.tgz#7cbcb64b5a141b6a2efc2c5d2c67b4e150b2a268"
 
 tar-pack@~3.3.0:
   version "3.3.0"
@@ -2520,6 +2570,20 @@ uid-number@~0.0.6:
 ultron@1.0.x:
   version "1.0.2"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/ultron/-/ultron-1.0.2.tgz#ace116ab557cd197386a4e88f4685378c8b2e4fa"
+
+underscore-contrib@~0.3.0:
+  version "0.3.0"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/underscore-contrib/-/underscore-contrib-0.3.0.tgz#665b66c24783f8fa2b18c9f8cbb0e2c7d48c26c7"
+  dependencies:
+    underscore "1.6.0"
+
+underscore@~1.6.0, underscore@1.6.0:
+  version "1.6.0"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/underscore/-/underscore-1.6.0.tgz#8b38b10cacdef63337b8b24e4ff86d45aea529a8"
+
+underscore@~1.8.3:
+  version "1.8.3"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/underscore/-/underscore-1.8.3.tgz#4f3fb53b106e6097fcf9cb4109f2a5e9bdfa5022"
 
 unpipe@~1.0.0:
   version "1.0.0"

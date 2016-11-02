@@ -34,6 +34,13 @@ let Common = require('../../Common.js');
 let Logger = require('fhda-logging').getLogger('ws-action-create-canv-attr');
 let WebsocketUtils = require('../../WebsocketUtils.js');
 
+/**
+ * Handle a websocket request to create CANV attributes for one or more faculty
+ * in Banner.
+ * @param  {Object} data Event data payload
+ * @param  {Function} respond Callback function to send a response back to the client
+ * @return {Promise} Resolved when the operation is complete
+ */
 module.exports = function (data, respond) {
     // Validate the calling user is an admin
     if(!(this.decoded_token.canvasAdmin)) {
