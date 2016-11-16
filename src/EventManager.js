@@ -50,9 +50,14 @@ function getPendingEvents(autoReschedule=Config.eventmanager.enabled) {
     // Get latest pending events
     BannerOperations.getPendingEvents()
         .map(handleEvent, {concurrency: 4})
+        
+        /****
+        Deprecated 11/16/2016
         .catch(error => {
             Logger.error(`An error occurred while processing Banner sync events`, error);
         })
+        ****/
+
         .finally(() => {
             Logger.info(`Completed Banner event synchronization`);
 
@@ -74,18 +79,34 @@ function handleEvent(event) {
     // Match event to a college
     let college = getCollegeForTerm(event.term);
 
+    // Check if the college object appears invalid
+    if(!(college)) {
+        Logger.verbose(`Ignoring event because the associated college configuration is not enabled or does not exist`, event);
+    }
     // Identify type of event, and delegate to the appropriate handler
-    if(event.type === TYPE_SYNC_PERSON) {
-        return SyncPerson(college, event);
+    else if(event.type === TYPE_SYNC_PERSON) {
+        return SyncPerson(college, event)
+            .catch(error => {
+                Logger.error('Failed to handle person sync event (type 0) due to an error', [error, event]);
+            });
     }
     else if(event.type === TYPE_ENROLL_STUDENT) {
-        return EnrollStudent(college, event);
+        return EnrollStudent(college, event)
+            .catch(error => {
+                Logger.error('Failed to handle student enrollment event (type 1) due to an error', [error, event]);
+            });
     }
     else if(event.type === TYPE_DROP_STUDENT) {
-        return DropStudent(college, event);
+        return DropStudent(college, event)
+            .catch(error => {
+                Logger.error('Failed to handle student drop event (type 2) due to an error', [error, event]);
+            });
     }
     else if(event.type === TYPE_CANCEL_SECTION) {
-        return CancelCourseSection(college, event);
+        return CancelCourseSection(college, event)
+            .catch(error => {
+                Logger.error('Failed to handle section cancellation event (type 3) due to an error', [error, event]);
+            });
     }
     else {
         Logger.warn(`Ignoring event due to an unsupported type`, event);

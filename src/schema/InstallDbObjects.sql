@@ -41,3 +41,46 @@ begin
     :new.event_id := canvaslms_event_seq.nextval;
 end;
 /
+
+create or replace trigger t_canvaslms_stdn_enroll after insert on "saturn"."sfrstca"
+for each row  when (
+    new.sfrstca_rsts_code like 'R%'
+    and new.sfrstca_source_cde = 'BASE'
+    and (
+        new.sfrstca_error_flag not in ('F')
+        or (new.sfrstca_error_flag is null)
+    ))
+begin
+    -- Insert a matching sync record into CANVASLMS_EVENTS for processing by the broker
+    insert into canvaslms_events (event_pidm, event_term, event_crn, event_type)
+    values (:new.sfrstca_pidm, :new.sfrstca_term_code, :new.sfrstca_crn, 1);
+end;
+/
+
+create or replace trigger t_canvaslms_stdn_delete after delete on "saturn"."sfrstcr"
+for each row
+begin
+    -- Insert a matching sync record into CANVASLMS_EVENTS for processing by the broker
+    insert into canvaslms_events (event_pidm, event_term, event_crn, event_type)
+    values (:old.sfrstcr_pidm, :old.sfrstcr_term_code, :old.sfrstcr_crn, 2);
+end;
+/
+
+create or replace trigger t_canvaslms_stdn_drop after update on "saturn"."sfrstcr"
+for each row when (
+    old.sfrstcr_rsts_code <> new.sfrstcr_rsts_code
+    and (new.sfrstcr_rsts_code like 'D%' or new.sfrstcr_rsts_code like 'I%'))
+begin
+    -- Insert a matching sync record into CANVASLMS_EVENTS for processing by the broker
+    insert into canvaslms_events (event_pidm, event_term, event_crn, event_type)
+    values (:new.sfrstcr_pidm, :new.sfrstcr_term_code, :new.sfrstcr_crn, 2);
+end;
+/
+
+create or replace trigger etsis.t_canvaslms_user_sync_pfname after update on "saturn"."spbpers"
+for each row when (old.spbpers_pref_first_name <> new.spbpers_pref_first_name)
+begin
+    -- Insert a matching sync record into CANVASLMS_EVENTS for processing by the broker
+    insert into canvaslms_events (event_pidm, event_type)
+    values (:new.spbpers_pidm, 0);
+end;
