@@ -56,7 +56,7 @@ module.exports = function(college, event) {
         })
         .catch(Errors.UntrackedSection, () => {
             Logger.warn(`Ignoring event because it does not match any known Canvas sections`, event);
-            // return BannerOperations.deleteEvent(event.id);
+            return BannerOperations.deleteEvent(event.id);
         })
         .catch(error => {
             Logger.error(`Failed to handle student enrollment event due to an error`, [error, event]);
