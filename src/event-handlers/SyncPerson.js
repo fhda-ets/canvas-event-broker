@@ -55,7 +55,7 @@ module.exports = function(college, event) {
         })
         .then(() => {
             // Delete the completed event
-            return BannerOperations.deleteEvent(event.id);
+            return BannerOperations.deleteEvent(event);
         })
         .catch(error => {
             Logger.error(`Failed to handle person sync request due to an error`, [error, event]);

@@ -84,3 +84,15 @@ begin
     insert into canvaslms_events (event_pidm, event_type)
     values (:new.spbpers_pidm, 0);
 end;
+/
+
+create or replace trigger etsis.t_canvaslms_sect_cancel after update on "saturn"."ssbsect"
+for each row when (
+    old.ssbsect_ssts_code <> new.ssbsect_ssts_code
+    and new.ssbsect_ssts_code in ('X'))
+begin
+    -- Insert a matching sync record into CANVASLMS_EVENTS for processing by the broker
+    insert into canvaslms_events (event_term, event_crn, event_type)
+    values (:new.ssbsect_term_code, :new.ssbsect_crn, 3);
+end;
+/

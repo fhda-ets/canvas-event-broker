@@ -50,14 +50,9 @@ function getPendingEvents(autoReschedule=Config.eventmanager.enabled) {
     // Get latest pending events
     BannerOperations.getPendingEvents()
         .map(handleEvent, {concurrency: 4})
-        
-        /****
-        Deprecated 11/16/2016
         .catch(error => {
             Logger.error(`An error occurred while processing Banner sync events`, error);
         })
-        ****/
-
         .finally(() => {
             Logger.info(`Completed Banner event synchronization`);
 
@@ -82,34 +77,24 @@ function handleEvent(event) {
     // Check if the college object appears invalid
     if(!(college)) {
         Logger.verbose(`Ignoring event because the associated college configuration is not enabled or does not exist`, event);
+        return BannerOperations.deleteEvent(event);
     }
     // Identify type of event, and delegate to the appropriate handler
     else if(event.type === TYPE_SYNC_PERSON) {
-        return SyncPerson(college, event)
-            .catch(error => {
-                Logger.error('Failed to handle person sync event (type 0) due to an error', [error, event]);
-            });
+        return SyncPerson(college, event);
     }
     else if(event.type === TYPE_ENROLL_STUDENT) {
-        return EnrollStudent(college, event)
-            .catch(error => {
-                Logger.error('Failed to handle student enrollment event (type 1) due to an error', [error, event]);
-            });
+        return EnrollStudent(college, event);
     }
     else if(event.type === TYPE_DROP_STUDENT) {
-        return DropStudent(college, event)
-            .catch(error => {
-                Logger.error('Failed to handle student drop event (type 2) due to an error', [error, event]);
-            });
+        return DropStudent(college, event);
     }
     else if(event.type === TYPE_CANCEL_SECTION) {
-        return CancelCourseSection(college, event)
-            .catch(error => {
-                Logger.error('Failed to handle section cancellation event (type 3) due to an error', [error, event]);
-            });
+        return CancelCourseSection(college, event);
     }
     else {
         Logger.warn(`Ignoring event due to an unsupported type`, event);
+        return BannerOperations.deleteEvent(event);
     }
 }
 

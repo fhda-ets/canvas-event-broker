@@ -54,14 +54,14 @@ function createCanvasFacultyAttribute(pidm) {
 
 /**
  * Delete a sync event from the CANVASLMS_EVENTS table.
- * @param  {Number} eventId ID of the event to delete
+ * @param  {Object} event The event object to be deleted
  * @return {Promise} Resolved with database statement is completed
  */
-function deleteEvent(eventId) {
+function deleteEvent(event) {
     return Banner
-        .sql(sqlDeleteEvent, {eventId: eventId})
+        .sql(sqlDeleteEvent, {eventId: event.id})
         .then(() => {
-            Logger.verbose(`Deleted completed event ${eventId} from sync queue`);
+            Logger.verbose(`Deleted completed event ${event.id} from sync queue`);
         });
 }
 
