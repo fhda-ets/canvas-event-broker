@@ -200,6 +200,8 @@ class College {
     enrollStudent(term, crn, person) {
         let college = this;
 
+        college.logger.verbose('Preparing to enroll student in Canvas section', [{term: term, crn: crn}, person]);
+
         // Verify if the request refers to a tracked Banner course section
         return BannerOperations.isSectionTracked(term, crn)
             .then(section => {
@@ -211,6 +213,8 @@ class College {
                     person.email)];
             })
             .spread((section, canvasProfile) => {
+                college.logger.verbose('Validated requested section is in Canvas', [{term: term, crn: crn}, section, canvasProfile]);
+
                 // Enroll student in Canvas Section
                 return [
                     section,

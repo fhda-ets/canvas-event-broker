@@ -35,6 +35,16 @@ for(let collegeName in Config.colleges) {
     }
 }
 
+// Create a lookup function for getting a College object based on a Banner term code
+colleges.getForTerm = function(termCode) {
+    if(termCode[5] === '1') {
+        return this.foothill;
+    }
+    else if(termCode[5] === '2') {
+        return this.deanza;
+    }
+}.bind(colleges);
+
 // Export loaded colleges
 module.exports = colleges;
 

@@ -1,8 +1,24 @@
 'use strict';
 let Common = require('./Common.js');
 let Logger = require('fhda-logging').getLogger('canvas-api-client');
+let LoggerHttp = require('fhda-logging').getLogger('canvas-api-client-http');
 let Random = require('random-gen');
 let Request = require('request-promise');
+
+// Configure request-debug to instrument HTTP traffic
+require('request-debug')(Request, function(type, data) {
+    if(type === 'request') {
+        LoggerHttp.debug(`Dispatching ${data.method} request to ${data.uri}`, {debugId: data.debugId});
+    }
+    else if(type === 'response') {
+        LoggerHttp.debug(`Received response`, {
+            debugId: data.debugId,
+            statusCode: data.statusCode
+        });
+
+        LoggerHttp.debug(`Response body for request ID ${data.debugId}`, data.body);
+    }
+});
 
 /**
  * Provides a high-level wrapper around the Canvas REST API.
@@ -436,12 +452,17 @@ class CanvasApiClient {
      */
     dropStudent(enrollment) {
         // Execute enrollment inactivate API call
-        return this.client
-            .del(`/courses/${enrollment.course_id}/enrollments/${enrollment.id}?task=inactivate`)
-            .promise()
-            .tap(enrollment => {
-                Logger.verbose(`Dropped student from Canvas section`, enrollment);
-            });
+        return this.client({
+            method: 'DELETE',
+            uri: `/courses/${enrollment.course_id}/enrollments/${enrollment.id}`,
+            form: {
+                'task': 'inactivate'
+            }
+        })
+        .promise()
+        .tap(enrollment => {
+            Logger.verbose(`Dropped student from Canvas section`, enrollment);
+        });
     }
 
     /**
@@ -453,12 +474,17 @@ class CanvasApiClient {
      */
     deleteStudent(enrollment) {
         // Execute enrollment delete API call
-        return this.client
-            .del(`/courses/${enrollment.course_id}/enrollments/${enrollment.id}?task=delete`)
-            .promise()
-            .tap(enrollment => {
-                Logger.verbose(`Deleted student from Canvas section`, enrollment);
-            });
+        return this.client({
+            method: 'DELETE',
+            uri: `/courses/${enrollment.course_id}/enrollments/${enrollment.id}`,
+            form: {
+                'task': 'delete'
+            }
+        })
+        .promise()
+        .tap(enrollment => {
+            Logger.verbose(`Dropped student from Canvas section`, enrollment);
+        });
     }
 
     /**

@@ -60,5 +60,6 @@ module.exports = function(college, event) {
         })
         .catch(error => {
             Logger.error(`Failed to handle student enrollment event due to an error`, [error, event]);
+            return Promise.reject(error);
         });
 };

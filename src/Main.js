@@ -26,6 +26,13 @@ if(Config.apiserver.enabled) {
     require('./ApiServer.js');
 }
 
+// Check and start the Slackbot integration if enabled
+if(Config.slackbot) {
+    if(Config.slackbot.enabled) {
+        require('./Slackbot.js');
+    }
+}
+
 // Attach a listener to identify SIGINT events and exit gracefully
 process.on('SIGINT', () => {
     Logger.info('Received SIGTERM; exiting');
