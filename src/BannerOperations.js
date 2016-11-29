@@ -161,9 +161,9 @@ function getPerson(identity) {
  * custom table.
  * @return {Promise} Resolved with an array of event objects
  */
-function getPendingEvents() {
+function getPendingEvents(limit=1000) {
     return Banner
-        .sql(sqlGetPendingEvents)
+        .sql(sqlGetPendingEvents, {limit: limit})
         .then(Banner.unwrapRows);
 }
 

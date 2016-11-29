@@ -71,31 +71,47 @@ function getPendingEvents(autoReschedule=Config.eventmanager.enabled) {
  * @return {Promise} Resolved when the event has been processed
  */
 function handleEvent(event) {
-    // Match event to a college
-    let college = getCollegeForTerm(event.term);
-
-    // Check if the college object appears invalid
-    if(!(college)) {
-        Logger.verbose(`Ignoring event because the associated college configuration is not enabled or does not exist`, event);
-        return BannerOperations.deleteEvent(event);
-    }
     // Identify type of event, and delegate to the appropriate handler
-    else if(event.type === TYPE_SYNC_PERSON) {
-        return SyncPerson(college, event);
+    if(event.type === TYPE_SYNC_PERSON) {
+        return handleIfCollegeValid(
+            getCollegeForTerm(event.term),
+            event,
+            SyncPerson);
     }
     else if(event.type === TYPE_ENROLL_STUDENT) {
-        return EnrollStudent(college, event);
+        return handleIfCollegeValid(
+            getCollegeForTerm(event.term),
+            event,
+            EnrollStudent);
     }
     else if(event.type === TYPE_DROP_STUDENT) {
-        return DropStudent(college, event);
+        return handleIfCollegeValid(
+            getCollegeForTerm(event.term),
+            event,
+            DropStudent);
     }
     else if(event.type === TYPE_CANCEL_SECTION) {
-        return CancelCourseSection(college, event);
+        return handleIfCollegeValid(
+            getCollegeForTerm(event.term),
+            event,
+            CancelCourseSection);
     }
     else {
         Logger.warn(`Ignoring event due to an unsupported type`, event);
         return BannerOperations.deleteEvent(event);
     }
+}
+
+function handleIfCollegeValid(college, event, handlerFunction) {
+    // Validate college object
+    if(!(college)) {
+        // Ignore event and delete it from the queue
+        Logger.verbose(`Ignoring event because the associated college configuration is not enabled or does not exist`, event);
+        return BannerOperations.deleteEvent(event);
+    }
+    
+    // Dispatch event to provided handler function
+    return handlerFunction(college, event);
 }
 
 // Module exports

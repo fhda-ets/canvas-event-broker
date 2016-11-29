@@ -10,7 +10,9 @@ from
     canvaslms_events,
     spriden
 where
-    spriden_pidm(+) = event_pidm
+    event_term is not null
+    and spriden_pidm(+) = event_pidm
     and spriden_change_ind(+) is null
+    and rownum <= :limit
 order by
     event_id asc
