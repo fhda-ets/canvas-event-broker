@@ -168,15 +168,19 @@ class College {
      */
     dropStudent(term, crn, pidm) {
         let college = this;
+        let relatedEnrollment;
 
         // Validate enrollment change is related to Canvas
         // Verify if the request refers to a tracked Banner enrollment
         return BannerOperations.isEnrollmentTracked(term, crn, pidm)
             .then(enrollment => {
-                // Get the Canvas enrollment object
+                // Get the Canvas enrollment object                
                 return college.canvasApi.getEnrollment(enrollment.enrollmentId);
             })
             .tap(enrollment => {
+                // Retain enrollment object
+                relatedEnrollment = enrollment;
+
                 // Drop the student
                 return college.canvasApi.dropStudent(enrollment);
             })
@@ -185,8 +189,15 @@ class College {
                 return BannerOperations.untrackEnrollment(formerEnrollment);
             })
             .tap(formerEnrollment => {
-                console.log('DROP!');
                 college.logger.info(`Successfully dropped student from Canvas section`, [{term: term, crn: crn}, formerEnrollment]);
+            })
+            .catch(error => {
+                if(error.name === 'StatusCodeError' && error.statusCode === 404) {
+                    // The requested enrollment was not found in Canvas so untrack it
+                    college.logger.warn(`Could not drop student because requested enrollment was not found`, [{term: term, crn: crn}, relatedEnrollment]);
+                    return BannerOperations.untrackEnrollment(relatedEnrollment);
+                }
+                return Promise.reject(error);
             });
     }
 
