@@ -62,6 +62,7 @@ module.exports = {
 
     oracle: {
         banner: {
+            queueTimeout: 60000 * 10,
             poolAlias: 'banner',
             poolMin: 1,
             poolMax: OS.cpus().length,

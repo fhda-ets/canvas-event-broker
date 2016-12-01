@@ -35,17 +35,12 @@ function getConnection() {
  */
 function sql(statement, params={}, options={}) {
     // The acquired connection
-    let connection;
-
-    // Holding variable for the database result (if executed successfully)
-    let result;
+    let connection; 
 
     return getConnection()
         .then(connectionRef => { connection = connectionRef; })
-        .then(() => { return connection.execute(statement, params, options); })
-        .then(resultRef => { result = resultRef; })
-        .then(() => { return connection.release(); })
-        .then(() => { return result; });
+        .then(() => connection.execute(statement, params, options))
+        .finally(() => connection.close());
 }
 
 /**
