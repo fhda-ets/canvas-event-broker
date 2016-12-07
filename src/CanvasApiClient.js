@@ -140,7 +140,14 @@ class CanvasApiClient {
             }
         })
         .catch(error => {
-            Logger.error(`Failed to create new Canvas account`, error);
+            Logger.error(`Failed to create new Canvas account`, [error, {
+                sisLoginId: sisLoginId,
+                firstName: firstName,
+                lastName: lastName,
+                email: email
+            }]);
+
+            return Promise.reject(error);
         });
     }
 
@@ -163,7 +170,14 @@ class CanvasApiClient {
             }
         })
         .catch(error => {
-            Logger.error(`Failed to update existing Canvas account`, error);
+            Logger.error(`Failed to update existing Canvas account` [error, {
+                sisLoginId: sisLoginId,
+                firstName: firstName,
+                lastName: lastName,
+                email: email
+            }]);
+
+            return Promise.reject(error);
         });
     }
 

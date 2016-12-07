@@ -1,6 +1,6 @@
 {
   "name": "canvas-event-broker",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Brokers academic events between the Banner SIS and Canvas LMS. Also provides API services for the Canvas Site Manager UI",
   "author": "Matt Rapczynski <rapczynskimatthew@fhda.edu",
   "license": "BSD-3-Clause",
