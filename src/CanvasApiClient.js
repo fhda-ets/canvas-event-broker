@@ -101,7 +101,7 @@ class CanvasApiClient {
                     // Create new account
                     return parent.createUser(sisLoginId, firstName, lastName, email);
                 }
-                else if(profile.name !== `${firstName} ${lastName}`) {
+                else if(profile.name !== `${firstName} ${lastName}` || profile.sortable_name !== `${lastName}, ${firstName}`) {
                     // Sync account due to name change
                     return parent.updateUser(sisLoginId, firstName, lastName, email);
                 }
@@ -127,7 +127,7 @@ class CanvasApiClient {
             form: {
                 'user[name]': `${firstName} ${lastName}`,
                 'user[short_name]': `${firstName} ${lastName}`,
-                'user[sortable_name]': `${firstName} ${lastName}`,
+                'user[sortable_name]': `${lastName}, ${firstName}`,
                 'user[skip_registration]': 'true',
                 'user[terms_of_use]': 'true',
                 'pseudonym[unique_id]': sisLoginId,
