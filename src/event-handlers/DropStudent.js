@@ -46,16 +46,13 @@ module.exports = function(college, event) {
 
     // Drop student from the requested Canvas section
     return college.dropStudent(event.term, event.crn, event.pidm)
-        .then(() => {
-            // Delete the completed event
-            return BannerOperations.deleteEvent(event);
-        })
         .catch(Errors.UntrackedEnrollment, () => {
             Logger.warn(`Ignoring event because it does not match any known Canvas enrollments`, event);
-            return BannerOperations.deleteEvent(event);
         })
         .catch(error => {
             Logger.error(`Failed to handle student drop event due to an error`, [error, event]);
-            return Promise.reject(error);
+        })
+        .finally(() => {
+            return BannerOperations.deleteEvent(event);
         });
 };
