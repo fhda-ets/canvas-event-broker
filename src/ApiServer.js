@@ -16,12 +16,13 @@ let HttpServer = require('http').Server(Express);
 // Load middlewares
 let BodyParser = require('body-parser');
 
+
 // Create Socket.IO server
 let SocketIo = require('socket.io')(HttpServer);
 let SocketIoJwt = require('socketio-jwt');
 
 // Configure routes for traditional HTTP actions
-Express.post('/external/sis/grades', BodyParser.text(), require('./route-handlers/SisGradeSubmission.js'));
+Express.post('/external/sis/grades', BodyParser.text({type: 'text/*'}), require('./route-handlers/SisGradeSubmission.js'));
 
 // Start listening
 HttpServer.listen(Config.listenPort);
