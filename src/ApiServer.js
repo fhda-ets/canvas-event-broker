@@ -22,7 +22,7 @@ let SocketIo = require('socket.io')(HttpServer);
 let SocketIoJwt = require('socketio-jwt');
 
 // Configure routes for traditional HTTP actions
-Express.post('/external/sis/grades', BodyParser.text({type: 'text/*'}), require('./route-handlers/SisGradeSubmission.js'));
+Express.post('/external/sis/grades', BodyParser.text({limit: '1mb', type: 'text/*'}), require('./route-handlers/SisGradeSubmission.js'));
 
 // Start listening
 HttpServer.listen(Config.listenPort);
