@@ -106,11 +106,10 @@ function handleEvent(event) {
  * Helper function to expedite the validation of a college object, and if
  * that is valid, then execute and return a Promise for the provided
  * async handler used to process the event.
- * 
  * @param {Object} college College configuration for the event (if matched)
  * @param {Object} event The event itself
  * @param {Function} handlerFunction Function to process the event
- * @returns
+ * @returns {Promise} Resolved when handler is complete, or the event is deleted if the college is unknown
  */
 function handleIfCollegeValid(college, event, handlerFunction) {
     // Validate college object

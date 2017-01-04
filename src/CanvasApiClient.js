@@ -299,6 +299,22 @@ class CanvasApiClient {
     }
 
     /**
+     * Get a specific Canvas enrollment term by its native ID.
+     * @param {Number} id Enrollment term ID
+     * @returns {Promise} Resolved with the matching EnrollmentTerm object, or an empty array if not found
+     */
+    getEnrollmentTerm(id) {
+        return this
+            .getEnrollmentTerms()
+            .reduce((result, enrollmentTerm) => {
+                if(enrollmentTerm.id === id) {
+                    return enrollmentTerm;
+                }
+                return result;
+            });
+    }
+
+    /**
      * Get a specific Canvas enrollment term by its SIS ID.
      * @param {String} sisId Banner term code
      * @returns {Promise} Resolved with the matching EnrollmentTerm object, or an empty array if not found

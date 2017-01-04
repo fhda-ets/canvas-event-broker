@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style type="text/css">
+            body {
+                font-family: Arial, sans-serif;
+            }
+
+            table {
+                border-collapse: collapse;
+                table-layout: fixed;
+                width: 100%;
+            }
+
+            table thead tr th {
+                background-color: #eee;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+
+            table tbody tr td {
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+
+            .divider {
+                border-bottom: 1px solid #ccc;
+                padding-bottom: 5px;
+            }
+
+            .margin-top-5px {
+                margin-top: 5px;
+            }
+
+            .margin-bottom-0px {
+                margin-bottom: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <h2 class="margin-bottom-0px">
+            Canvas Grade Submission Confirmation
+        </h2>
+        <h3 class="divider margin-top-5px">
+            {% if college === 'foothill' %}
+                Foothill College
+            {% elif college === 'deanza' %}
+                De Anza College
+            {% endif %}
+        </h3>
+
+        <p>
+            Hello,
+        </p>
+        <p>
+            This is an automated confirmation of your recent grade
+            submission for your Canvas course <strong>{{ course.name }}</strong>, <strong>{{ enrollmentTerm.name }}</strong>.
+        </p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Student ID</th>
+                    <th>Grade</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for grade in grades %}
+                    <tr>
+                        <td>
+                            {% if grade.studentProfile %}
+                                {{ grade.studentProfile.sortable_name }}
+                            {% else %}
+                                Unknown (Canvas User ID: {{ grade.student_id }})
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if grade.studentProfile %}
+                                {{ grade.studentProfile.sis_login_id }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ grade.score }}
+                        </td>
+                        <td>
+                            {% if grade.gradingOutcome === 'skipped-existing' %}
+                                <strong>Error:</strong> Student is already graded in Banner
+                            {% elif grade.gradingOutcome === 'non-letter-score' %}
+                                <strong>Error:</strong> Cannot use numeric score from Canvas. Must be letter grade
+                            {% else %}
+                                Success
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p>
+            <small>
+                Publisher: {{ publisher.name }} (Campus ID: {{ publisher.sis_login_id }}, Canvas ID: {{ publisher.id }})<br/>
+                Date and Time: {{ datetime }}<br/>
+                Environment: {{ bannerEnvironment }}
+            </small>
+        </p>
+    </body>
+</html>
