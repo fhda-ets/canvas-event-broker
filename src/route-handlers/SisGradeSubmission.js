@@ -1,4 +1,5 @@
 'use strict';
+let BannerOperations = require('../BannerOperations.js');
 let CollegeManager = require('../CollegeManager.js');
 let FastCsv = require('fast-csv');
 let Filesystem = require('fs');
@@ -17,6 +18,9 @@ module.exports = function(request, response) {
 
     // Define an array to capture grading records
     let grades = [];
+
+    // Write a temp file to disk for inspection
+    Filesystem.writeFileSync('grades-raw.csv', request.body);
     
     // Attach CSV parser to incoming request body
     let csvParser = FastCsv.fromString(request.body, {
@@ -39,18 +43,28 @@ module.exports = function(request, response) {
 
     // Set up event listener for when parsing is complete
     csvParser.on('end', function() {
-        // Write a temp file to disk for inspection
-        Filesystem.writeFileSync('grades-raw.json', JSON.stringify(grades));
+        // Dispatch grade processing task, and retain the promise for test cases
+        processGradeSubmissions(college, grades);
 
+        // Send success response
         Logger.info('Grades batch process complete');
         response.send({complete: true});
-
-        // Dispatch grade processing task, and retain the promise for test cases
-        //webcontext['batchProcess'] = processGradeSubmissions(grades, sharedState);
     });
 
 };
 
-function processGradeSubmissions(grades) {
-
+function processGradeSubmissions(college, grades) {
+    // Iterate each grade record
+    Promise.each(grades, grade => {
+        // Gather additional data before processing
+        return Promise.props(Object.assign(grade, {
+            bannerSection: BannerOperations.getTrackedSectionById(grade.section_sis_id),
+            publisherProfile: college.canvasApi.getUser(grade.publisher_id, ''),
+            studentProfile: college.canvasApi.getUser(grade.student_id, '')
+        }));
+    })
+    .then(() => {
+        // Write a temp file to disk for inspection
+        Filesystem.writeFileSync('grades-raw.json', JSON.stringify(grades));
+    });    
 }

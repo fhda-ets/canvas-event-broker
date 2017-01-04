@@ -22,6 +22,7 @@ const sqlGetPendingEvents = Jetpack.read('src/sql/PendingEvents.sql');
 const sqlGetPerson = Jetpack.read('src/sql/Person.sql');
 const sqlGetSectionEnrollment = Jetpack.read('src/sql/SectionEnrollment.sql');
 const sqlGetTrackedEnrollments = Jetpack.read('src/sql/TrackedEnrollments.sql');
+const sqlGetTrackedSectionById = Jetpack.read('src/sql/GetTrackedSectionById.sql');
 const sqlIsEnrollmentTracked = Jetpack.read('src/sql/IsEnrollmentTracked.sql');
 const sqlIsSectionTracked = Jetpack.read('src/sql/IsSectionTracked.sql');
 const sqlTrackCourseSection = Jetpack.read('src/sql/TrackCourseSection.sql');
@@ -190,6 +191,18 @@ function getTrackedEnrollments(term, pidm) {
     return Banner
         .sql(sqlGetTrackedEnrollments, {term: term, pidm: pidm})
         .then(Banner.unwrapRows);
+}
+
+
+/**
+ * Get a tracked section object from Banner based on the Canvas SIS section ID 
+ * @param {String} sectionId
+ * @returns Resolved with section object
+ */
+function getTrackedSectionById(sectionId) {
+    return Banner
+        .sql(sqlGetTrackedSectionById, {sectionId: sectionId})
+        .then(Banner.unwrapObject);
 }
 
 /**
@@ -383,6 +396,7 @@ module.exports = {
     getPerson: getPerson,
     getSectionEnrollment: getSectionEnrollment,
     getTrackedEnrollments: getTrackedEnrollments,
+    getTrackedSectionById: getTrackedSectionById,
     isEnrollmentTracked: isEnrollmentTracked,
     isSectionTracked: isSectionTracked,
     trackCourseSection: trackCourseSection,
