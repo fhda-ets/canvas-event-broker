@@ -160,13 +160,13 @@ function getPerson(identity) {
     else if(identity.pidm) {
         // Execute query using a Banner PIDM
         return Banner
-            .sql(sqlGetPerson, Object.assign(identity, {campusId: null}))
+            .sql(sqlGetPerson, {pidm: identity.pidm, campusId: null})
             .then(Banner.unwrapObject);
     }
     else if(identity.campusId) {
         // Execute query using a campus ID/SPRIDEN_ID
         return Banner
-            .sql(sqlGetPerson, Object.assign(identity, {pidm: null}))
+            .sql(sqlGetPerson, {campusId: identity.campusId.trim(), pidm: null})
             .then(Banner.unwrapObject);
     }
 }
