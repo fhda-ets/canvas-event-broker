@@ -14,6 +14,7 @@ let Logger = require('fhda-logging').getLogger('banner-operations');
 // Load SQL statements
 const sqlCreateCanvasFacultyAttribute = Jetpack.read('src/sql/InsertCanvasFacultyAttribute.sql');
 const sqlDeleteEvent = Jetpack.read('src/sql/DeleteEvent.sql');
+const sqlGetBannerEnrollments = Jetpack.read('src/sql/BannerEnrollments.sql');
 const sqlGetCourse = Jetpack.read('src/sql/Course.sql');
 const sqlGetCourseSection = Jetpack.read('src/sql/CourseSection.sql');
 const sqlGetInstructors = Jetpack.read('src/sql/Instructors.sql');
@@ -64,6 +65,19 @@ function deleteEvent(event) {
         .then(() => {
             Logger.verbose(`Deleted completed event ${event.id} from sync queue`);
         });
+}
+
+/**
+ * Lookup student enrollments from SFRSTCR joined with Canvas courses from
+ * CANVALMS_SECTIONS.
+ * @param  {String} term Banner term code
+ * @param  {Number} pidm Banner identity of the student
+ * @return {Promise} Resolved when database query is completed
+ */
+function getBannerEnrollments(term, pidm) {
+    return Banner
+        .sql(sqlGetBannerEnrollments, {term: term, pidm: pidm})
+        .then(Banner.unwrapRows);
 }
 
 /**
@@ -388,6 +402,7 @@ function untrackTeacherEnrollments(course) {
 module.exports = {
     createCanvasFacultyAttribute: createCanvasFacultyAttribute,
     deleteEvent: deleteEvent,
+    getBannerEnrollments: getBannerEnrollments,
     getCourse: getCourse,
     getCourseSection: getCourseSection,
     getInstructors: getInstructors,

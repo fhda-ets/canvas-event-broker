@@ -262,11 +262,19 @@ class College {
 
         college.logger.info(`Checking student enrollment synchronization`, [person, {term: term}]);
 
-        // Lookup enrollments from Banner and Canvas
-        return Promise.all([
-            BannerOperations.getTrackedEnrollments(term, person.pidm),
-            college.canvasApi.getCoursesForUser(term, person.campusId)])
+        // Ensure Canvas account is sychronized
+        // @date Jan-9-2017
+        return college.canvasApi.syncUser(
+            person.campusId,
+            person.firstName,
+            person.lastName,
+            person.email)
 
+        .then(() => Promise.all([
+            // Lookup enrollments from Banner and Canvas
+            BannerOperations.getBannerEnrollments(term, person.pidm),
+            college.canvasApi.getCoursesForUser(term, person.campusId)]))
+        
         .spread((bannerEnrollments, canvasEnrollments) => {
             // Are there more enrollments in Banner than in Canvas?
             if(canvasEnrollments.length < bannerEnrollments.length) {
@@ -275,10 +283,11 @@ class College {
                     bannerCount: bannerEnrollments.length,
                     canvasCount: canvasEnrollments.length}]);
 
-                // Iterate each Banner enrollment and manually force enroll the student in Canvas
+                // Iterate each Banner enrollment and enroll the student into the Canvas course
                 return Promise.each(bannerEnrollments, enrollment => {
-                    syncOps.push(`Added missing student to course (Canvas course = ${enrollment.course_id}, term = ${term}, crn = ${enrollment.crn})`);
-                    return college.canvasApi.enrollStudent(enrollment.sectionId, enrollment.userId);
+                    syncOps.push(`Added missing student to course (Canvas course = ${enrollment.courseId}, term = ${term}, crn = ${enrollment.crn})`);
+                    
+                    return this.enrollStudent(term, enrollment.crn, person);
                 });
             }
             else if(canvasEnrollments.length > bannerEnrollments.length) {
@@ -298,7 +307,12 @@ class College {
                     return college.canvasApi.dropStudent(enrollment);
                 });
             }
-            college.logger.warn(`Student enrollment checks passed, and appear to be in sync`, [person, {term: term}]);
+            college.logger.warn(`Student enrollment checks passed, and appear to be in sync`, {
+                bannerEnrollments: bannerEnrollments,
+                canvasEnrollments: canvasEnrollments,
+                person: person,
+                term: term
+            });
         })
         .then(() => {
             syncOps.push(`Sync completed for ${person.firstName} ${person.lastName}`);
