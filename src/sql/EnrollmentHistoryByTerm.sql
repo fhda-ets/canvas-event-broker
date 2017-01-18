@@ -18,8 +18,8 @@ where
         where
             s2.sfrstca_term_code = s1.sfrstca_term_code
             and s2.sfrstca_crn = s1.sfrstca_crn
-            and s2.sfrstca_rsts_code = s1.sfrstca_rsts_code
             and s2.sfrstca_pidm = s1.sfrstca_pidm
+            and (s2.sfrstca_rsts_code like 'R%' or s2.sfrstca_rsts_code like 'D%')            
             and s2.sfrstca_source_cde = 'BASE'
             and (s2.sfrstca_error_flag not in ('F') or s2.sfrstca_error_flag is null))
     and canvaslms_sections.term = s1.sfrstca_term_code
