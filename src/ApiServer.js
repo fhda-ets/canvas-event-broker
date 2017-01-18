@@ -16,7 +16,6 @@ let HttpServer = require('http').Server(Express);
 // Load middlewares
 let BodyParser = require('body-parser');
 
-
 // Create Socket.IO server
 let SocketIo = require('socket.io')(HttpServer);
 let SocketIoJwt = require('socketio-jwt');
@@ -41,6 +40,7 @@ SocketIo.on('connection', function (socket) {
     // Register handlers for web socket events
     socket.on('banner:createCanvasAttributes', require('./websocket-handlers/banner/CreateCanvAttribute.js').bind(socket));
     socket.on('banner:getInstructorSchedule', require('./websocket-handlers/banner/GetInstructorSchedule.js').bind(socket));
+    socket.on('canvas:addSectionToCourse', require('./websocket-handlers/canvas/AddSectionToCourse.js').bind(socket));
     socket.on('canvas:getCourses', require('./websocket-handlers/canvas/GetCourses.js').bind(socket));
     socket.on('canvas:createCourse', require('./websocket-handlers/canvas/CreateCourse.js').bind(socket));
     socket.on('canvas:deleteCourse', require('./websocket-handlers/canvas/DeleteCourse.js').bind(socket));
