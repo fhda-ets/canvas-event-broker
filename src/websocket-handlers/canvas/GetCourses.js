@@ -41,9 +41,18 @@ let WebsocketUtils = require('../../WebsocketUtils.js');
  * @return {Promise} Resolved when the operation is complete
  */
 module.exports = function (data, respond) {
-    return CollegeManager[data.college]
-        .canvasApi
-        .getCoursesForUser(data.term, this.decoded_token.aud, data.withSections)
+    // Lookup college configuration
+    let college = CollegeManager[data.college];
+
+    return college
+        .canvasApi.getCoursesForUser(data.term, this.decoded_token.aud, data.withSections)
+        .map(course => {
+            // Decorate course with promise to check on content migrations
+            course.migrations = college.canvasApi.listActiveMigrations(course.id);
+
+            // Resolve
+            return Promise.props(course);
+        })
         .tap(respond)
         .catch(WebsocketUtils.handleError.bind(
             this,

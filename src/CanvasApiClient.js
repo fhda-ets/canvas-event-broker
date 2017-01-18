@@ -576,6 +576,41 @@ class CanvasApiClient {
             });
     }
 
+    /*
+     * Content Migrations
+     */
+    
+    /**
+     * List active migration tasks for a Canvas course. Active means the workflow
+     * status is not "completed".
+     * @param {String} courseId Canvas course ID
+     * @returns {Promise|Array} Resolved with list of active migration tasks
+     */
+    listActiveMigrations(courseId) {
+        return this.client
+            .get(`/courses/${courseId}/content_migrations`)
+            .promise()
+            .filter(migration => migration.workflow_state !== 'completed');
+    }
+    
+    /**
+     * Create a new migration task using an existing course site as the course,
+     * and targeting another existing course site that is presumed empty. 
+     * @param {String} fromCourseId Canvas course ID for the source
+     * @param {String} toCourseId Canvas course ID for the target
+     * @returns {Promise} Resolved when the migration task was created
+     */
+    createMigration(fromCourseId, toCourseId) {
+        return this.client({
+            method: `POST`,
+            uri: `/courses/${toCourseId}/content_migrations`,
+            form: {
+                'migration_type': 'course_copy_importer',
+                'settings[source_course_id]': fromCourseId
+            }
+        });
+    }
+
 }
 
 module.exports = CanvasApiClient;

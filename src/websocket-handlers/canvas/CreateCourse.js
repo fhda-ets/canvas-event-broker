@@ -74,8 +74,7 @@ module.exports = function (data, respond) {
         getBannerCourse,
         getBannerSections,
         generateSectionNumberString,
-        generateCourseName,
-        generateCourseCode,
+        generateSiteNames,
         createCourseSite,
         createSections,
         enrollInstructors);
@@ -100,8 +99,8 @@ function createCourseSite(context) {
     context.ws.emit('ui:progress:setText', {text: 'Creating course'});
 
     return context.canvasApi.createCourse({
-        'course[name]': context.generatedCourseName,
-        'course[course_code]': context.generatedCourseCode,
+        'course[name]': context.siteNames.fullName,
+        'course[course_code]': context.siteNames.courseCode,
         'course[term_id]': context.enrollmentTerm.id,
         'course[sis_course_id]': `${context.parentTerm}:${context.sanitizedSubject}${context.sanitizedCourseNumber}:${Random.number(4)}`
     })
@@ -162,18 +161,11 @@ function enrollInstructors(context) {
         .return(context);
 }
 
-function generateCourseCode(context) {
-    context.generatedCourseCode = `${context.sanitizedSubject} ${context.sanitizedCourseNumber} (${context.sectionString})`;
-
-    // Return context for chaining
-    return context;
-}
-
-function generateCourseName(context) {
-    context.generatedCourseName = `${context.abbreviatedTermCode} ${Case.title(context.parentCourse.title)} Sections ${context.sectionString}`;
-
-    // Return context for chaining
-    return context;
+function generateSiteNames(context) {
+    return context.college
+        .generateSiteNames(context)
+        .then(names => context.siteNames = names)
+        .return(context);
 }
 
 function generateSectionNumberString(context) {
