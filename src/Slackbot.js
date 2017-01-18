@@ -2,7 +2,7 @@
 let Botkit = require('botkit');
 let CollegeManager = require('./CollegeManager.js');
 let Config = require('config');
-let Logger = require('fhda-logging').getLogger('slackbot');
+let Logger = require('fhda-pubsub-logging')('slackbot');
 
 // Load additional modules
 let HandlerEnrollStudent = require('./event-handlers/EnrollStudent.js');

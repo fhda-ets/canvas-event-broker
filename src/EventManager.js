@@ -9,7 +9,7 @@
 let BannerOperations = require('./BannerOperations.js');
 let CollegeManager = require('./CollegeManager.js');
 let Config = require('config');
-let Logger = require('fhda-logging').getLogger('event-manager');
+let Logger = require('fhda-pubsub-logging')('event-manager');
 
 // Load event handler modules
 let SyncPerson = require('./event-handlers/SyncPerson.js');

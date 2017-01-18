@@ -30,7 +30,7 @@
 
 'use strict';
 let BannerOperations = require('../BannerOperations.js');
-let Logger = require('fhda-logging').getLogger('event-handler-sync-person');
+let Logger = require('fhda-pubsub-logging')('event-handler-sync-person');
 
 /**
  * Handle a person sync event from Banner.

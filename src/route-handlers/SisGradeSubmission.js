@@ -37,7 +37,7 @@ let Config = require('config');
 let EmailManager = require('../EmailManager.js');
 let FastCsv = require('fast-csv');
 let Filesystem = require('fs');
-let Logger = require('fhda-logging').getLogger('sis-grades');
+let Logger = require('fhda-pubsub-logging')('sis-grades');
 let MemoizePromise = require('promise-memoize');
 
 const regexIsLetterGrade = /^[ABCDF][-+]?$/i;

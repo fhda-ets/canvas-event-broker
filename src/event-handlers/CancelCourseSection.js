@@ -1,7 +1,7 @@
 'use strict';
 let BannerOperations = require('../BannerOperations.js');
 let Errors = require('../Errors.js');
-let Logger = require('fhda-logging').getLogger('event-handler-cancel-section');
+let Logger = require('fhda-pubsub-logging')('event-handler-cancel-section');
 
 /**
  * Handle a section cancellation event from Banner.

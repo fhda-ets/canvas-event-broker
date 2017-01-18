@@ -31,7 +31,7 @@
 'use strict';
 let BannerOperations = require('../../BannerOperations.js');
 let Common = require('../../Common.js');
-let Logger = require('fhda-logging').getLogger('ws-action-create-canv-attr');
+let Logger = require('fhda-pubsub-logging')('ws-action-create-canv-attr');
 let WebsocketUtils = require('../../WebsocketUtils.js');
 
 /**

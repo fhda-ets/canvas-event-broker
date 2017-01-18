@@ -31,8 +31,8 @@
 'use strict';
 let Colleges = require('../CollegeManager.js');
 let DatasetBuilder = require('./DatasetBuilder.js');
-let Logger = require('fhda-logging').getLogger('test-suite');
-let LoggerWebsocket = require('fhda-logging').getLogger('mock-websocket');
+let Logger = require('fhda-pubsub-logging')('test-suite');
+let LoggerWebsocket = require('fhda-pubsub-logging')('mock-websocket');
 let RandomItem = require('random-item');
 let Should = require('should');
 

@@ -27,7 +27,7 @@ class College {
         this.config = require(`config`).get(`colleges.${name}`);
 
         // Load logger
-        this.logger = require(`fhda-logging`).getLogger(`college-${name}`);
+        this.logger = require(`fhda-pubsub-logging`)(`college-${name}`);
 
         // Create Canvas API client
         this.canvasApi = new CanvasApiClient(
@@ -211,7 +211,11 @@ class College {
     enrollStudent(term, crn, person) {
         let college = this;
 
-        college.logger.verbose('Preparing to enroll student in Canvas section', [{term: term, crn: crn}, person]);
+        college.logger.verbose('Preparing to enroll student in Canvas section', { 
+            term: term,
+            crn: crn,
+            person: person
+        });
 
         // Verify if the request refers to a tracked Banner course section
         return BannerOperations.isSectionTracked(term, crn)
@@ -224,7 +228,12 @@ class College {
                     person.email)];
             })
             .spread((section, canvasProfile) => {
-                college.logger.verbose('Validated requested section is in Canvas', [{term: term, crn: crn}, section, canvasProfile]);
+                college.logger.verbose('Validated requested section is in Canvas', {
+                    term: term,
+                    crn: crn,
+                    section: section,
+                    canvasProfile: canvasProfile
+                });
 
                 // Enroll student in Canvas Section
                 return [
@@ -246,7 +255,11 @@ class College {
                     section.sectionId)];
             })
             .tap(() => {
-                college.logger.info(`Successfully enrolled student into Canvas section`, [{term: term, crn: crn}, person]);
+                college.logger.info(`Successfully enrolled student into Canvas section`, {
+                    term: term,
+                    crn: crn,
+                    person: person
+                });
             });
     }
 
@@ -271,48 +284,54 @@ class College {
             person.email)
 
         .then(() => Promise.all([
-            // Lookup enrollments from Banner and Canvas
-            BannerOperations.getBannerEnrollments(term, person.pidm),
-            college.canvasApi.getCoursesForUser(term, person.campusId)]))
+            // Lookup enrollments from Banner
+            BannerOperations.enrollmentHistoryByTerm(term, person.pidm),
+
+            // Lookup enrollments from Canvas (with reduction Banner term and CRN)
+            college.canvasApi.getEnrollmentsForUser(term, person.campusId)
+        ]))                
         
         .spread((bannerEnrollments, canvasEnrollments) => {
-            // Are there more enrollments in Banner than in Canvas?
-            if(canvasEnrollments.length < bannerEnrollments.length) {
-                college.logger.warn(`It appears that Canvas student adds are not in sync with Banner`, [person, {
-                    term: term,
-                    bannerCount: bannerEnrollments.length,
-                    canvasCount: canvasEnrollments.length}]);
-
-                // Iterate each Banner enrollment and enroll the student into the Canvas course
-                return Promise.each(bannerEnrollments, enrollment => {
-                    syncOps.push(`Added missing student to course (Canvas course = ${enrollment.courseId}, term = ${term}, crn = ${enrollment.crn})`);
-                    
-                    return this.enrollStudent(term, enrollment.crn, person);
-                });
-            }
-            else if(canvasEnrollments.length > bannerEnrollments.length) {
-                college.logger.warn(`It appears that Canvas student drops are not in sync with Banner`, [person, {
-                    term: term,
-                    bannerCount: bannerEnrollments.length,
-                    canvasCount: canvasEnrollments.length}]);
-
-                // Iterate each Canvas enrollment, but filter to only those not found in Banner
-                return Promise.filter(canvasEnrollments, enrollment => {
-                    return Lodash.find(bannerEnrollments, ['section_id', enrollment.id]) !== undefined;
-                })
-                // Iterate revised list of Canvas enrollments
-                .each(enrollment => {
-                    // Drop student from Canvas course
-                    syncOps.push(`Dropped student from course (Canvas course = ${enrollment.course_id}, term = ${term}, crn = ${enrollment.crn})`);
-                    return college.canvasApi.dropStudent(enrollment);
-                });
-            }
-            college.logger.warn(`Student enrollment checks passed, and appear to be in sync`, {
-                bannerEnrollments: bannerEnrollments,
-                canvasEnrollments: canvasEnrollments,
-                person: person,
-                term: term
+            college.logger.info('Queried Banner and Canvas enrollments for student prior to sync', {
+                banner: bannerEnrollments,
+                canvas: canvasEnrollments,
+                person: person
             });
+
+            // Iterate enrollments to identify possible problems
+            return Promise.all([
+                // Check for student adds that should be repaired
+                Promise
+                    .filter(bannerEnrollments, enrollment => enrollment.registrationStatus[0] === 'R')
+                    .each(enrollment => {
+                        // Enroll student in Canvas course                                            
+                        return this
+                            .enrollStudent(term, enrollment.crn, person)
+                            .then(() => syncOps.push(`Added student to course (term = ${term}, crn = ${enrollment.crn})`))
+                            .catch(error => {
+                                college.logger.error('Error dump', error);
+                                if(!(error.message.includes('unique constraint (ETSIS.PK_CANVALMS_ENROLLMENTS) violated'))) {
+                                    syncOps.push(`Failed to missing student to course (error = ${error.message}, term = ${term}, crn = ${enrollment.crn})`);
+                                }
+                            });
+                    }),
+
+                // Check for student drops that should be repaired
+                Promise.each(canvasEnrollments, canvasEnrollment => {
+                    let hasMatchingBannerDrop = Lodash.find(bannerEnrollments, bannerEnrollment => {
+                        return (bannerEnrollment.term === canvasEnrollment.bannerTerm
+                            && bannerEnrollment.crn === canvasEnrollment.bannerCrn
+                            && bannerEnrollment.registrationStatus[0] === 'D');
+                    });
+
+                    if(hasMatchingBannerDrop) {
+                        // Drop student from Canvas course
+                        return college.canvasApi
+                            .dropStudent(canvasEnrollment)
+                            .then(() => syncOps.push(`Dropped student from course (Canvas course = ${canvasEnrollment.course_id}, term = ${canvasEnrollment.bannerTerm}, crn = ${canvasEnrollment.bannerCrn})`));
+                    }
+                })
+            ]);
         })
         .then(() => {
             syncOps.push(`Sync completed for ${person.firstName} ${person.lastName}`);

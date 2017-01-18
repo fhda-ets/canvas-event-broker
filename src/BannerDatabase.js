@@ -7,7 +7,7 @@
 
 'use strict';
 let Config = require('config');
-let Logger = require('fhda-logging').getLogger('banner');
+let Logger = require('fhda-pubsub-logging')('banner');
 let Oracle = require('oracledb');
 
 /**

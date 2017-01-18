@@ -14,7 +14,7 @@ global.Promise = require('bluebird');
 
 // Load application modules
 let Config = require('config');
-let Logger = require('fhda-logging').getLogger('main');
+let Logger = require('fhda-pubsub-logging')('main');
 
 // Check and start the event manager if enabled
 if(Config.eventmanager.enabled) {

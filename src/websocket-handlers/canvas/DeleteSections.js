@@ -30,7 +30,7 @@
 
 'use strict';
 let CollegeManager = require('../../CollegeManager.js');
-let Logger = require('fhda-logging').getLogger('ws-action-delete-sections');
+let Logger = require('fhda-pubsub-logging')('ws-action-delete-sections');
 let ProgressMonitor = require('../../ProgressMonitor.js');
 let WebsocketUtils = require('../../WebsocketUtils.js');
 

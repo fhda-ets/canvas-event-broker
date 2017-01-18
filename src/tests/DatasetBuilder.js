@@ -30,7 +30,7 @@
 
 'use strict';
 let Banner = require('../BannerDatabase.js');
-let Logger = require('fhda-logging').getLogger('dataset-builder');
+let Logger = require('fhda-pubsub-logging')('dataset-builder');
 let Jetpack = require('fs-jetpack');
 
 // Load SQL statements

@@ -7,7 +7,7 @@
 
 'use strict';
 let Config = require('config').get('apiserver');
-let Logger = require('fhda-logging').getLogger('api-server');
+let Logger = require('fhda-pubsub-logging')('api-server');
 
 // Create Express web application
 let Express = require('express')();

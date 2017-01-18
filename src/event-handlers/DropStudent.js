@@ -31,7 +31,7 @@
 'use strict';
 let BannerOperations = require('../BannerOperations.js');
 let Errors = require('../Errors.js');
-let Logger = require('fhda-logging').getLogger('event-handler-drop-student');
+let Logger = require('fhda-pubsub-logging')('event-handler-drop-student');
 
 /**
  * Handle a student drop event from Banner.

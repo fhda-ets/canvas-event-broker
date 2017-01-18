@@ -30,7 +30,7 @@
 
 'use strict';
 let CollegeManager = require('../../CollegeManager.js');
-let Logger = require('fhda-logging').getLogger('ws-action-get-canv-courses');
+let Logger = require('fhda-pubsub-logging')('ws-action-get-canv-courses');
 let WebsocketUtils = require('../../WebsocketUtils.js');
 
 /**

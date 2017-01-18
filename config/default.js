@@ -47,16 +47,11 @@ module.exports = {
     },
 
     logging: {
-        level: 'info',
-        source: 'canvas-event-broker',
-        environment: 'development',
-        exitOnErrorEvent: false,
-        exitOnUncaughtException: true,
-        memoryReportingEnabled: false,
+        level: 'verbose',
+        source: 'bsis',
+        environment: 'test',
         transports: {
-            console: true,
-            file: true,
-            splunk: false
+            console: {}
         }
     },
 

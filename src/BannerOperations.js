@@ -9,11 +9,12 @@
 let Banner = require('./BannerDatabase.js');
 let Errors = require('./Errors.js');
 let Jetpack = require('fs-jetpack');
-let Logger = require('fhda-logging').getLogger('banner-operations');
+let Logger = require('fhda-pubsub-logging')('banner-operations');
 
 // Load SQL statements
 const sqlCreateCanvasFacultyAttribute = Jetpack.read('src/sql/InsertCanvasFacultyAttribute.sql');
 const sqlDeleteEvent = Jetpack.read('src/sql/DeleteEvent.sql');
+const sqlEnrollmentHistoryByTerm = Jetpack.read('src/sql/EnrollmentHistoryByTerm.sql');
 const sqlGetBannerEnrollments = Jetpack.read('src/sql/BannerEnrollments.sql');
 const sqlGetCourse = Jetpack.read('src/sql/Course.sql');
 const sqlGetCourseSection = Jetpack.read('src/sql/CourseSection.sql');
@@ -65,6 +66,12 @@ function deleteEvent(event) {
         .then(() => {
             Logger.verbose(`Deleted completed event ${event.id} from sync queue`);
         });
+}
+
+function enrollmentHistoryByTerm(term, pidm) {
+    return Banner
+        .sql(sqlEnrollmentHistoryByTerm, {term: term, pidm: pidm})
+        .then(Banner.unwrapRows);
 }
 
 /**
@@ -322,6 +329,13 @@ function trackEnrollment(college, term, crn, pidm, userId, enrollmentType, enrol
     return Banner.sql(sqlTrackEnrollment, params)
         .then(() => {
             Logger.verbose('Added tracked Canvas enrollment to Banner', params);
+        })
+        .catch(error => {
+            // Ignore unique constraint errors, but reject all others
+            if(!(error.message.includes('(ETSIS.PK_CANVALMS_ENROLLMENTS) violated'))) {
+                return Promise.reject(error);
+            }
+            Logger.warn('Ignored ETSIS.PK_CANVALMS_ENROLLMENTS unique constraint error on trackEnrollment(...)', params);
         });
 }
 
@@ -402,6 +416,7 @@ function untrackTeacherEnrollments(course) {
 module.exports = {
     createCanvasFacultyAttribute: createCanvasFacultyAttribute,
     deleteEvent: deleteEvent,
+    enrollmentHistoryByTerm: enrollmentHistoryByTerm,
     getBannerEnrollments: getBannerEnrollments,
     getCourse: getCourse,
     getCourseSection: getCourseSection,

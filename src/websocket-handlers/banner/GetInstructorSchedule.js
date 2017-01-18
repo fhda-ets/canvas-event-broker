@@ -30,7 +30,7 @@
 
 'use strict';
 let BannerOperations = require('../../BannerOperations.js');
-let Logger = require('fhda-logging').getLogger('ws-action-get-ins-sched');
+let Logger = require('fhda-pubsub-logging')('ws-action-get-ins-sched');
 let WebsocketUtils = require('../../WebsocketUtils.js');
 
 /**

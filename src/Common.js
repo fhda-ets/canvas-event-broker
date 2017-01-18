@@ -34,6 +34,18 @@ function abbreviateTermCode(termCode) {
     }
 }
 
+function parseSisSectionId(sisSectionId) {
+    let tokens = sisSectionId.split(':');
+
+    if(tokens.length == 3) {
+        return {
+            term: tokens[0],
+            crn: tokens[1]
+        };
+    }
+    return null;
+}
+
 /**
  * Use regular expressions to remove extra characters from a Banner course number
  * that prevent it from being readable within a Canvas course.
@@ -54,6 +66,7 @@ function sanitizeSubjectCode(subject) {
 // Module exports
 module.exports = {
     abbreviateTermCode: abbreviateTermCode,
+    parseSisSectionId: parseSisSectionId,
 
     /**
      * Constants for controlling concurrency limits on Bluebird promises

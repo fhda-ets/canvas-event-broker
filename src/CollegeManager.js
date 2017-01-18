@@ -9,7 +9,7 @@
 'use strict';
 let Config = require('config');
 let College = require('./College.js');
-let Logger = require('fhda-logging').getLogger('college-manager');
+let Logger = require('fhda-pubsub-logging')('college-manager');
 
 /**
  * Module initialization

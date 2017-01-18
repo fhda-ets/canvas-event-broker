@@ -34,8 +34,8 @@
 global.Promise = require('bluebird');
 
 // Load dependencies
-let Logger = require('fhda-logging').getLogger('test-suite');
-let LoggerWebsocket = require('fhda-logging').getLogger('mock-websocket');
+let Logger = require('fhda-pubsub-logging')('test-suite');
+let LoggerWebsocket = require('fhda-pubsub-logging')('mock-websocket');
 
 // Load Websocket handler moduler
 let WsCreateCourse = require('../../websocket-handlers/canvas/CreateCourse.js');

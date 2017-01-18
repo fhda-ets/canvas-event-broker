@@ -1,7 +1,7 @@
 'use strict';
 let Common = require('./Common.js');
-let Logger = require('fhda-logging').getLogger('canvas-api-client');
-let LoggerHttp = require('fhda-logging').getLogger('canvas-api-client-http');
+let Logger = require('fhda-pubsub-logging')('canvas-api-client');
+let LoggerHttp = require('fhda-pubsub-logging')('canvas-api-client-http');
 let Random = require('random-gen');
 let Request = require('request-promise');
 
@@ -328,6 +328,34 @@ class CanvasApiClient {
                 }
                 return result;
             });
+    }
+
+    /**
+     * Get a list of enrollments for a specific user, for a specific Banner
+     * SIS term, and optionally filtered by an enrollment status other than
+     * 'active'.
+     * @param {String} termCode Banner term code
+     * @param {String} sisLoginId Banner login identity for the person
+     * @param {String} [state=active] Enrollment state to filter to further narrow results
+     */
+    getEnrollmentsForUser(termCode, sisLoginId, state='active') {
+        return this.client
+            .get(`/users/sis_login_id:${sisLoginId}/enrollments`)
+            .promise()
+            .map(enrollment => {
+                // Parse Banner SIS section ID to get the term and CRN
+                let parsedSectionId = Common.parseSisSectionId(enrollment.sis_section_id);
+
+                // Decorate enrollment
+                enrollment.bannerTerm = parsedSectionId.term;
+                enrollment.bannerCrn = parsedSectionId.crn;
+
+                // Return object
+                return enrollment;
+            })
+
+            // Filter by specific Banner term and enrollment state
+            .filter(enrollment => enrollment.bannerTerm === termCode && enrollment.enrollment_state === state);
     }
 
     /**
