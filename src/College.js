@@ -322,7 +322,7 @@ class College {
                     let hasMatchingBannerDrop = Lodash.find(bannerEnrollments, bannerEnrollment => {
                         return (bannerEnrollment.term === canvasEnrollment.bannerTerm
                             && bannerEnrollment.crn === canvasEnrollment.bannerCrn
-                            && bannerEnrollment.registrationStatus[0] === 'D');
+                            && (bannerEnrollment.registrationStatus[0] === 'D' || bannerEnrollment.registrationStatus[0] === 'I'));
                     });
 
                     if(hasMatchingBannerDrop) {

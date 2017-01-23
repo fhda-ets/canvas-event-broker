@@ -491,8 +491,7 @@ class CanvasApiClient {
                 'enrollment[user_id]': userId,
                 'enrollment[type]': 'StudentEnrollment',
                 'enrollment[enrollment_state]': 'active',
-                'enrollment[notify]': 'false',
-                'enrollment[limit_privileges_to_course_section]': 'true'
+                'enrollment[notify]': 'false'
             }
         })
         .promise()
