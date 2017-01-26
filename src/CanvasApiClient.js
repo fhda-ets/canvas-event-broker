@@ -578,6 +578,25 @@ class CanvasApiClient {
     /*
      * Content Migrations
      */
+
+    /**
+     * Get a list of courses owned by a user that would make for ideal sources
+     * for setting up an automatic content migration into a new course.
+     * @param {String} sisLoginId Banner login identity for the person
+     * @returns {Promise|Array} Resolved with a list of potential courses
+     */
+    listMigrationSources(sisLoginId) {
+        return this.client({
+            method: `GET`,
+            uri: `/users/sis_login_id:${sisLoginId}/courses`,
+            qs: {
+                'include[]': 'term',
+                'state[]': ['unpublished', 'available'],
+                'per_page': '250',
+            }
+        })
+        .promise();
+    }
     
     /**
      * List active migration tasks for a Canvas course. Active means the workflow
@@ -607,7 +626,8 @@ class CanvasApiClient {
                 'migration_type': 'course_copy_importer',
                 'settings[source_course_id]': fromCourseId
             }
-        });
+        })
+        .promise();
     }
 
 }

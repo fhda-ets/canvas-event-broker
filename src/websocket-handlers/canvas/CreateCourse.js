@@ -58,6 +58,7 @@ module.exports = function (data, respond) {
         college: college,
         enrollment: {},
         instructors: [],
+        migrateFrom: data.migrateFrom,
         progress: new ProgressMonitor(),
         ws: this
     }, data);
@@ -77,7 +78,8 @@ module.exports = function (data, respond) {
         generateSiteNames,
         createCourseSite,
         createSections,
-        enrollInstructors);
+        enrollInstructors,
+        migrateCourseContent);
 
     // start execution
     return pipeline(context)
@@ -220,6 +222,21 @@ function getEnrollmentTerm(context) {
             Logger.debug(`Looked up Canvas enrollment term by SIS ID ${context.parentTerm}`, enrollmentTerm);
         })
         .return(context);
+}
+
+function migrateCourseContent(context) {
+    // Is a course content migration requested?
+    if(context.migrateFrom) {
+        Logger.info(`Course creation task includes a content migration request from course ${context.migrateFrom}`);
+
+        // Create migration request
+        return context.canvasApi
+            .createMigration(context.migrateFrom, context.canvasCourse.id)
+            .return(context);
+    }
+
+    // Return context to continue chaining
+    return Promise.resolve(context);
 }
 
 function validateSectionsDoNotExist(context) {
