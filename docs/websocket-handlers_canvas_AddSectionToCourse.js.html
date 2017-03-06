@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>websocket-handlers/banner/GetInstructorSchedule.js - Documentation</title>
+    <title>websocket-handlers/canvas/AddSectionToCourse.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">websocket-handlers/banner/GetInstructorSchedule.js</h1>
+    <h1 class="page-title">websocket-handlers/canvas/AddSectionToCourse.js</h1>
     
 
     
@@ -68,24 +68,44 @@
  */
 
 'use strict';
-let BannerOperations = require('../../BannerOperations.js');
-let Logger = require('fhda-pubsub-logging')('ws-action-get-ins-sched');
+// REM let BannerOperations = require('../../BannerOperations.js');
+let CollegeManager = require('../../CollegeManager.js');
+let Logger = require('fhda-pubsub-logging')('ws-action-delete-sections');
+let ProgressMonitor = require('../../ProgressMonitor.js');
 let WebsocketUtils = require('../../WebsocketUtils.js');
 
 /**
- * Handle a websocket request to get the teaching schedule for the identified
- * user from Banner.
+ * Handle a websocket request to delete a Canvas course site/classroom.
  * @param  {Object} data Event data payload
  * @param  {Function} respond Callback function to send a response back to the client
  * @return {Promise} Resolved when the operation is complete
  */
 module.exports = function (data, respond) {
-    BannerOperations
-        .getInstructorSchedule(data.termCode, this.decoded_token.aud)
-        .then(respond)
+    // Create an alternate reference to the web socket
+    let socket = this;
+
+    // Lookup college configuration
+    let college = CollegeManager[data.college];
+
+    // Create a new progress monitir
+    let progress = new ProgressMonitor();
+
+    // Attach an event handler to reporting progress changed back to the UI
+    progress.on('progressUpdated', function(data) {
+        socket.emit('ui:progress:setPercent', data);
+    });
+
+    // Tell the client to display a progress bar
+    socket.emit('ui:progress:show', {text: `Adding new section to course (CRN ${data.crn})`});
+
+    return college.createSection(data.term, data.crn, data.canvasCourseId, progress)
+        .then(() => {
+            socket.emit('ui:progress:hide');
+            respond({status: 'done'});
+        })
         .catch(WebsocketUtils.handleError.bind(
             this,
-            'A serious error occurred while attempting to lookup an instructor schedule',
+            'A serious error occurred while attempting to add a section to an existing Canvas course',
             Logger,
             respond
         ));

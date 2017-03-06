@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>websocket-handlers/banner/GetInstructorSchedule.js - Documentation</title>
+    <title>websocket-handlers/canvas/MigrationGetSources.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">websocket-handlers/banner/GetInstructorSchedule.js</h1>
+    <h1 class="page-title">websocket-handlers/canvas/MigrationGetSources.js</h1>
     
 
     
@@ -68,24 +68,30 @@
  */
 
 'use strict';
-let BannerOperations = require('../../BannerOperations.js');
-let Logger = require('fhda-pubsub-logging')('ws-action-get-ins-sched');
+let CollegeManager = require('../../CollegeManager.js');
+let Lodash = require('lodash');
+let Logger = require('fhda-pubsub-logging')('ws.action.migration.get-candidates');
 let WebsocketUtils = require('../../WebsocketUtils.js');
 
 /**
- * Handle a websocket request to get the teaching schedule for the identified
- * user from Banner.
+ * Handle a websocket request to get a list of Canvas courses that would make
+ * for good sources to launch a content migration.
  * @param  {Object} data Event data payload
  * @param  {Function} respond Callback function to send a response back to the client
  * @return {Promise} Resolved when the operation is complete
  */
 module.exports = function (data, respond) {
-    BannerOperations
-        .getInstructorSchedule(data.termCode, this.decoded_token.aud)
+    // Lookup college configuration
+    let college = CollegeManager[data.college];
+
+    return college
+        .canvasApi.listMigrationSources(this.decoded_token.aud)    
+        .filter(course => course.name !== 'Canvas Certification Training')
+        .then(result => Lodash.sortBy(result, ['name']))
         .then(respond)
         .catch(WebsocketUtils.handleError.bind(
             this,
-            'A serious error occurred while attempting to lookup an instructor schedule',
+            'A serious error occurred while attempting to lookup migration course candidates in Canvas',
             Logger,
             respond
         ));

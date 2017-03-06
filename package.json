@@ -44,7 +44,7 @@
     "should": "^11.1.0"
   },
   "scripts": {
-    "generate-docs": "rm -Rf docs && node_modules/.bin/jsdoc -c jsdoc.json",
+    "docs": "rm -Rf docs && node_modules/.bin/jsdoc -c jsdoc.json",
     "pm2-kill": "node_modules/pm2/bin/pm2 kill",
     "pm2-start": "node_modules/pm2/bin/pm2 start --force --no-daemon --no-vizion --restart-delay 5000 src/Main.js",
     "pm2-status": "node_modules/pm2/bin/pm2 status --no-daemon",

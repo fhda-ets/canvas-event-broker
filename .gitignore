@@ -1,5 +1,6 @@
 .vscode
 config/local*.js
+debug
 node_modules
 *.log
 *.log.gz

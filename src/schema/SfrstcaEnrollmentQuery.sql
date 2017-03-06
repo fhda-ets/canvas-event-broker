@@ -8,7 +8,7 @@ from
 where 
     s1.sfrstca_term_code = '201732'
     and (s1.sfrstca_rsts_code like 'R%' or s1.sfrstca_rsts_code like 'D%')
-    and s1.sfrstca_pidm = gb_common.f_get_pidm('20255108')
+    and s1.sfrstca_pidm = gb_common.f_get_pidm('campusid')
     and s1.sfrstca_source_cde = 'BASE'
     and (s1.sfrstca_error_flag not in ('F') or s1.sfrstca_error_flag is null)
     and s1.sfrstca_seq_number = (
@@ -27,5 +27,5 @@ select *
 from sfrstcr
 where
     sfrstcr_term_code = '201732'
-    and sfrstcr_pidm = gb_common.f_get_pidm('20255108')
+    and sfrstcr_pidm = gb_common.f_get_pidm('campusid')
 /

@@ -68,6 +68,12 @@ function deleteEvent(event) {
         });
 }
 
+/**
+ * Get the enrollment history for a student based on the SFRSTCA audit table.
+ * @param  {String} term Banner term code
+ * @param  {Number} pidm Banner identity of the student
+ * @return {Promise} Resolved when database query is completed
+ */
 function enrollmentHistoryByTerm(term, pidm) {
     return Banner
         .sql(sqlEnrollmentHistoryByTerm, {term: term, pidm: pidm})
