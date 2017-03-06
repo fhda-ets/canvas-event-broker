@@ -79,6 +79,10 @@ ansi-styles@^2.2.1:
   version "2.2.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/ansi-styles/-/ansi-styles-2.2.1.tgz#b432dd3358b634cf75e1e4664368240533c1ddbe"
 
+ansi-styles@~1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/ansi-styles/-/ansi-styles-1.0.0.tgz#cb102df1c56f5123eab8b67cd7b98027a0279178"
+
 anymatch@^1.3.0:
   version "1.3.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/anymatch/-/anymatch-1.3.0.tgz#a3e52fa39168c825ff57b0248126ce5a8ff95507"
@@ -197,10 +201,6 @@ async@^2.0.0-rc.5, async@^2.0.1:
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/async/-/async-2.1.2.tgz#612a4ab45ef42a70cde806bad86ee6db047e8385"
   dependencies:
     lodash "^4.14.0"
-
-async@~1.0.0:
-  version "1.0.0"
-  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/async/-/async-1.0.0.tgz#f8fc04ca3a13784ade9e1641af98578cfbd647a9"
 
 async@~1.2.1:
   version "1.2.1"
@@ -382,6 +382,12 @@ buffer-equal-constant-time@^1.0.1:
   version "1.0.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/buffer-equal-constant-time/-/buffer-equal-constant-time-1.0.1.tgz#f8e71132f7ffe6e01a5c9697a4c6f3e48d5cc819"
 
+buffer-from@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/buffer-from/-/buffer-from-0.1.1.tgz#57b18b1da0a19ec06f33837a5275a242351bd75e"
+  dependencies:
+    is-array-buffer-x "^1.0.13"
+
 buffer-shims@^1.0.0:
   version "1.0.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/buffer-shims/-/buffer-shims-1.0.0.tgz#9978ce317388c649ad8793028c3477ef044a8b51"
@@ -452,6 +458,14 @@ catharsis@~0.8.8:
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/catharsis/-/catharsis-0.8.8.tgz#693479f43aac549d806bd73e924cd0d944951a06"
   dependencies:
     underscore-contrib "~0.3.0"
+
+chalk@0.4.x:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-0.4.0.tgz#5199a3ddcd0c1efe23bc08c1b027b06176e0c64f"
+  dependencies:
+    ansi-styles "~1.0.0"
+    has-color "~0.1.0"
+    strip-ansi "~0.1.0"
 
 chalk@1.1.3, chalk@^1.0.0, chalk@^1.1, chalk@^1.1.0, chalk@^1.1.1, chalk@^1.1.3:
   version "1.1.3"
@@ -544,10 +558,6 @@ code-point-at@^1.0.0:
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/code-point-at/-/code-point-at-1.0.1.tgz#1104cd34f9b5b45d3eba88f1babc1924e1ce35fb"
   dependencies:
     number-is-nan "^1.0.0"
-
-colors@1.0.x:
-  version "1.0.3"
-  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/colors/-/colors-1.0.3.tgz#0433f44d809680fdeb60ed260f1b0c262e82a40b"
 
 colors@^1.1.2:
   version "1.1.2"
@@ -665,10 +675,6 @@ ctype@0.5.3:
   version "0.5.3"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/ctype/-/ctype-0.5.3.tgz#82c18c2461f74114ef16c135224ad0b9144ca12f"
 
-cycle@1.0.x:
-  version "1.0.3"
-  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/cycle/-/cycle-1.0.3.tgz#21e80b2be8580f98b468f379430662b046c34ad2"
-
 d@^0.1.1, d@~0.1.1:
   version "0.1.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/d/-/d-0.1.1.tgz#da184c535d18d8ee7ba2aa229b914009fae11309"
@@ -702,6 +708,12 @@ debug@*, debug@2, debug@2.2.0, debug@^2.1.1, debug@^2.2, debug@~2.2.0:
 debug@0.7.4:
   version "0.7.4"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/debug/-/debug-0.7.4.tgz#06e1ea8082c2cb14e39806e22e2f6f757f92af39"
+
+debug@^2.4.5:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.1.tgz#79855090ba2c4e3115cc7d8769491d58f0491351"
+  dependencies:
+    ms "0.7.2"
 
 decamelize@^1.0.0, decamelize@^1.1.1:
   version "1.2.0"
@@ -769,6 +781,12 @@ doctrine@^1.2.2:
   dependencies:
     esutils "^2.0.2"
     isarray "^1.0.0"
+
+duplexer2@~0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/duplexer2/-/duplexer2-0.0.2.tgz#c614dcf67e2fb14995a91711e5a617e8a60a31db"
+  dependencies:
+    readable-stream "~1.1.9"
 
 ecc-jsbn@~0.1.1:
   version "0.1.1"
@@ -1005,6 +1023,10 @@ eventemitter2@~0.4.14:
   version "0.4.14"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/eventemitter2/-/eventemitter2-0.4.14.tgz#8f61b75cde012b2e9eb284d4545583b5643b61ab"
 
+eventemitter3@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-2.0.2.tgz#20ce4891909ce9f35b088c94fab40e2c96f473ac"
+
 exit-hook@^1.0.0:
   version "1.1.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/exit-hook/-/exit-hook-1.1.1.tgz#f05ca233b48c05d54fff07765df8507e95c02ff8"
@@ -1082,10 +1104,6 @@ extsprintf@1.0.2:
   version "1.0.2"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/extsprintf/-/extsprintf-1.0.2.tgz#e1080e0658e300b06294990cc70e1502235fd550"
 
-eyes@0.1.x:
-  version "0.1.8"
-  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/eyes/-/eyes-0.1.8.tgz#62cf120234c683785d902348a800ef3e0cc20bc0"
-
 fast-csv@^2.3.0:
   version "2.3.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/fast-csv/-/fast-csv-2.3.0.tgz#cf2d28ac1d01da7654f184aad240de5d5da7021b"
@@ -1113,16 +1131,20 @@ feature-detect-es6@^1.3.1:
   dependencies:
     array-back "^1.0.3"
 
-"fhda-logging@git+http://stash.ad.fhda.edu/scm/npmp/fhda-logging.git#3.3.0":
-  version "3.3.0"
-  resolved "git+http://stash.ad.fhda.edu/scm/npmp/fhda-logging.git#1a14d5866111c094852878d13adfb148bcdfbca0"
+"fhda-pubsub-logging@git+http://stash.ad.fhda.edu/scm/npmp/fhda-pubsub-logging.git#1.0.1":
+  version "1.0.1"
+  resolved "git+http://stash.ad.fhda.edu/scm/npmp/fhda-pubsub-logging.git#66de3e7001ca4e29244b18842e78313c6aafee3e"
   dependencies:
+    chalk "^1.1.3"
     config "^1.20.1"
-    request "^2.75.0"
+    debug "^2.4.5"
+    eventemitter3 "^2.0.2"
+    hyperquest "^2.1.2"
+    lodash "^4.17.2"
+    purdy "^2.2.0"
+    rotating-file-stream "^1.1.2"
     speed-date "^1.0.0"
     stacky "^1.3.1"
-    winston "^2.2.0"
-    yn "^1.2.0"
 
 figures@^1.3.5:
   version "1.7.0"
@@ -1402,7 +1424,7 @@ has-binary@0.1.7:
   dependencies:
     isarray "0.0.1"
 
-has-color@^0.1.7:
+has-color@^0.1.7, has-color@~0.1.0:
   version "0.1.7"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/has-color/-/has-color-0.1.7.tgz#67144a5260c34fc3cca677d041daf52fe7b78b2f"
 
@@ -1413,6 +1435,16 @@ has-cors@1.1.0:
 has-flag@^1.0.0:
   version "1.0.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/has-flag/-/has-flag-1.0.0.tgz#9d9e793165ce017a00f00418c43f942a7b1d11fa"
+
+has-symbol-support-x@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/has-symbol-support-x/-/has-symbol-support-x-1.1.0.tgz#286d792eac673c0c2308fc7b2160b75cebadd550"
+
+has-to-string-tag-x@^1.0.10, has-to-string-tag-x@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/has-to-string-tag-x/-/has-to-string-tag-x-1.1.0.tgz#fd718cf21c24d2e5e5dd94c4fe2134c1583b1e68"
+  dependencies:
+    has-symbol-support-x "^1.1.0"
 
 has-unicode@^2.0.0:
   version "2.0.1"
@@ -1477,6 +1509,14 @@ https-proxy-agent@^1.0.0:
     agent-base "2"
     debug "2"
     extend "3"
+
+hyperquest@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/hyperquest/-/hyperquest-2.1.2.tgz#95dbf6fcc74c749bae55cc39321335ddd6adc158"
+  dependencies:
+    buffer-from "^0.1.1"
+    duplexer2 "~0.0.2"
+    through2 "~0.6.3"
 
 iconv-lite@0.4.13:
   version "0.4.13"
@@ -1555,6 +1595,14 @@ ipaddr.js@1.1.1:
   version "1.1.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/ipaddr.js/-/ipaddr.js-1.1.1.tgz#c791d95f52b29c1247d5df80ada39b8a73647230"
 
+is-array-buffer-x@^1.0.13:
+  version "1.0.13"
+  resolved "https://registry.yarnpkg.com/is-array-buffer-x/-/is-array-buffer-x-1.0.13.tgz#d31d8185545bd42f0944303ea4404bc560cec0b2"
+  dependencies:
+    has-to-string-tag-x "^1.0.10"
+    is-object-like-x "^1.0.11"
+    to-string-tag-x "^1.0.11"
+
 is-arrayish@^0.2.1:
   version "0.2.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/is-arrayish/-/is-arrayish-0.2.1.tgz#77c99840527aa8ecb1a8ba697b80645a7a926a9d"
@@ -1615,6 +1663,14 @@ is-fullwidth-code-point@^2.0.0:
   version "2.0.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/is-fullwidth-code-point/-/is-fullwidth-code-point-2.0.0.tgz#a3b30a5c4f199183167aaab93beefae3ddfb654f"
 
+is-function-x@^1.0.6:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/is-function-x/-/is-function-x-1.1.0.tgz#a4493b118ab70a0763d4ec2517a2d3a0e6ba069d"
+  dependencies:
+    has-to-string-tag-x "^1.1.0"
+    is-primitive "^2.0.0"
+    to-string-tag-x "^1.1.0"
+
 is-glob@^2.0.0, is-glob@^2.0.1:
   version "2.0.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/is-glob/-/is-glob-2.0.1.tgz#d096f926a3ded5600f3fdfd91198cb0888c2d863"
@@ -1635,6 +1691,13 @@ is-number@^2.0.2, is-number@^2.1.0:
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/is-number/-/is-number-2.1.0.tgz#01fcbbb393463a548f2f466cce16dece49db908f"
   dependencies:
     kind-of "^3.0.2"
+
+is-object-like-x@^1.0.11:
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/is-object-like-x/-/is-object-like-x-1.0.11.tgz#aa0a941d77859682d7511413f88d0fb4839c727e"
+  dependencies:
+    is-function-x "^1.0.6"
+    is-primitive "^2.0.0"
 
 is-path-cwd@^1.0.0:
   version "1.0.0"
@@ -1696,7 +1759,7 @@ isobject@^2.0.0:
   dependencies:
     isarray "1.0.0"
 
-isstream@0.1.x, isstream@~0.1.2:
+isstream@~0.1.2:
   version "0.1.2"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
 
@@ -1941,6 +2004,10 @@ lodash.isarray@^3.0.0:
   version "3.0.4"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/lodash.isarray/-/lodash.isarray-3.0.4.tgz#79e4eb88c36a8122af86f844aa9bcd851b5fbb55"
 
+lodash.isnull@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/lodash.isnull/-/lodash.isnull-3.0.0.tgz#fafbe59ea1dca27eed786534039dd84c2e07c56e"
+
 lodash.keys@^3.0.0:
   version "3.1.2"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/lodash.keys/-/lodash.keys-3.1.2.tgz#4dbc0472b156be50a0b286855d1bd0b0c656098a"
@@ -1960,6 +2027,10 @@ lodash@^3.0.0, lodash@^3.10.1:
 lodash@^4.0.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.3.0:
   version "4.16.4"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/lodash/-/lodash-4.16.4.tgz#01ce306b9bad1319f2a5528674f88297aeb70127"
+
+lodash@^4.17.2:
+  version "4.17.4"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
 mailcomposer@4.0.0:
   version "4.0.0"
@@ -2125,6 +2196,10 @@ moment@2.x.x, "moment@>= 2.6.0", moment@^2.10.3, moment@^2.15:
 ms@0.7.1, ms@^0.7.1:
   version "0.7.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/ms/-/ms-0.7.1.tgz#9cd13c03adbff25b65effde7ce864ee952017098"
+
+ms@0.7.2:
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/ms/-/ms-0.7.2.tgz#ae25cf2512b3885a1d95d7f037868d8431124765"
 
 mustache@^2.2.1:
   version "2.3.0"
@@ -2439,10 +2514,6 @@ pipep@^0.1.1:
   version "0.1.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/pipep/-/pipep-0.1.1.tgz#fe9fdcef60176f52b2ef8f3e0a0604268b974840"
 
-pkginfo@0.3.x:
-  version "0.3.1"
-  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/pkginfo/-/pkginfo-0.3.1.tgz#5b29f6a81f70717142e09e765bbeab97b4f81e21"
-
 pluralize@^1.2.1:
   version "1.2.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/pluralize/-/pluralize-1.2.1.tgz#d1a21483fd22bb41e58a12fa3421823140897c45"
@@ -2554,6 +2625,14 @@ punycode@^2.0.1:
   version "2.0.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/punycode/-/punycode-2.0.1.tgz#3f142fd8e6ef4e9ce24acbf7ba869ff9b00d2c2b"
 
+purdy@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/purdy/-/purdy-2.2.0.tgz#ad74be54b0e8b108d107aa7cbfba2a38d24168b6"
+  dependencies:
+    chalk "0.4.x"
+    hoek "2.x.x"
+    joi "^6.10.1"
+
 q@0.9.7:
   version "0.9.7"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/q/-/q-0.9.7.tgz#4de2e6cb3b29088c9e4cbc03bf9d42fb96ce2f75"
@@ -2630,6 +2709,15 @@ read-pkg@^1.0.0:
     load-json-file "^1.0.0"
     normalize-package-data "^2.3.2"
     path-type "^1.0.0"
+
+"readable-stream@>=1.0.33-1 <1.1.0-0":
+  version "1.0.34"
+  resolved "https://registry.yarnpkg.com/readable-stream/-/readable-stream-1.0.34.tgz#125820e34bc842d2f2aaafafe4c2916ee32c157c"
+  dependencies:
+    core-util-is "~1.0.0"
+    inherits "~2.0.1"
+    isarray "0.0.1"
+    string_decoder "~0.10.x"
 
 "readable-stream@^2.0.0 || ^1.1.13", readable-stream@~2.1.4:
   version "2.1.5"
@@ -2847,6 +2935,10 @@ rimraf@2, rimraf@^2.2.8, rimraf@~2.5.1, rimraf@~2.5.4:
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/rimraf/-/rimraf-2.5.4.tgz#96800093cbf1a0c86bd95b4625467535c29dfa04"
   dependencies:
     glob "^7.0.5"
+
+rotating-file-stream@^1.1.2:
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/rotating-file-stream/-/rotating-file-stream-1.1.9.tgz#82554d5f274297073232a6c214d55a271958fa2f"
 
 rsa-pem-from-mod-exp@^0.8.4:
   version "0.8.4"
@@ -3121,7 +3213,7 @@ sshpk@^1.7.0:
     jsbn "~0.1.0"
     tweetnacl "~0.14.0"
 
-stack-trace@0.0.9, stack-trace@0.0.x:
+stack-trace@0.0.9:
   version "0.0.9"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/stack-trace/-/stack-trace-0.0.9.tgz#a8f6eaeca90674c333e7c43953f275b451510695"
 
@@ -3185,6 +3277,10 @@ strip-ansi@^3.0.0, strip-ansi@^3.0.1:
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/strip-ansi/-/strip-ansi-3.0.1.tgz#6a385fb8853d952d5ff05d0e8aaf94278dc63dcf"
   dependencies:
     ansi-regex "^2.0.0"
+
+strip-ansi@~0.1.0:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-0.1.1.tgz#39e8a98d044d150660abe4a6808acf70bb7bc991"
 
 strip-bom@^2.0.0:
   version "2.0.0"
@@ -3261,6 +3357,13 @@ text-table@~0.2.0:
   version "0.2.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
 
+through2@~0.6.3:
+  version "0.6.5"
+  resolved "https://registry.yarnpkg.com/through2/-/through2-0.6.5.tgz#41ab9c67b29d57209071410e1d7a7a968cd3ad48"
+  dependencies:
+    readable-stream ">=1.0.33-1 <1.1.0-0"
+    xtend ">=4.0.0 <4.1.0-0"
+
 through@^2.3.6:
   version "2.3.8"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/through/-/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
@@ -3268,6 +3371,13 @@ through@^2.3.6:
 to-array@0.1.4:
   version "0.1.4"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/to-array/-/to-array-0.1.4.tgz#17e6c11f73dd4f3d74cda7a4ff3238e9ad9bf890"
+
+to-string-tag-x@^1.0.11, to-string-tag-x@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/to-string-tag-x/-/to-string-tag-x-1.1.0.tgz#69cb42ac1fda925150f4aacd7c9638319d3c2746"
+  dependencies:
+    lodash.isnull "^3.0.0"
+    validate.io-undefined "^1.0.3"
 
 topo@1.x.x:
   version "1.1.0"
@@ -3385,6 +3495,10 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
 
+validate.io-undefined@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/validate.io-undefined/-/validate.io-undefined-1.0.3.tgz#7e27fcbb315b841e78243431897671929e20b7f4"
+
 vary@~1.1.0:
   version "1.1.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/vary/-/vary-1.1.0.tgz#e1e5affbbd16ae768dd2674394b9ad3022653140"
@@ -3429,18 +3543,6 @@ window-size@^0.2.0:
   version "0.2.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/window-size/-/window-size-0.2.0.tgz#b4315bb4214a3d7058ebeee892e13fa24d98b075"
 
-winston@^2.2.0:
-  version "2.2.0"
-  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/winston/-/winston-2.2.0.tgz#2c853dd87ab552a8e8485d72cbbf9a2286f029b7"
-  dependencies:
-    async "~1.0.0"
-    colors "1.0.x"
-    cycle "1.0.x"
-    eyes "0.1.x"
-    isstream "0.1.x"
-    pkginfo "0.3.x"
-    stack-trace "0.0.x"
-
 wordwrap@~1.0.0:
   version "1.0.0"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/wordwrap/-/wordwrap-1.0.0.tgz#27584810891456a4171c8d0226441ade90cbcaeb"
@@ -3482,7 +3584,7 @@ xmlhttprequest-ssl@1.5.1:
   version "1.5.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/xmlhttprequest-ssl/-/xmlhttprequest-ssl-1.5.1.tgz#3b7741fea4a86675976e908d296d4445961faa67"
 
-xtend@^4.0.0, xtend@^4.0.1:
+"xtend@>=4.0.0 <4.1.0-0", xtend@^4.0.0, xtend@^4.0.1:
   version "4.0.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/xtend/-/xtend-4.0.1.tgz#a5c6d532be656e23db820efb943a1f04998d63af"
 
@@ -3560,7 +3662,3 @@ yargs@~1.2.6:
 yeast@0.1.2:
   version "0.1.2"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/yeast/-/yeast-0.1.2.tgz#008e06d8094320c372dbc2f8ed76a0ca6c8ac419"
-
-yn@^1.2.0:
-  version "1.2.0"
-  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/yn/-/yn-1.2.0.tgz#d237a4c533f279b2b89d3acac2db4b8c795e4a63"

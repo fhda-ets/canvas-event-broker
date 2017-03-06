@@ -48,7 +48,7 @@ module.exports = {
 
     logging: {
         level: 'verbose',
-        source: 'bsis',
+        source: 'canvas-event-broker',
         environment: 'test',
         transports: {
             console: {}
