@@ -66,18 +66,22 @@ begin
 end;
 /
 
-create or replace trigger t_canvaslms_stdn_drop after update on "saturn"."sfrstcr"
-for each row when (
-    old.sfrstcr_rsts_code <> new.sfrstcr_rsts_code
-    and (new.sfrstcr_rsts_code like 'D%' or new.sfrstcr_rsts_code like 'I%'))
+create or replace trigger t_canvaslms_stdn_drop_audit after insert on "saturn"."sfrstca"
+for each row  when (
+    (new.sfrstca_rsts_code like 'D%' or new.sfrstca_rsts_code like 'I%' or new.sfrstca_rsts_code like 'P%')
+    and new.sfrstca_source_cde = 'BASE'
+    and (
+        new.sfrstca_error_flag not in ('F')
+        or (new.sfrstca_error_flag is null)
+    ))
 begin
-    -- Insert a matching sync record into CANVASLMS_EVENTS for processing by the broker
-    insert into canvaslms_events (event_pidm, event_term, event_crn, event_type)
-    values (:new.sfrstcr_pidm, :new.sfrstcr_term_code, :new.sfrstcr_crn, 2);
+    -- insert a matching sync record into canvas_event_sync for processing by the broker
+    insert into etsis.canvaslms_events (event_pidm, event_term, event_crn, event_type)
+    values (:new.sfrstca_pidm, :new.sfrstca_term_code, :new.sfrstca_crn, 2);
 end;
 /
 
-create or replace trigger etsis.t_canvaslms_user_sync_pfname after update on "saturn"."spbpers"
+create or replace trigger t_canvaslms_user_sync_pfname after update on "saturn"."spbpers"
 for each row when (old.spbpers_pref_first_name <> new.spbpers_pref_first_name)
 begin
     -- Insert a matching sync record into CANVASLMS_EVENTS for processing by the broker
@@ -86,7 +90,7 @@ begin
 end;
 /
 
-create or replace trigger etsis.t_canvaslms_sect_cancel after update on "saturn"."ssbsect"
+create or replace trigger t_canvaslms_sect_cancel after update on "saturn"."ssbsect"
 for each row when (
     old.ssbsect_ssts_code <> new.ssbsect_ssts_code
     and new.ssbsect_ssts_code in ('X'))
