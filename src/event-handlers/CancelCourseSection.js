@@ -11,19 +11,26 @@ let Logger = require('fhda-pubsub-logging')('event-handler-cancel-section');
  * @param  {Object} event An event object
  * @return {Promise} Resolved when the operation is complete
  */
-module.exports = function(college, event) {
+module.exports = async function(college, event) {
     Logger.info('Handling section cancellation event', event);
 
-    // Delete Canvas section
-    return college.deleteSection(event.term, event.crn)
-        .catch(Errors.UntrackedSection, () => {
+    try {
+        // Delete Canvas section
+        await college.deleteSection(event.term, event.crn)
+    }
+    catch(error) {
+        if(error instanceof Errors.UntrackedEnrollment) {
             Logger.warn(`Ignoring event because it does not match any known Canvas sections`, event);
-            
-        })
-        .catch(error => {
-            Logger.error(`Failed to handle section cancellation event due to an error`, [error, event]);
-        })
-        .finally(() => {
-            return BannerOperations.deleteEvent(event);
-        });
+        }
+        else {
+            Logger.error(`Failed to handle section cancellation event due to an error`, {
+                error: error,
+                event: event
+            });
+        }
+    }
+    finally {
+        // Delete event from queue
+        await BannerOperations.deleteEvent(event);
+    }
 };

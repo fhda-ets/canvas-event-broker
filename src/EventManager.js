@@ -37,31 +37,31 @@ function getCollegeForTerm(termCode) {
     }
 }
 
-// TODO: Rewrite this function to match a college to an entire event object
-// rather than a term code
-
 /**
  * Queries the CANVASLMS_EVENTS table to fetch the latest pending events to be processed.
  * @param  {Boolean} [autoReschedule=Config.eventmanager.enabled] Should the event sync auto-reschedule the next iteration?
  */
-function getPendingEvents(autoReschedule=Config.eventmanager.enabled) {
+async function getPendingEvents(autoReschedule=Config.eventmanager.enabled) {
     Logger.info(`Checking Banner for new events`);
 
-    // Get latest pending events
-    BannerOperations.getPendingEvents()
-        .map(handleEvent, {concurrency: 4})
-        .catch(error => {
-            Logger.error(`An error occurred while processing Banner sync events`, error);
-        })
-        .finally(() => {
-            Logger.info(`Completed Banner event synchronization`);
+    try {
+        // Get latest pending events
+        let result = await BannerOperations.getPendingEvents()
+            // Evaluate and process events in parallel
+            .map(handleEvent, {concurrency: 4});
 
-            // Is automatic rescheduling enabled?
-            if(autoReschedule) {
-                setTimeout(getPendingEvents, Config.eventmanager.interval);
-                Logger.verbose(`Scheduled next event sync iteration`);
-            }
-        });
+        Logger.info(`Completed Banner event synchronization (${result.length} events)`);
+    }
+    catch(error) {
+        Logger.error(`An error occurred while processing Banner sync events`, { error: error });
+    }
+    finally {
+        // Is automatic rescheduling enabled?
+        if(autoReschedule) {
+            setTimeout(getPendingEvents, Config.eventmanager.interval);
+            Logger.verbose(`Scheduled next event sync iteration`);
+        }
+    }
 }
 
 /**
@@ -70,35 +70,23 @@ function getPendingEvents(autoReschedule=Config.eventmanager.enabled) {
  * @param  {Object} event The event to be evaluated
  * @return {Promise} Resolved when the event has been processed
  */
-function handleEvent(event) {
-    // Identify type of event, and delegate to the appropriate handler
-    if(event.type === TYPE_SYNC_PERSON) {
-        return handleIfCollegeValid(
-            getCollegeForTerm(event.term),
-            event,
-            SyncPerson);
-    }
-    else if(event.type === TYPE_ENROLL_STUDENT) {
-        return handleIfCollegeValid(
-            getCollegeForTerm(event.term),
-            event,
-            EnrollStudent);
-    }
-    else if(event.type === TYPE_DROP_STUDENT) {
-        return handleIfCollegeValid(
-            getCollegeForTerm(event.term),
-            event,
-            DropStudent);
-    }
-    else if(event.type === TYPE_CANCEL_SECTION) {
-        return handleIfCollegeValid(
-            getCollegeForTerm(event.term),
-            event,
-            CancelCourseSection);
-    }
-    else {
-        Logger.warn(`Ignoring event due to an unsupported type`, event);
-        return BannerOperations.deleteEvent(event);
+async function handleEvent(event) {
+    switch(event.type) {
+        case TYPE_SYNC_PERSON:
+            await handleIfCollegeValid(getCollegeForTerm(event.term), event, SyncPerson);
+            break;
+        case TYPE_ENROLL_STUDENT:
+            await handleIfCollegeValid(getCollegeForTerm(event.term), event, EnrollStudent);
+            break;
+        case TYPE_DROP_STUDENT:
+            await handleIfCollegeValid(getCollegeForTerm(event.term), event, DropStudent);
+            break;
+        case TYPE_CANCEL_SECTION:
+            await handleIfCollegeValid(getCollegeForTerm(event.term), event, CancelCourseSection);
+            break;
+        default:
+            Logger.warn(`Ignoring event due to an unsupported type`, event);
+            await BannerOperations.deleteEvent(event);
     }
 }
 

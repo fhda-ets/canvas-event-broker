@@ -40,23 +40,27 @@ let Logger = require('fhda-pubsub-logging')('event-handler-sync-person');
  * @param  {Object} event An event object
  * @return {Promise} Resolved when the operation is complete
  */
-module.exports = function(college, event) {
+module.exports = async function(college, event) {
     Logger.info('Handling person sync event', event);
 
-    // Lookup the person in Banner
-    return BannerOperations.getPerson(event.pidm)
-        .then(person => {
-            // Sync Canvas user profile with latest data from Banner
-            return college.canvasApi.syncUser(
-                person.campusId,
-                person.firstName,
-                person.lastName,
-                person.email);
-        })
-        .catch(error => {
-            Logger.error(`Failed to handle person sync request due to an error`, [error, event]);
-        })
-        .finally(() => {
-            return BannerOperations.deleteEvent(event);
+    try {
+        // Lookup the person in Banner
+        let person = await BannerOperations.getPerson(event.pidm);
+
+        // Sync Canvas user profile with latest data from Banner
+        await college.canvasApi.syncUser(
+            person.campusId,
+            person.firstName,
+            person.lastName,
+            person.email);
+
+        // Delete event from queue
+        await BannerOperations.deleteEvent(event);
+    }
+    catch(error) {
+        Logger.error(`Failed to handle person sync request due to an error`, {
+            error: error,
+            event: event
         });
+    }
 };

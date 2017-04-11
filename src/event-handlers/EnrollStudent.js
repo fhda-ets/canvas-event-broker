@@ -41,22 +41,29 @@ let Logger = require('fhda-pubsub-logging')('event-handler-enroll-student');
  * @param  {Object} event An event object
  * @return {Promise} Resolved when the operation is complete
  */
-module.exports = function(college, event) {
+module.exports = async function(college, event) {
     Logger.info('Handling student enrollment event', event);
 
-    // Get Banner person profile
-    return BannerOperations.getPerson(event.pidm)
-        .then(person => {
-            // Enroll the student in the requested Canvas section
-            return college.enrollStudent(event.term, event.crn, person);
-        })
-        .catch(Errors.UntrackedSection, () => {
+    try {
+        // Get Banner person profile
+        let person = await BannerOperations.getPerson(event.pidm);
+
+        // Enroll the student in the requested Canvas section
+        await college.enrollStudent(event.term, event.crn, person);
+    }
+    catch(error) {
+        if(error instanceof Errors.UntrackedSection) {
             Logger.warn(`Ignoring event because it does not match any known Canvas sections`, event);
-        })
-        .catch(error => {
-            Logger.error(`Failed to handle student enrollment event due to an error`, [error, event]);
-        })
-        .finally(() => {
-            return BannerOperations.deleteEvent(event);
-        });
+        }   
+        else {
+            Logger.error(`Failed to handle student enrollment event due to an error`, {
+                error: error,
+                event: event
+            });
+        }
+    }
+    finally {
+        // Delete event from queue
+        await BannerOperations.deleteEvent(event);
+    }
 };
