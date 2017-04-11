@@ -31,6 +31,7 @@
     "slackbots": "^0.5.3",
     "socket.io": "^1.4.8",
     "socketio-jwt": "^4.5.0",
+    "string-replace-async": "^1.2.0",
     "yargs": "^6.4.0"
   },
   "devDependencies": {

@@ -46,6 +46,11 @@ let WsGetEnrollmentTerms = require('../websocket-handlers/canvas/GetEnrollmentTe
 let WsSyncStudent = require('../websocket-handlers/canvas/SyncStudent.js');
 
 for(let collegeId in Colleges) {
+    // Skip bound functions
+    if(typeof Colleges[collegeId] === 'function') {
+        continue;
+    }
+
     // Lookup college configuration by property key
     let college = Colleges[collegeId];
 
@@ -93,7 +98,7 @@ for(let collegeId in Colleges) {
 
             let courseContext = undefined;
 
-            it.only('Can create CANV faculty attributes for one or more IDs', function() {
+            it('Can create CANV faculty attributes for one or more IDs', function() {
                 // Configure test
                 this.timeout(180000);
 
@@ -159,6 +164,7 @@ for(let collegeId in Colleges) {
                 // Handle mock request
                 // eslint-disable-next-line
                 return WsCreateCourse.bind(mockWebsocket)(mockCreateRequest, result => {
+                    Should.equal(result.status, 'done');
                 })
                 .then(context => {
                     courseContext = context;

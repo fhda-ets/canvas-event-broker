@@ -699,21 +699,21 @@ date-extended@~0.0.3:
     extended "~0.0.3"
     is-extended "~0.0.3"
 
-debug@*, debug@2, debug@2.2.0, debug@^2.1.1, debug@^2.2, debug@~2.2.0:
-  version "2.2.0"
-  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/debug/-/debug-2.2.0.tgz#f87057e995b1a1f6ae6a4960664137bc56f039da"
+debug@*, debug@2, debug@^2.1.1, debug@^2.2, debug@^2.4.5:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.1.tgz#79855090ba2c4e3115cc7d8769491d58f0491351"
   dependencies:
-    ms "0.7.1"
+    ms "0.7.2"
 
 debug@0.7.4:
   version "0.7.4"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/debug/-/debug-0.7.4.tgz#06e1ea8082c2cb14e39806e22e2f6f757f92af39"
 
-debug@^2.4.5:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.1.tgz#79855090ba2c4e3115cc7d8769491d58f0491351"
+debug@2.2.0, debug@~2.2.0:
+  version "2.2.0"
+  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/debug/-/debug-2.2.0.tgz#f87057e995b1a1f6ae6a4960664137bc56f039da"
   dependencies:
-    ms "0.7.2"
+    ms "0.7.1"
 
 decamelize@^1.0.0, decamelize@^1.1.1:
   version "1.2.0"
@@ -916,7 +916,7 @@ escape-regexp@0.0.1:
   version "0.0.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/escape-regexp/-/escape-regexp-0.0.1.tgz#f44bda12d45bbdf9cb7f862ee7e4827b3dd32254"
 
-escape-string-regexp@1.0.5, escape-string-regexp@^1.0.2, escape-string-regexp@^1.0.5, escape-string-regexp@~1.0.5:
+escape-string-regexp@1.0.5, escape-string-regexp@^1.0.2, escape-string-regexp@^1.0.4, escape-string-regexp@^1.0.5, escape-string-regexp@~1.0.5:
   version "1.0.5"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/escape-string-regexp/-/escape-string-regexp-1.0.5.tgz#1b61c0562190a8dff6ae3bb2cf0200ca130b86d4"
 
@@ -2024,11 +2024,7 @@ lodash@^3.0.0, lodash@^3.10.1:
   version "3.10.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
 
-lodash@^4.0.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.3.0:
-  version "4.16.4"
-  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/lodash/-/lodash-4.16.4.tgz#01ce306b9bad1319f2a5528674f88297aeb70127"
-
-lodash@^4.17.2:
+lodash@^4.0.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.17.2, lodash@^4.3.0:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
@@ -2193,11 +2189,11 @@ moment@2.x.x, "moment@>= 2.6.0", moment@^2.10.3, moment@^2.15:
   version "2.15.2"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/moment/-/moment-2.15.2.tgz#1bfdedf6a6e345f322fe956d5df5bd08a8ce84dc"
 
-ms@0.7.1, ms@^0.7.1:
+ms@0.7.1:
   version "0.7.1"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/ms/-/ms-0.7.1.tgz#9cd13c03adbff25b65effde7ce864ee952017098"
 
-ms@0.7.2:
+ms@0.7.2, ms@^0.7.1:
   version "0.7.2"
   resolved "https://registry.yarnpkg.com/ms/-/ms-0.7.2.tgz#ae25cf2512b3885a1d95d7f037868d8431124765"
 
@@ -3240,6 +3236,13 @@ string-extended@0.0.8:
     date-extended "~0.0.3"
     extended "~0.0.3"
     is-extended "~0.0.3"
+
+string-replace-async@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/string-replace-async/-/string-replace-async-1.2.0.tgz#0398d1d2d55a9c51c9b0f6a29d5a167e56c18cf1"
+  dependencies:
+    escape-string-regexp "^1.0.4"
+    object-assign "^4.0.1"
 
 string-width@^1.0.1, string-width@^1.0.2:
   version "1.0.2"

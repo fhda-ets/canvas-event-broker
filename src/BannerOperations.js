@@ -104,7 +104,7 @@ function getCourse(term, crn) {
         .sql(sqlGetCourse, {term: term, crn: crn})
         .then(Banner.unwrapObject)
         .tap(course => {
-            Logger.debug(`Queried Banner course`, [{term: term, crn: crn}, course]);
+            Logger.debug(`Queried Banner course`, course);
         });
 }
 
@@ -119,7 +119,7 @@ function getCourseSection(term, crn) {
         .sql(sqlGetCourseSection, {term: term, crn: crn})
         .then(Banner.unwrapObject)
         .tap(section => {
-            Logger.debug(`Queried Banner section`, [{term: term, crn: crn}, section]);
+            Logger.debug(`Queried Banner section`, section);
         });
 }
 
@@ -268,7 +268,10 @@ function isSectionTracked(term, crn, rejectOnUntracked=true) {
         .sql(sqlIsSectionTracked, {term: term, crn: crn})
         .then(Banner.unwrapRows)
         .then(rows => {
-            Logger.debug(`Queried CANVASLMS_SECTIONS to verify term and CRN`, rows);
+            Logger.debug(`Queried CANVASLMS_SECTIONS to verify term and CRN`, {
+                result: rows
+            });
+            
             if(rows.length == 1){
                 return rows[0];
             }

@@ -34,6 +34,19 @@ function abbreviateTermCode(termCode) {
     }
 }
 
+function compareBySectionNumber(a, b) {
+    let aNum = parseInt(a.sectionNumber.replace('[A-Z]', ''));
+    let bNum = parseInt(b.sectionNumber.replace('[A-Z]', ''));
+
+    if(aNum > bNum) {
+        return 1;
+    }
+    else if(aNum < bNum) {
+        return -1;
+    }
+    return 0;
+}
+
 function parseSisSectionId(sisSectionId) {
     let tokens = sisSectionId.split(':');
 
@@ -66,6 +79,7 @@ function sanitizeSubjectCode(subject) {
 // Module exports
 module.exports = {
     abbreviateTermCode: abbreviateTermCode,
+    compareBySectionNumber: compareBySectionNumber,
     parseSisSectionId: parseSisSectionId,
 
     /**
