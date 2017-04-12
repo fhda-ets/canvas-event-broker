@@ -1819,6 +1819,10 @@ jsdoc:
     taffydb "2.6.2"
     underscore "~1.8.3"
 
+jsdoc-strip-async-await@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/jsdoc-strip-async-await/-/jsdoc-strip-async-await-0.1.0.tgz#7a755a2b7527da2c76e2163a455636183456152a"
+
 json-schema@0.2.3:
   version "0.2.3"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/json-schema/-/json-schema-0.2.3.tgz#b480c892e59a2f05954ce727bd3f2a4e882f9e13"
@@ -2505,10 +2509,6 @@ pinkie-promise@^2.0.0:
 pinkie@^2.0.0:
   version "2.0.4"
   resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/pinkie/-/pinkie-2.0.4.tgz#72556b80cfa0d48a974e80e77248e80ed4f7f870"
-
-pipep@^0.1.1:
-  version "0.1.1"
-  resolved "http://sonatype.ad.fhda.edu/nexus/content/groups/fhda-npm/pipep/-/pipep-0.1.1.tgz#fe9fdcef60176f52b2ef8f3e0a0604268b974840"
 
 pluralize@^1.2.1:
   version "1.2.1"

@@ -8,5 +8,6 @@
         "recurse": true,
         "template": "node_modules/docdash",
         "verbose": true
-    }
+    },
+    "plugins": ["node_modules/jsdoc-strip-async-await"]
 }

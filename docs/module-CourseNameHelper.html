@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>ProgressMonitor - Documentation</title>
+    <title>CourseNameHelper - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">ProgressMonitor</h1>
+    <h1 class="page-title">CourseNameHelper</h1>
     
 
     
@@ -39,13 +39,8 @@
 
 <header>
     
-        <h2>
-        ProgressMonitor
-        </h2>
         
-            <div class="class-description">ProgressMonitor instances can be created and passed across various steps
-of one long running operation to track and report its progress back
-to a requesting client (i.e creating a new Canvas course).</div>
+            
         
     
 </header>
@@ -54,14 +49,14 @@ to a requesting client (i.e creating a new Canvas course).</div>
     <div class="container-overview">
     
         
+            <div class="description">Utility functions to dynamically generate course names and course codes
+for new Canvas sites using a custom string template format. Templates
+support async lookups for running queries against Banner to collect data
+necessary to generating accurate and useful names.</div>
+        
 
-    
-    <h2>Constructor</h2>
-    
-
-    <h4 class="name" id="ProgressMonitor"><span class="type-signature"></span>new ProgressMonitor<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
+        
+            
 
 
 
@@ -71,7 +66,7 @@ to a requesting client (i.e creating a new Canvas course).</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ProgressMonitor.js.html">ProgressMonitor.js</a>, <a href="ProgressMonitor.js.html#line10">line 10</a>
+        <a href="CourseNameHelper.js.html">CourseNameHelper.js</a>, <a href="CourseNameHelper.js.html#line31">line 31</a>
     </li></ul></dd>
     
 
@@ -113,9 +108,6 @@ to a requesting client (i.e creating a new Canvas course).</div>
 
 
 
-<div class="description">
-    Create a new instance with all properties set to zero (i.e. no progress).
-</div>
 
 
 
@@ -140,7 +132,7 @@ to a requesting client (i.e creating a new Canvas course).</div>
 
 
 
-
+        
     
     </div>
 
@@ -155,18 +147,12 @@ to a requesting client (i.e creating a new Canvas course).</div>
     
 
     
-
-    
-        <h3 class="subsection-title">Methods</h3>
+        <h3 class="subsection-title">Members</h3>
 
         
             
+<h4 class="name" id="~fnLibrary"><span class="type-signature">(inner) </span>fnLibrary<span class="type-signature"></span></h4>
 
-    
-
-    <h4 class="name" id="addTasks"><span class="type-signature"></span>addTasks<span class="signature">(amount)</span><span class="type-signature"></span></h4>
-
-    
 
 
 
@@ -176,7 +162,7 @@ to a requesting client (i.e creating a new Canvas course).</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ProgressMonitor.js.html">ProgressMonitor.js</a>, <a href="ProgressMonitor.js.html#line28">line 28</a>
+        <a href="CourseNameHelper.js.html">CourseNameHelper.js</a>, <a href="CourseNameHelper.js.html#line118">line 118</a>
     </li></ul></dd>
     
 
@@ -216,7 +202,82 @@ to a requesting client (i.e creating a new Canvas course).</div>
 
 
 <div class="description">
-    Add tasks to the total count expected to be completed
+    Library of substitution functions for executing templates
+</div>
+
+
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="~executeTemplate"><span class="type-signature">(inner) </span>executeTemplate<span class="signature">(context, template)</span><span class="type-signature"> &rarr; {Promise|Async}</span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="CourseNameHelper.js.html">CourseNameHelper.js</a>, <a href="CourseNameHelper.js.html#line58">line 58</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    Given a context and template string, use an async modification of String.replace
+to identify each token, and execute an async function to replace its value
+with a "real world" data point from Banner.
 </div>
 
 
@@ -254,13 +315,13 @@ to a requesting client (i.e creating a new Canvas course).</div>
 
         <tr>
             
-                <td class="name"><code>amount</code></td>
+                <td class="name"><code>context</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">Object</span>
 
 
             
@@ -270,7 +331,30 @@ to a requesting client (i.e creating a new Canvas course).</div>
 
             
 
-            <td class="description last">Number of tasks to add</td>
+            <td class="description last">Contextual data to pass to each variable function</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>template</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The template to execute</td>
         </tr>
 
     
@@ -290,6 +374,31 @@ to a requesting client (i.e creating a new Canvas course).</div>
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Resolved with output String when template has been executed
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+|
+
+<span class="param-type">Async</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
         
@@ -297,7 +406,7 @@ to a requesting client (i.e creating a new Canvas course).</div>
 
     
 
-    <h4 class="name" id="completeTask"><span class="type-signature"></span>completeTask<span class="signature">(completed<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~generateCourseCode"><span class="type-signature">(inner) </span>generateCourseCode<span class="signature">(parentTerm, parentCrn, sections, template<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise|Async}</span></h4>
 
     
 
@@ -309,7 +418,7 @@ to a requesting client (i.e creating a new Canvas course).</div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ProgressMonitor.js.html">ProgressMonitor.js</a>, <a href="ProgressMonitor.js.html#line37">line 37</a>
+        <a href="CourseNameHelper.js.html">CourseNameHelper.js</a>, <a href="CourseNameHelper.js.html#line100">line 100</a>
     </li></ul></dd>
     
 
@@ -349,8 +458,7 @@ to a requesting client (i.e creating a new Canvas course).</div>
 
 
 <div class="description">
-    Mark the number (one or more) of tasks completed. Each update also
-recalculates the internal percentage completed.
+    Generate a new course code for a Canvas site.
 </div>
 
 
@@ -392,13 +500,121 @@ recalculates the internal percentage completed.
 
         <tr>
             
-                <td class="name"><code>completed</code></td>
+                <td class="name"><code>parentTerm</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Number</span>
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Banner term code of the parent/root course</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>parentCrn</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Banner CRN of the parent/root course</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sections</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+|
+
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Array of sections for the course</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>template</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
 
 
             
@@ -419,12 +635,12 @@ recalculates the internal percentage completed.
             
                 <td class="default">
                 
-                    <code>1</code>
+                    <code>Config.common.courseNameTemplate</code>
                 
                 </td>
             
 
-            <td class="description last">Number of tasks completed</td>
+            <td class="description last">Template string (or resolves to common default shared by all colleges)</td>
         </tr>
 
     
@@ -444,6 +660,31 @@ recalculates the internal percentage completed.
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    Resolved with new course code string
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+|
+
+<span class="param-type">Async</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
         
@@ -451,7 +692,7 @@ recalculates the internal percentage completed.
 
     
 
-    <h4 class="name" id="getPercentComplete"><span class="type-signature"></span>getPercentComplete<span class="signature">()</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    <h4 class="name" id="~generateCourseName"><span class="type-signature">(inner) </span>generateCourseName<span class="signature">(parentTerm, parentCrn, sections, template<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise|Async}</span></h4>
 
     
 
@@ -463,7 +704,7 @@ recalculates the internal percentage completed.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="ProgressMonitor.js.html">ProgressMonitor.js</a>, <a href="ProgressMonitor.js.html#line52">line 52</a>
+        <a href="CourseNameHelper.js.html">CourseNameHelper.js</a>, <a href="CourseNameHelper.js.html#line76">line 76</a>
     </li></ul></dd>
     
 
@@ -503,7 +744,7 @@ recalculates the internal percentage completed.
 
 
 <div class="description">
-    Get the percentage of tasks completed
+    Generate a new course name for a Canvas site.
 </div>
 
 
@@ -514,6 +755,183 @@ recalculates the internal percentage completed.
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>parentTerm</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Banner term code of the parent/root course</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>parentCrn</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Banner CRN of the parent/root course</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sections</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+|
+
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Array of sections for the course</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>template</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    <code>Config.common.courseNameTemplate</code>
+                
+                </td>
+            
+
+            <td class="description last">Template string (or resolves to common default shared by all colleges)</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -531,6 +949,10 @@ recalculates the internal percentage completed.
 <h5>Returns:</h5>
 
         
+<div class="param-desc">
+    Resolved with new course name string
+</div>
+
 
 
 <dl class="param-type">
@@ -539,7 +961,10 @@ recalculates the internal percentage completed.
     </dt>
     <dd>
         
-<span class="param-type">Number</span>
+<span class="param-type">Promise</span>
+|
+
+<span class="param-type">Async</span>
 
 
     </dd>

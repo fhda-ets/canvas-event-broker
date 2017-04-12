@@ -33,12 +33,9 @@ let BannerOperations = require('../../BannerOperations.js');
 let CollegeManager = require('../../CollegeManager.js');
 let Common = require('../../Common.js');
 let CourseNameHelper = require('../../CourseNameHelper');
-// DEP let Errors = require('../../Errors.js');
 let Logger = require('fhda-pubsub-logging')('ws-action-create-course');
-// DEP let Pipeline = require('pipep');
 let ProgressMonitor = require('../../ProgressMonitor.js');
 let Random = require('random-gen');
-// DEP let WebsocketUtils = require('../../WebsocketUtils.js');
 
 /**
  * Handle a websocket request to create a new Canvas course/site classroom.

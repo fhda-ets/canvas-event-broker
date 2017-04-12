@@ -186,7 +186,7 @@ for(let collegeId in Colleges) {
 
                 // Handle mock request
                 return WsGetCourses.bind(mockWebsocket)(mockRequest, result => {
-                    Should.equal(result.length, 1);
+                    (result.length).should.be.aboveOrEqual(1);
                 });
             });
 

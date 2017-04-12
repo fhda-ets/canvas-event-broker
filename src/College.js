@@ -1,7 +1,6 @@
 'use strict';
 let BannerOperations = require('./BannerOperations.js');
 let CanvasApiClient = require('./CanvasApiClient.js');
-let Case = require('case');
 let Common = require('./Common.js');
 let Lodash = require('lodash');
 
@@ -339,20 +338,7 @@ class College {
             return syncOps;
         });
     }
-
-    /**
-     * Default implementation of a course site naming scheme to generate both
-     * the course name and course code. This can be overriden on a per-college
-     * basis.
-     * @param {Object} context Data payload describing the course and its sections (typically from a create course action)
-     * @return {Promise} Resolved when names are generated (uses Promises to retain the option for async operations)
-     */
-    generateSiteNames(context) {
-        return Promise.resolve({
-            courseCode: `${context.sanitizedSubject} ${context.sanitizedCourseNumber} (${context.sectionString})`,
-            fullName: `${context.abbreviatedTermCode} ${Case.title(context.parentCourse.title)} Sections ${context.sectionString}`
-        });
-    }
+    
 }
 
 module.exports = College;

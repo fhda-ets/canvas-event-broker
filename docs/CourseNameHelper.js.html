@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>websocket-handlers/canvas/GetCourses.js - Documentation</title>
+    <title>CourseNameHelper.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">websocket-handlers/canvas/GetCourses.js</h1>
+    <h1 class="page-title">CourseNameHelper.js</h1>
     
 
     
@@ -38,7 +38,7 @@
     <section>
         <article>
             <pre class="prettyprint source linenums"><code>/**
- * Copyright (c) 2016, Foothill-De Anza Community College District
+ * Copyright (c) 2017, Foothill-De Anza Community College District
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -67,40 +67,162 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/**
+ * Utility functions to dynamically generate course names and course codes
+ * for new Canvas sites using a custom string template format. Templates
+ * support async lookups for running queries against Banner to collect data
+ * necessary to generating accurate and useful names.
+ * @license BSD-3-Clause
+ * @module
+ */
+
 'use strict';
-let CollegeManager = require('../../CollegeManager.js');
-let Logger = require('fhda-pubsub-logging')('ws-action-get-canv-courses');
-let WebsocketUtils = require('../../WebsocketUtils.js');
+let BannerOperations = require('./BannerOperations');
+let Case = require('case');
+let Common = require('./Common');
+let Config = require('config');
+let StringReplaceAsync = require('string-replace-async');
+
+// Define a regex for parsing template variables
+let templateVarRegex = /[\x5B]([A-Za-z]+)[\x5D]+/g;
 
 /**
- * Handle a websocket request to get a list of Canvas courses currently
- * associated with the identified user.
- * @param  {Object} data Event data payload
- * @param  {Function} respond Callback function to send a response back to the client
- * @return {Promise} Resolved when the operation is complete
+ * Given a context and template string, use an async modification of String.replace
+ * to identify each token, and execute an async function to replace its value
+ * with a "real world" data point from Banner.
+ * @param {Object} context Contextual data to pass to each variable function
+ * @param {String} template The template to execute
+ * @returns {Promise|Async} Resolved with output String when template has been executed
  */
-module.exports = function (data, respond) {
-    // Lookup college configuration
-    let college = CollegeManager[data.college];
+async function executeTemplate(context, template) {
+    // Use an async String replace to execute long running operations for each substitution
+    return StringReplaceAsync(template, templateVarRegex, async (match, varName) => {
+        if(typeof fnLibrary[varName] === 'function') {
+            return await fnLibrary[varName](context);
+        }
+        return match;        
+    });    
+}
 
-    return college
-        .canvasApi.getCoursesForUser(data.term, this.decoded_token.aud, data.withSections)
-        .map(course => {
-            // Decorate course with promise to check on content migrations
-            course.migrations = college.canvasApi.listActiveMigrations(course.id);
+/**
+ * Generate a new course name for a Canvas site.
+ * @param {String} parentTerm Banner term code of the parent/root course
+ * @param {String} parentCrn Banner CRN of the parent/root course
+ * @param {Array|Object} sections Array of sections for the course
+ * @param {String} [template=Config.common.courseNameTemplate] Template string (or resolves to common default shared by all colleges)
+ * @returns {Promise|Async} Resolved with new course name string
+ */
+async function generateCourseName(parentTerm, parentCrn, sections, template=Config.common.courseNameTemplate) {
+    // Create a data context (mapping data from Banner as needed)
+    let context = {
+        instructors: await BannerOperations.getInstructors(parentTerm, parentCrn),
+        parentCourse: await BannerOperations.getCourse(parentTerm, parentCrn),
+        parentTerm: parentTerm,
+        parentCrn: parentCrn,
+        sections: await Promise.map(
+            sections,
+            section => BannerOperations.getCourseSection(section.term, section.crn))
+    };
 
-            // Resolve
-            return Promise.props(course);
-        })
-        .tap(respond)
-        .catch(WebsocketUtils.handleError.bind(
-            this,
-            'A serious error occurred while attempting to lookup course memberships in Canvas',
-            Logger,
-            respond
-        ));
+    // Execute template
+    return await executeTemplate(context, template);
+}
+
+/**
+ * Generate a new course code for a Canvas site.
+ * @param {String} parentTerm Banner term code of the parent/root course
+ * @param {String} parentCrn Banner CRN of the parent/root course
+ * @param {Array|Object} sections Array of sections for the course
+ * @param {String} [template=Config.common.courseNameTemplate] Template string (or resolves to common default shared by all colleges)
+ * @returns {Promise|Async} Resolved with new course code string
+ */
+async function generateCourseCode(parentTerm, parentCrn, sections, template=Config.common.courseCodeTemplate) {
+    // Create a data context (mapping data from Banner as needed)
+    let context = {
+        parentCourse: await BannerOperations.getCourse(parentTerm, parentCrn),
+        parentTerm: parentTerm,
+        parentCrn: parentCrn,
+        sections: await Promise.map(
+            sections,
+            section => BannerOperations.getCourseSection(section.term, section.crn))
+    };
+
+    // Execute template
+    return await executeTemplate(context, template);
+}
+
+/**
+ * Library of substitution functions for executing templates
+ */
+let fnLibrary = {
+    allCrns: function(context) {
+        // Get section CRNs, sort, and join into one string
+        return context.sections
+            .sort(Common.compareBySectionNumber)
+            .map(section => section.crn)
+            .join(', ');
+    },
+
+    instLastName: function(context) {
+        return context.instructors[0].lastName;
+    },
+
+    parentCourseNum: function(context) {
+        // Return sanitized course number
+        return Common.sanitizeSubjectCode(context.parentCourse.courseNumber);  
+    },
+
+    parentCrn: function(context) {
+        return context.parentCrn;
+    },
+
+    parentSubj: function(context) {
+        // Return sanitized subject code
+        return Common.sanitizeSubjectCode(context.parentCourse.subjectCode);  
+    },
+
+    parentTitle: function(context) {
+        // Return sanitized subject code
+        return Case.capital(context.parentCourse.title);
+    },
+
+    sections: function(context) {
+        // Get section numbers, sort, and join into one string
+        return context.sections
+            .sort(Common.compareBySectionNumber)
+            .map(section => section.sectionNumber)            
+            .join(', ');
+    },
+
+    termAbbrev: function(context) {
+        // Parse year
+        let year = parseInt(context.parentTerm.substr(0, 4));
+        
+        // Evaluate term
+        if(context.parentTerm[4] === '1') {
+            let adjustedYear = String(year - 1).substr(2, 2);
+            return `Su${adjustedYear}`;
+        }
+        else if(context.parentTerm[4] === '2') {
+            let adjustedYear = String(year - 1).substr(2, 2);
+            return `F${adjustedYear}`;
+        }
+        else if(context.parentTerm[4] === '3') {
+            let adjustedYear = String(year).substr(2, 2);
+            return `W${adjustedYear}`;
+        }
+        else if(context.parentTerm[4] === '4') {
+            let adjustedYear = String(year).substr(2, 2);
+            return `Sp${adjustedYear}`;
+        }
+    }
 };
-</code></pre>
+
+// Module exports
+module.exports = {
+	generateCourseCode: generateCourseCode,
+	generateCourseName: generateCourseName
+};</code></pre>
         </article>
     </section>
 
