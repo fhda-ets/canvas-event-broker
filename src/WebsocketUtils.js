@@ -20,7 +20,12 @@ function handleError(message, logger, handlerCallback, error) {
     logger.error(message, {
         error: error
     });
-    handlerCallback({status: 'error', message: message});
+
+    handlerCallback({
+        status: 'error',
+        message: `${message}: ${(error.message) ? error.message : ''}`
+    });
+
     return Promise.reject(error);
 }
 
@@ -28,7 +33,11 @@ function handleAsyncError(message, logger, handlerCallback, error) {
     logger.error(message, {
         error: error
     });
-    handlerCallback({status: 'error', message: message});
+
+    handlerCallback({
+        status: 'error',
+        message: `${message}: ${(error.message) ? error.message : ''}`
+    });
 }
 
 // Module exports

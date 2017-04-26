@@ -43,6 +43,9 @@ class College {
         // Set college name
         this.name = name;
 
+        // Define a guard variable to prevent more than one reconciliation at a time
+        this.reconciliationInProgress = false;
+
         // Set up any defined scheduled jobs
         if(this.config.scheduledJobs) {
             this.scheduledJobs = new Set();
@@ -303,169 +306,181 @@ class College {
      * @returns {Promise} Resolved when the reconciliation run has completed without errors
      */
     async reconcileEnrollment() {
-        this.logger.info('Preparing to reconcile enrollment');
+        // Check reconciliation guard
+        if(this.reconciliationInProgress === true) {
+            throw new Error(`Enrollment reconciliation is already in progress for '${this.name}' -- cannot run more than one process at a time`);
+        }
+        this.reconciliationInProgress = true;
 
-        // Ensure reconciliation output directory exists
-        Jetpack.dir('reconciliation-reports');
+        try {
+            this.logger.info('Preparing to reconcile enrollment');
 
-        // Define collection of final reports for each term
-        let finalReports = [];
+            // Ensure reconciliation output directory exists
+            Jetpack.dir('reconciliation-reports');
 
-        // Lookup current academic terms
-        let terms = await BannerOperations.getCurrentTermsByCollege(this.config.collegeId);
-        this.logger.verbose('Query current academic terms', terms);
+            // Define collection of final reports for each term
+            let finalReports = [];
 
-        // Iterate over the current and next academic terms
-        for(let term of [terms.term, terms.nextTerm]) {
-            // Check to ensure the term is not blacklisted
-            if(this.config.reconciliation !== undefined) {
-                if(this.config.reconciliation.blacklistTerms !== undefined) {
-                    if(this.config.reconciliation.blacklistTerms.includes(term)) {
-                        this.logger.info(`Skipping reconcile of enrollment for term ${term} -- term is configured as blacklisted`);
-                        continue;
+            // Lookup current academic terms
+            let terms = await BannerOperations.getCurrentTermsByCollege(this.config.collegeId);
+            this.logger.verbose('Query current academic terms', terms);
+
+            // Iterate over the current and next academic terms
+            for(let term of [terms.term, terms.nextTerm]) {
+                // Check to ensure the term is not blacklisted
+                if(this.config.reconciliation !== undefined) {
+                    if(this.config.reconciliation.blacklistTerms !== undefined) {
+                        if(this.config.reconciliation.blacklistTerms.includes(term)) {
+                            this.logger.info(`Skipping reconcile of enrollment for term ${term} -- term is configured as blacklisted`);
+                            continue;
+                        }
                     }
                 }
-            }
-            this.logger.info(`Reconciling enrollment for term ${term}`);
+                this.logger.info(`Reconciling enrollment for term ${term}`);
 
-            // Get Canvas enrollment term object
-            let enrollmentTerm = await this.canvasApi.getEnrollmentTermBySisId(term);
-            if(enrollmentTerm === undefined) {
-                // Skip
-                this.logger.info(`Skipping reconcile of enrollment for term ${term} -- no matching Canvas enrollment term`);
-                continue;
-            }
-            this.logger.verbose(`Found Canvas enrollment term ${enrollmentTerm.id} for ${term}`, enrollmentTerm);
-            
-            // Get Canvas courses
-            this.logger.verbose(`Querying available courses`, terms);
-            let courses = await this.canvasApi.getCoursesForEnrollmentTerm(enrollmentTerm.id);
-            this.logger.verbose(`Found ${courses.length} Canvas courses for reconciliation`);
+                // Get Canvas enrollment term object
+                let enrollmentTerm = await this.canvasApi.getEnrollmentTermBySisId(term);
+                if(enrollmentTerm === undefined) {
+                    // Skip
+                    this.logger.info(`Skipping reconcile of enrollment for term ${term} -- no matching Canvas enrollment term`);
+                    continue;
+                }
+                this.logger.verbose(`Found Canvas enrollment term ${enrollmentTerm.id} for ${term}`, enrollmentTerm);
+                
+                // Get Canvas courses
+                this.logger.verbose(`Querying available courses`, terms);
+                let courses = await this.canvasApi.getCoursesForEnrollmentTerm(enrollmentTerm.id);
+                this.logger.verbose(`Found ${courses.length} Canvas courses for reconciliation`);
 
-            // Run a huge transform to list all enrollments for Canvas in each course
-            let canvasEnrollments = await Promise
-                .filter(courses, course => course.sis_course_id !== null)
-                .map(course => this.canvasApi.getCourseEnrollment(course.id), { concurrency: 16 })
-                .then(enrollmentGroups => Lodash.flattenDeep(enrollmentGroups))
-                .filter(enrollment => enrollment.sis_section_id !== null)
-                .map(enrollment => {
-                    let parsedSisId = enrollment.sis_section_id.split(/:/);
-                    enrollment.bannerTerm = parsedSisId[0];
-                    enrollment.bannerCrn = parsedSisId[1];
-                    return enrollment;
+                // Run a huge transform to list all enrollments for Canvas in each course
+                let canvasEnrollments = await Promise
+                    .filter(courses, course => course.sis_course_id !== null)
+                    .map(course => this.canvasApi.getCourseEnrollment(course.id), { concurrency: 16 })
+                    .then(enrollmentGroups => Lodash.flattenDeep(enrollmentGroups))
+                    .filter(enrollment => enrollment.sis_section_id !== null)
+                    .map(enrollment => {
+                        let parsedSisId = enrollment.sis_section_id.split(/:/);
+                        enrollment.bannerTerm = parsedSisId[0];
+                        enrollment.bannerCrn = parsedSisId[1];
+                        return enrollment;
+                    });
+
+                // Collect all of the Banner enrollment for known Canvas courses in the current term
+                let bannerEnrollments = await BannerOperations.getAllEnrollmentsByTerm(term);
+
+                // Log a report of the initial findings
+                this.logger.info(`Completed data gathering for enrollment reconciliation`, {
+                    enrollmentTerm: enrollmentTerm,
+                    banner: {
+                        enrollmentCount: bannerEnrollments.length,
+                        sample: bannerEnrollments[0]
+                    },
+                    canvas: {
+                        enrollmentCount: canvasEnrollments.length,
+                        sample: canvasEnrollments[0]
+                    }
                 });
 
-            // Collect all of the Banner enrollment for known Canvas courses in the current term
-            let bannerEnrollments = await BannerOperations.getAllEnrollmentsByTerm(term);
+                // Build reconciliation report for web client
+                let report = {
+                    term: enrollmentTerm,
+                    bannerEnrollmentCount: bannerEnrollments.length,
+                    canvasEnrollmentCount: canvasEnrollments.length,
+                    enrollments: {
+                        missing: 0,
+                        corrected: 0
+                    },
 
-            // Log a report of the initial findings
-            this.logger.info(`Completed data gathering for enrollment reconciliation`, {
-                enrollmentTerm: enrollmentTerm,
-                banner: {
-                    enrollmentCount: bannerEnrollments.length,
-                    sample: bannerEnrollments[0]
-                },
-                canvas: {
-                    enrollmentCount: canvasEnrollments.length,
-                    sample: canvasEnrollments[0]
+                    drops: {
+                        missing: 0,
+                        corrected: 0
+                    }
+                };
+
+                // Identify registered students who are missing from Canvas
+                for(let bannerEnrollment of bannerEnrollments) {
+                    // Search for enrollment match
+                    let enrolledInCanvas = Lodash.find(canvasEnrollments, {
+                        bannerTerm: bannerEnrollment.term,
+                        bannerCrn: bannerEnrollment.crn,
+                        sis_user_id: bannerEnrollment.campusId
+                    }) !== undefined;
+
+                    // If the Canvas enrollment is not found, then the student should be marked for add
+                    if(enrolledInCanvas === false) {
+                        report.enrollments.missing++;
+
+                        this.logger.info(`Reconcilation needed to enroll ${bannerEnrollment.campusId} in Canvas section ${bannerEnrollment.term}:${bannerEnrollment.crn}`);
+
+                        // Lookup person by PIDM
+                        let person = await BannerOperations.getPerson(bannerEnrollment.pidm);
+
+                        // Enroll student in Canvas
+                        await this.enrollStudent(
+                            bannerEnrollment.term,
+                            bannerEnrollment.crn,
+                            person);
+
+                        report.enrollments.corrected++;
+                    }
                 }
-            });
 
-            // Build reconciliation report for web client
-            let report = {
-                term: enrollmentTerm,
-                bannerEnrollmentCount: bannerEnrollments.length,
-                canvasEnrollmentCount: canvasEnrollments.length,
-                enrollments: {
-                    missing: 0,
-                    corrected: 0
-                },
+                // Identify active Canvas students who are not registered students in the matching Banner section
+                for(let canvasEnrollment of canvasEnrollments) {
+                    // Search for enrollment match
+                    let enrolledInBanner = Lodash.find(bannerEnrollments, {
+                        term: canvasEnrollment.bannerTerm,
+                        crn: canvasEnrollment.bannerCrn,
+                        campusId: canvasEnrollment.sis_user_id
+                    }) !== undefined;
 
-                drops: {
-                    missing: 0,
-                    corrected: 0
+                    // If the Banner enrollment is not found, then the student should be marked for drop
+                    if(enrolledInBanner === false) {
+                        report.drops.missing++;
+
+                        this.logger.info(`Reconcilation needed to drop ${canvasEnrollment.sis_user_id} from Canvas section ${canvasEnrollment.bannerTerm}:${canvasEnrollment.bannerCrn}`, canvasEnrollment);
+
+                        // Drop student from Canvas
+                        await this.dropStudent(
+                            canvasEnrollment.bannerTerm,
+                            canvasEnrollment.bannerCrn,
+                            null,
+                            canvasEnrollment);
+
+                        report.drops.corrected++;
+                    }
                 }
-            };
 
-            // Identify registered students who are missing from Canvas
-            for(let bannerEnrollment of bannerEnrollments) {
-                // Search for enrollment match
-                let enrolledInCanvas = Lodash.find(canvasEnrollments, {
-                    bannerTerm: bannerEnrollment.term,
-                    bannerCrn: bannerEnrollment.crn,
-                    sis_user_id: bannerEnrollment.campusId
-                }) !== undefined;
+                // Add term report to collection
+                finalReports.push(report);
 
-                // If the Canvas enrollment is not found, then the student should be marked for add
-                if(enrolledInCanvas === false) {
-                    report.enrollments.missing++;
-
-                    this.logger.info(`Reconcilation needed to enroll ${bannerEnrollment.campusId} in Canvas section ${bannerEnrollment.term}:${bannerEnrollment.crn}`);
-
-                    // Lookup person by PIDM
-                    let person = await BannerOperations.getPerson(bannerEnrollment.pidm);
-
-                    // Enroll student in Canvas
-                    await this.enrollStudent(
-                        bannerEnrollment.term,
-                        bannerEnrollment.crn,
-                        person);
-
-                    report.enrollments.corrected++;
-                }
-            }
-
-            // Identify active Canvas students who are not registered students in the matching Banner section
-            for(let canvasEnrollment of canvasEnrollments) {
-                // Search for enrollment match
-                let enrolledInBanner = Lodash.find(bannerEnrollments, {
-                    term: canvasEnrollment.bannerTerm,
-                    crn: canvasEnrollment.bannerCrn,
-                    campusId: canvasEnrollment.sis_user_id
-                }) !== undefined;
-
-                // If the Banner enrollment is not found, then the student should be marked for drop
-                if(enrolledInBanner === false) {
-                    report.drops.missing++;
-
-                    this.logger.info(`Reconcilation needed to drop ${canvasEnrollment.sis_user_id} from Canvas section ${canvasEnrollment.bannerTerm}:${canvasEnrollment.bannerCrn}`, canvasEnrollment);
-
-                    // Drop student from Canvas
-                    await this.dropStudent(
-                        canvasEnrollment.bannerTerm,
-                        canvasEnrollment.bannerCrn,
-                        null,
-                        canvasEnrollment);
-
-                    report.drops.corrected++;
-                }
-            }
-
-            // Add term report to collection
-            finalReports.push(report);
-
-            // Write larger reconcilaition report for archiving
-            Jetpack.write(`reconciliation-reports/reconciliation-${term}-${Moment().format('MMM-D-YYYY-hh-mm-a')}.json`, {
-                report: report,
-                bannerEnrollment: bannerEnrollments,
-                canvasEnrollment: canvasEnrollments
-            });
-            
-            // Keep only the last 6 reconciliation reports per college
-            Jetpack.find('reconciliation-reports', {matching: `./*-*${term[5]}-*.json`})
-                .map(path => Object.assign(Jetpack.inspect(path, {times: true}), { path: path }))
-                .sort((a, b) => a.modifyTime.milliseconds - b.modifyTime.milliseconds)
-                .slice(0, -6)
-                .forEach(oldestFile => {
-                    this.logger.info(`Removing old reconciliation report ${oldestFile.path}`);
-                    Jetpack.remove(oldestFile.path);
+                // Write larger reconcilaition report for archiving
+                Jetpack.write(`reconciliation-reports/reconciliation-${term}-${Moment().format('MMM-D-YYYY-hh-mm-a')}.json`, {
+                    report: report,
+                    bannerEnrollment: bannerEnrollments,
+                    canvasEnrollment: canvasEnrollments
                 });
+                
+                // Keep only the last 6 reconciliation reports per college
+                Jetpack.find('reconciliation-reports', {matching: `./*-*${term[5]}-*.json`})
+                    .map(path => Object.assign(Jetpack.inspect(path, {times: true}), { path: path }))
+                    .sort((a, b) => a.modifyTime.milliseconds - b.modifyTime.milliseconds)
+                    .slice(0, -6)
+                    .forEach(oldestFile => {
+                        this.logger.info(`Removing old reconciliation report ${oldestFile.path}`);
+                        Jetpack.remove(oldestFile.path);
+                    });
 
-            this.logger.info(`Completed enrollment reconciliation for ${term}`);
+                this.logger.info(`Completed enrollment reconciliation for ${term}`);
+            }
+
+            // Return collection of completed reconciliation reports
+            return finalReports;
         }
-
-        // Return collection of completed reconciliation reports
-        return finalReports;
+        finally {
+            // Ensure guard variable is reset no matter what happens
+            this.reconciliationInProgress = false;
+        }
     }
 
     /**
