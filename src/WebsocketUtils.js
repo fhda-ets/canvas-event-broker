@@ -17,12 +17,22 @@
  * @return {Promise} A rejected Promise with the original error
  */
 function handleError(message, logger, handlerCallback, error) {
-    logger.error(message, error);
+    logger.error(message, {
+        error: error
+    });
     handlerCallback({status: 'error', message: message});
     return Promise.reject(error);
 }
 
+function handleAsyncError(message, logger, handlerCallback, error) {
+    logger.error(message, {
+        error: error
+    });
+    handlerCallback({status: 'error', message: message});
+}
+
 // Module exports
 module.exports = {
-    handleError: handleError
+    handleError: handleError,
+    handleAsyncError: handleAsyncError
 };

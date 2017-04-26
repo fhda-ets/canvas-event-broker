@@ -2,5 +2,6 @@
 config/local*.js
 debug
 node_modules
+reconciliation-reports
 *.log
 *.log.gz

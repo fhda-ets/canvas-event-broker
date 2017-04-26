@@ -76,6 +76,19 @@ for(let collegeId in Colleges) {
                     .getCoursesForUser(null, '10716429');
             });
 
+            it('Get all courses by enrollment term', function() {
+                return college.canvasApi
+                    .getCoursesForEnrollmentTerm(5);
+            });
+        });
+
+        describe.only('High-level college features', function() {
+            // Configure Mocha to be patient (this is a potentially long process)
+            this.timeout(60000 * 5);
+
+            it.only('Reconcile enrollment for the current term', function() {
+                return college.reconcileEnrollment();
+            });
         });
 
         describe('Websocket API handlers', function() {

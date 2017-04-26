@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.2.0 - April 2017
+
+- New enrollment reconciliation
+- New support for scheduled jobs, configurable per college
+- Very initial starting ingredients to support De Anza online orientation project
+- Support for building Docker images derived from our internal base image
+- Miscellaneous fix
+
 ## 2.1.0 - April 2017
 
 - Migrating to Node v7+ for async/await syntax

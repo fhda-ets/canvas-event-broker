@@ -70,6 +70,7 @@ function unwrapRows(result) {
 
 // Set driver-level defaults
 Oracle.autoCommit = true;
+Oracle.maxRows = 100000;
 Oracle.outFormat = Oracle.OBJECT;
 
 // Create a connection pool to Banner

@@ -47,5 +47,6 @@ SocketIo.on('connection', function (socket) {
     socket.on('canvas:deleteSections', require('./websocket-handlers/canvas/DeleteSections.js').bind(socket));
     socket.on('canvas:getEnrollmentTerms', require('./websocket-handlers/canvas/GetEnrollmentTerms.js').bind(socket));
     socket.on('canvas:migration:getSources', require('./websocket-handlers/canvas/MigrationGetSources.js').bind(socket));
+    socket.on('canvas:reconcileEnrollment', require('./websocket-handlers/canvas/ReconcileEnrollment.js').bind(socket));
     socket.on('canvas:syncStudent', require('./websocket-handlers/canvas/SyncStudent.js').bind(socket));
 });

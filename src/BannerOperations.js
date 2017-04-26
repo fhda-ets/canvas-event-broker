@@ -12,7 +12,9 @@ let Jetpack = require('fs-jetpack');
 let Logger = require('fhda-pubsub-logging')('banner-operations');
 
 // Load SQL statements
+const sqlAllEnrollmentsByTerm = Jetpack.read('src/sql/AllEnrollmentsByTerm.sql');
 const sqlCreateCanvasFacultyAttribute = Jetpack.read('src/sql/InsertCanvasFacultyAttribute.sql');
+const sqlCurrentTermsByCollege = Jetpack.read('src/sql/CurrentTermsByCollege.sql');
 const sqlDeleteEvent = Jetpack.read('src/sql/DeleteEvent.sql');
 const sqlEnrollmentHistoryByTerm = Jetpack.read('src/sql/EnrollmentHistoryByTerm.sql');
 const sqlGetBannerEnrollments = Jetpack.read('src/sql/BannerEnrollments.sql');
@@ -80,6 +82,11 @@ function enrollmentHistoryByTerm(term, pidm) {
         .then(Banner.unwrapRows);
 }
 
+async function getAllEnrollmentsByTerm(term) {
+    let result = await Banner.sql(sqlAllEnrollmentsByTerm, {term: term});
+    return result.rows;
+}
+
 /**
  * Lookup student enrollments from SFRSTCR joined with Canvas courses from
  * CANVALMS_SECTIONS.
@@ -121,6 +128,16 @@ function getCourseSection(term, crn) {
         .tap(section => {
             Logger.debug(`Queried Banner section`, section);
         });
+}
+
+/**
+ * Lookup the current (and next) academic terms by college ID.
+ * @param {String} collegeId The college to restrict the lookup by
+ * @returns {Promise|Async} Resolved with the first row of the query
+ */
+async function getCurrentTermsByCollege(collegeId) {
+    let result = await Banner.sql(sqlCurrentTermsByCollege, {collegeId: collegeId});
+    return result.rows[0];
 }
 
 /**
@@ -168,6 +185,12 @@ function getPerson(identity) {
         // Execute query using a Banner PIDM
         return Banner
             .sql(sqlGetPerson, {pidm: identity, campusId: null})
+            .then(Banner.unwrapObject);
+    }
+    else if(typeof identity === 'string') {
+        // Execute query using a campus ID/SPRIDEN_ID
+        return Banner
+            .sql(sqlGetPerson, {campusId: identity.trim(), pidm: null})
             .then(Banner.unwrapObject);
     }
     else if(identity.pidm) {
@@ -426,9 +449,11 @@ module.exports = {
     createCanvasFacultyAttribute: createCanvasFacultyAttribute,
     deleteEvent: deleteEvent,
     enrollmentHistoryByTerm: enrollmentHistoryByTerm,
+    getAllEnrollmentsByTerm: getAllEnrollmentsByTerm,
     getBannerEnrollments: getBannerEnrollments,
     getCourse: getCourse,
     getCourseSection: getCourseSection,
+    getCurrentTermsByCollege: getCurrentTermsByCollege,
     getInstructors: getInstructors,
     getInstructorSchedule: getInstructorSchedule,
     getPendingEvents: getPendingEvents,

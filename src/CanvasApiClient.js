@@ -1,5 +1,6 @@
 'use strict';
 let Common = require('./Common.js');
+let HttpLinkHeader = require('http-link-header');
 let Logger = require('fhda-pubsub-logging')('canvas-api-client');
 let LoggerHttp = require('fhda-pubsub-logging')('canvas-api-client-http');
 let Random = require('random-gen');
@@ -43,14 +44,14 @@ class CanvasApiClient {
             simple: true,
             time: true,
             timeout: 20000,
-            transform: (body, response) => {
+            transform: (body, response, resolveWithFullResponse) => {
                 // Track Canvas API usage
                 Logger.info(`Canvas API usage`, {
                     rateLimitRemain: parseFloat(response.headers['x-rate-limit-remaining']),
                     requestCost: parseFloat(response.headers['x-request-cost'])
                 });
 
-                return body;
+                return (resolveWithFullResponse) ? response : body;
             }
         });
     }
@@ -114,7 +115,7 @@ class CanvasApiClient {
     }
 
     createUser(sisLoginId, firstName, lastName, email) {
-        Logger.info(`Creating new Canvas accont`, {
+        Logger.info(`Creating new Canvas account`, {
             sisLoginId: sisLoginId,
             firstName: firstName,
             lastName: lastName,
@@ -283,6 +284,20 @@ class CanvasApiClient {
         });
     }
 
+    async getCoursesForEnrollmentTerm(enrollmentTermId) {
+        // Execute request using internal pagination helper function
+        return await this.requestWithPagination({
+            method: 'GET',
+            uri: `/accounts/1/courses`,
+            useQuerystring: true,
+            qs: {
+                'per_page': '100',
+                'enrollment_term_id': enrollmentTermId,
+                'state[]': ['created', 'claimed', 'available']
+            }
+        });
+    }
+
     /**
      * Enrollment Terms
      */
@@ -317,17 +332,19 @@ class CanvasApiClient {
     /**
      * Get a specific Canvas enrollment term by its SIS ID.
      * @param {String} sisId Banner term code
-     * @returns {Promise} Resolved with the matching EnrollmentTerm object, or an empty array if not found
+     * @returns {Promise} Resolved with the matching EnrollmentTerm object, or undefined if not found
      */
-    getEnrollmentTermBySisId(sisId) {
-        return this
-            .getEnrollmentTerms()
-            .reduce((result, enrollmentTerm) => {
-                if(enrollmentTerm.sis_term_id === sisId) {
-                    return enrollmentTerm;
-                }
-                return result;
-            });
+    async getEnrollmentTermBySisId(sisId) {
+        let enrollmentTerms = await this.getEnrollmentTerms();
+
+        // Iterate enrollment term objects, find one to match the SIS ID
+        for(let term of enrollmentTerms) {
+            if(term.sis_term_id === sisId) {
+                // Terminate the loop and return the identified enrollment term
+                return term;
+            }
+        }
+        return undefined;
     }
 
     /**
@@ -377,6 +394,11 @@ class CanvasApiClient {
                 }
                 return Promise.reject(error);
             });
+    }
+
+    async getSectionsForCourse(courseId) {
+        return await this.client
+            .get(`/courses/${courseId}/sections`);
     }
 
     /**
@@ -437,18 +459,38 @@ class CanvasApiClient {
     }
 
     /**
-     * Get all student Enrollment objects for an existing Canvas section.
-     * @param {String|Number} id Canvas section ID
-     * @param {String|Number} [perPage=250] Number of records to return in a single page
+     * Get all Enrollment objects for a Canvas course. By default, the
+     * result is limited to only active students in a course.
+     * @param {String|Number} id Canvas course ID
      * @returns {Promise} Resolved with an array of Enrollment objects
      */
-    getSectionEnrollment(id, perPage=250) {
-        return this.client({
+    async getCourseEnrollment(id, type=['StudentEnrollment'], state=['active']) {
+        // Execute request using internal pagination helper function
+        return await this.requestWithPagination({
+            method: 'GET',
+            uri: `/courses/${id}/enrollments`,
+            useQuerystring: true,
+            qs: {
+                'per_page': `100`,
+                'type[]': type,
+                'state[]': state
+            }
+        });
+    }
+
+    /**
+     * Get all student Enrollment objects for an existing Canvas section.
+     * @param {String|Number} id Canvas section ID
+     * @returns {Promise} Resolved with an array of Enrollment objects
+     */
+    async getSectionEnrollment(id) {
+        // Execute request using internal pagination helper function
+        return await this.requestWithPagination({
             method: 'GET',
             uri: `/sections/${id}/enrollments`,
             useQuerystring: true,
             qs: {
-                'per_page': `${perPage}`,
+                'per_page': `100`,
                 'type[]': 'StudentEnrollment'
             }
         });
@@ -629,6 +671,81 @@ class CanvasApiClient {
         })
         .promise();
     }
+
+    async requestWithPagination(requestOpts) {
+        let finalResult = [];
+        let hasPagesRemaining = false;
+        // REM let paginationUrl = null;
+        let requestedPageCount = 0;
+        let totalPages = 1;
+
+        // Parse page count from request
+        if(requestOpts.qs['per_page']) {
+            requestedPageCount = parseInt(requestOpts.qs['per_page']);
+        }
+        else if(requestOpts.form['per_page']) {
+            requestedPageCount = parseInt(requestOpts.form['per_page']);
+        }
+
+        // Fetch the initial page
+        let pageResponse = await this.client(
+            // Enforce sensible defaults so that pagination can function properly
+            Object.assign(requestOpts, {
+                resolveWithFullResponse: true,
+            }));
+
+        // Append internal result array
+        finalResult = finalResult.concat(pageResponse.body); 
+        Logger.debug(`Fetched page ${totalPages}, entry count: ${pageResponse.body.length}, page count per request: ${requestedPageCount}`);
+
+        // Parse pagination orders
+        let paginationOrders = this.parseCanvasPagination(pageResponse.headers.link);
+        hasPagesRemaining = paginationOrders.next !== undefined;
+
+        // Continue fetching additional pages if possible
+        while(hasPagesRemaining) {            
+            Logger.debug(`Next page still available`, {
+                hasPagesRemaining: hasPagesRemaining,
+                orders: paginationOrders
+            });
+            totalPages++;            
+
+            // Fetch next page
+            pageResponse = await this.client({
+                method: requestOpts.method,
+                baseUrl: null,
+                uri: paginationOrders.next,
+                resolveWithFullResponse: true
+            });
+
+            // Append internal result array
+            finalResult = finalResult.concat(pageResponse.body);
+            Logger.debug(`Fetched page ${totalPages}, entry count: ${pageResponse.body.length}, page count per request: ${requestedPageCount}`);
+
+            // Parse pagination orders
+            paginationOrders = this.parseCanvasPagination(pageResponse.headers.link);
+            hasPagesRemaining = paginationOrders.next !== undefined;
+        }
+        Logger.debug(`Completed fetching pages`);
+        return finalResult;   
+    }
+
+    /**
+     * Utility function to parse content from a standard formatted HTTP Link
+     * header, and transform the output into a simple key-value object
+     * where rel: url.
+     * @param {String} linkHeader String content of the Link header from an HTTP request
+     * @returns {Object} One or more links mapped to the rel name
+     */
+    parseCanvasPagination(linkHeader) {
+        return HttpLinkHeader
+            .parse(linkHeader)
+            .refs
+            .reduce((result, ref) => {
+                result[ref.rel] = ref.uri;
+                return result;
+            }, {});
+    }   
 
 }
 
