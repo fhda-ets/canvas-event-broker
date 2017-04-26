@@ -43,6 +43,9 @@ module.exports = function (data, respond) {
     return CollegeManager[data.college]
         .canvasApi
         .getEnrollmentTerms()
+        .filter(term => {
+            return term.sis_term_id !== null && term.sis_term_id !== 'Migration';
+        })
         .tap(respond)
         .catch(WebsocketUtils.handleError.bind(
             this,
