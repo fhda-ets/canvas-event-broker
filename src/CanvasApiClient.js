@@ -473,7 +473,8 @@ class CanvasApiClient {
             qs: {
                 'per_page': `100`,
                 'type[]': type,
-                'state[]': state
+                'state[]': state,
+                'role[]': 'StudentEnrollment'
             }
         });
     }
