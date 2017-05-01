@@ -41,23 +41,28 @@ let WebsocketUtils = require('../../WebsocketUtils.js');
  * @param  {Function} respond Callback function to send a response back to the client
  * @return {Promise} Resolved when the operation is complete
  */
-module.exports = function (data, respond) {
+module.exports = async function (data, respond) {
     // Lookup college configuration
     let college = CollegeManager[data.college];
 
     // Get Banner person profile
-    return BannerOperations.getPerson(data.identity)
-        .then(person => {
-            // Run student enrollment sync checks
-            return college.syncStudent(data.term, person);
-        })
-        .then(syncOps => {
-            respond({status: 'done', ops: syncOps});
-        })
-        .catch(WebsocketUtils.handleError.bind(
-            null,
-            'A serious error occurred while attempting to sync enrollment for a student between Banner and Canvas',
+    let person = await BannerOperations.getPerson(data.identity);
+
+    try {
+        // Verify person object
+        if(!(person)) {
+            throw new Error(`Could not find ${data.identity.campusId} in Banner. Check to make sure that you used the correct campus ID, and that the intended person is set up correctly in Banner`);
+        }
+
+        // Run student enrollment sync checks
+        let syncOps = await college.syncStudent(data.term, person);
+        respond({status: 'done', ops: syncOps});
+    }
+    catch(error) {
+        WebsocketUtils.handleAsyncError(
+            `A serious error occurred while attempting to sync enrollment for a student between Banner and Canvas' for ${data.identity.campusId} at '${data.college}'`,
             Logger,
-            respond
-        ));
+            respond,
+            error);
+    }
 };

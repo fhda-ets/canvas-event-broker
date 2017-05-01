@@ -360,12 +360,14 @@ class CanvasApiClient {
             .get(`/users/sis_login_id:${sisLoginId}/enrollments`)
             .promise()
             .map(enrollment => {
-                // Parse Banner SIS section ID to get the term and CRN
-                let parsedSectionId = Common.parseSisSectionId(enrollment.sis_section_id);
+                // If possible, parse Banner SIS section ID to get the term and CRN
+                if(enrollment.sis_section_id) {
+                    let parsedSectionId = Common.parseSisSectionId(enrollment.sis_section_id);
 
-                // Decorate enrollment
-                enrollment.bannerTerm = parsedSectionId.term;
-                enrollment.bannerCrn = parsedSectionId.crn;
+                    // Decorate enrollment
+                    enrollment.bannerTerm = parsedSectionId.term;
+                    enrollment.bannerCrn = parsedSectionId.crn;
+                }
 
                 // Return object
                 return enrollment;

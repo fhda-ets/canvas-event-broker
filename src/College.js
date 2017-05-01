@@ -489,74 +489,73 @@ class College {
      * @param {String} term Banner term
      * @param {Object} person Identity of the student to check
      */
-    syncStudent(term, person) {
-        let college = this;
+    async syncStudent(term, person) {
+        // Define collection for results from student sync
         let syncOps = [];
 
-        college.logger.info(`Checking student enrollment synchronization`, [person, {term: term}]);
+        this.logger.info(`Checking student enrollment synchronization`, {
+            person: person,
+            term: term
+        });  
 
-        // Ensure Canvas account is sychronized
-        // @date Jan-9-2017
-        return college.canvasApi.syncUser(
+        // Ensure Canvas account is exists and is synchronized
+        await this.canvasApi.syncUser(
             person.campusId,
             person.firstName,
             person.lastName,
-            person.email)
+            person.email);
 
-        .then(() => Promise.all([
-            // Lookup enrollments from Banner
-            BannerOperations.enrollmentHistoryByTerm(term, person.pidm),
+        // Lookup enrollments from Banner
+        // Filter enrollments to only registered students
+        let bannerEnrollments = (await BannerOperations.enrollmentHistoryByTerm(term, person.pidm))
+            .filter(enrollment => enrollment.registrationStatus[0] === 'R');
 
-            // Lookup enrollments from Canvas (with reduction Banner term and CRN)
-            college.canvasApi.getEnrollmentsForUser(term, person.campusId)
-        ]))                
-        
-        .spread((bannerEnrollments, canvasEnrollments) => {
-            college.logger.info('Queried Banner and Canvas enrollments for student prior to sync', {
-                banner: bannerEnrollments,
-                canvas: canvasEnrollments,
-                person: person
+        // Lookup enrollments from Canvas
+        let canvasEnrollments = await this.canvasApi.getEnrollmentsForUser(term, person.campusId);
+
+        this.logger.info('Queried Banner and Canvas enrollments for student prior to live sync', {
+            term: term,
+            banner: bannerEnrollments,
+            canvas: canvasEnrollments,
+            person: person
+        });
+
+        // Iterate each Banner enrollment
+        for(let enrollment of bannerEnrollments) {
+            try {
+                // Enroll in Canvas
+                await this.enrollStudent(term, enrollment.crn, person);
+                syncOps.push(`Added student to course (term = ${term}, crn = ${enrollment.crn})`);
+            }
+            catch(error) {
+                if(!(error.message.includes('unique constraint (ETSIS.PK_CANVALMS_ENROLLMENTS) violated'))) {
+                    this.logger.error(`Failed to enroll student in Canvas with live synchronization`, {
+                        term: term,
+                        person: person,
+                        enrollment: enrollment
+                    });
+                    syncOps.push(`Failed to add missing student to course (error = ${error.message}, term = ${term}, crn = ${enrollment.crn})`);
+                }                
+            }
+        }   
+
+        // Iterate each Canvas enrollment
+        for(let enrollment of canvasEnrollments) {
+            let hasMatchingBannerDrop = Lodash.find(bannerEnrollments, bannerEnrollment => {
+                return (bannerEnrollment.term === enrollment.bannerTerm
+                    && bannerEnrollment.crn === enrollment.bannerCrn
+                    && (bannerEnrollment.registrationStatus[0] === 'D' || bannerEnrollment.registrationStatus[0] === 'I' || bannerEnrollment.registrationStatus[0] === 'P'));
             });
 
-            // Iterate enrollments to identify possible problems
-            return Promise.all([
-                // Check for student adds that should be repaired
-                Promise
-                    .filter(bannerEnrollments, enrollment => enrollment.registrationStatus[0] === 'R')
-                    .each(enrollment => {
-                        // Enroll student in Canvas course                                            
-                        return this
-                            .enrollStudent(term, enrollment.crn, person)
-                            .then(() => syncOps.push(`Added student to course (term = ${term}, crn = ${enrollment.crn})`))
-                            .catch(error => {
-                                college.logger.error('Error dump', error);
-                                if(!(error.message.includes('unique constraint (ETSIS.PK_CANVALMS_ENROLLMENTS) violated'))) {
-                                    syncOps.push(`Failed to missing student to course (error = ${error.message}, term = ${term}, crn = ${enrollment.crn})`);
-                                }
-                            });
-                    }),
+            if(hasMatchingBannerDrop) {
+                // Drop student from Canvas course
+                await this.canvasApi.dropStudent(enrollment);
+                syncOps.push(`Dropped student from course (Canvas course = ${enrollment.course_id}, term = ${enrollment.bannerTerm}, crn = ${enrollment.bannerCrn})`);
+            }
+        }
 
-                // Check for student drops that should be repaired
-                Promise.each(canvasEnrollments, canvasEnrollment => {
-                    let hasMatchingBannerDrop = Lodash.find(bannerEnrollments, bannerEnrollment => {
-                        return (bannerEnrollment.term === canvasEnrollment.bannerTerm
-                            && bannerEnrollment.crn === canvasEnrollment.bannerCrn
-                            && (bannerEnrollment.registrationStatus[0] === 'D' || bannerEnrollment.registrationStatus[0] === 'I' || bannerEnrollment.registrationStatus[0] === 'P'));
-                    });
-
-                    if(hasMatchingBannerDrop) {
-                        // Drop student from Canvas course
-                        return college.canvasApi
-                            .dropStudent(canvasEnrollment)
-                            .then(() => syncOps.push(`Dropped student from course (Canvas course = ${canvasEnrollment.course_id}, term = ${canvasEnrollment.bannerTerm}, crn = ${canvasEnrollment.bannerCrn})`));
-                    }
-                })
-            ]);
-        })
-        .then(() => {
-            syncOps.push(`Sync completed for ${person.firstName} ${person.lastName}`);
-            return syncOps;
-        });
+        syncOps.push(`Sync completed for ${person.firstName} ${person.lastName}`);
+        return syncOps;
     }
     
 }

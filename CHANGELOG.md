@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.1 - May 2017
+
+- **Fixed:** Resolved several low level bugs and improved error handling around student sync
+- Refactored `College.syncStudent` with async/await syntax
+
 ## 2.2.0 - April 2017
 
 - New enrollment reconciliation

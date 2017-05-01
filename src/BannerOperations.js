@@ -180,30 +180,43 @@ function getInstructorSchedule(term, instructorId) {
  * database statement is completed.
  */
 function getPerson(identity) {
+    Logger.debug('Preparing to query Banner for person identity', identity);
+    
     // Check the type of identity provided
     if(Number.isInteger(identity)) {
+        Logger.debug('Querying Banner identity by PIDM (Number.isInteger)');
+
         // Execute query using a Banner PIDM
         return Banner
             .sql(sqlGetPerson, {pidm: identity, campusId: null})
             .then(Banner.unwrapObject);
     }
     else if(typeof identity === 'string') {
+        Logger.debug('Querying Banner identity by string campus ID (typeof === string)');
+
         // Execute query using a campus ID/SPRIDEN_ID
         return Banner
             .sql(sqlGetPerson, {campusId: identity.trim(), pidm: null})
             .then(Banner.unwrapObject);
     }
     else if(identity.pidm) {
+        Logger.debug('Querying Banner identity by numeric pidm (identity.pidm)');
+
         // Execute query using a Banner PIDM
         return Banner
             .sql(sqlGetPerson, {pidm: identity.pidm, campusId: null})
             .then(Banner.unwrapObject);
     }
     else if(identity.campusId) {
+        Logger.debug('Querying Banner identity by string campus ID (identity.campusId)');
+
         // Execute query using a campus ID/SPRIDEN_ID
         return Banner
             .sql(sqlGetPerson, {campusId: identity.campusId.trim(), pidm: null})
             .then(Banner.unwrapObject);
+    }
+    else {
+        throw new Error(`${identity} is an invalid person identity object -- cannot complete lookup in Banner`);
     }
 }
 
