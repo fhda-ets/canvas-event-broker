@@ -649,7 +649,47 @@ class CanvasApiClient {
     }
 
     async getFinalSectionGrades(id) {
+        // TODO: Develop later
+    }
 
+    /**
+     * User custom data
+     */
+
+    async setCustomData(userId, namespace, scope, data) {
+        await this.client({
+            method: 'PUT',
+            uri: `/users/59/custom_data/${scope}`,
+            form: {
+                ns: namespace,
+                data: data
+            }
+        });
+    }
+
+    async getCustomData(userId, namespace, scope) {
+        try {
+            // Execute GET request to fetch custom data
+            let result = await this.client({
+                method: 'GET',
+                uri: `/users/59/custom_data/${scope}`,
+                qs: {
+                    ns: namespace
+                }
+            });
+
+            // Return data field
+            return result.data;
+        }
+        catch(error) {
+            // If the custom data point is missing, simply return null to the caller
+            if(error.error.message === 'no data for scope') {
+                return null;
+            }
+            
+            // Raise an error condition for every other outcome
+            throw error;
+        }
     }
 
     /*

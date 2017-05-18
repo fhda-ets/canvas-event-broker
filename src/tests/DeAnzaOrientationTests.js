@@ -34,13 +34,29 @@ let Logger = require('fhda-pubsub-logging')('test-suite');
 
 describe('De Anza College - Online Orientation Support', function() {
 
+    // Override default test timeout
+    this.timeout(30000);
+
     let college = Colleges['deanza'];
 
     it('Should be able to lookup enrollments from the online orientation course', async function() {
         // Lookup final grades for the orientation course
         let enrollments = await college.canvasApi.getFinalCourseGrades(college.config.orientationCourseId);
 
-        console.log(enrollments);
+        // Lookup custom data for each student
+        for(let enrollment of enrollments) {
+            let daooDateTaken = await college.canvasApi.getCustomData(
+                enrollment.user.id,
+                'edu.fhda.daoo',
+                'daoo_date_taken');
+
+            if(daooDateTaken === null) {
+                // TODO: Update Banner
+                // TODO: Update custom data for user indicating that they took the orientation exam
+            }
+
+            console.log(`${enrollment.user.sortable_name} ${(daooDateTaken === null) ? 'has not' : 'has'} completed the online orientation final exam`);
+        }
     });
 
 });
