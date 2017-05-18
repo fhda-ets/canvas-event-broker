@@ -486,7 +486,7 @@ class CanvasApiClient {
      * @param {String|Number} id Canvas section ID
      * @returns {Promise} Resolved with an array of Enrollment objects
      */
-    async getSectionEnrollment(id) {
+    async getSectionEnrollment(id, type=['StudentEnrollment'], state=['active']) {
         // Execute request using internal pagination helper function
         return await this.requestWithPagination({
             method: 'GET',
@@ -494,6 +494,8 @@ class CanvasApiClient {
             useQuerystring: true,
             qs: {
                 'per_page': `100`,
+                'type[]': type,
+                'state[]': state,
                 'type[]': 'StudentEnrollment'
             }
         });
@@ -618,6 +620,36 @@ class CanvasApiClient {
                     });
                 }
             });
+    }
+
+    /**
+     * Student Grading and Scoring
+     * 
+     */
+
+     /**
+      * Lookup all of the student enrollments in a course, and return only
+      * relevant student information along with their final score or grade.
+      * @param {String} id Canvas course ID to lookup.
+      */
+    async getFinalCourseGrades(id) {
+        // Get enrollment records
+        let enrollment = await this.getCourseEnrollment(id);
+
+        // Reduce to just campus IDs and grade data
+        return enrollment.reduce((result, enrollment) => {
+            if(enrollment.grades.final_score !== null && enrollment.sis_user_id !== null) {
+                result.push({
+                    grades: enrollment.grades,
+                    user: enrollment.user
+                });
+            }
+            return result;
+        }, []);
+    }
+
+    async getFinalSectionGrades(id) {
+
     }
 
     /*

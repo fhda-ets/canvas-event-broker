@@ -37,19 +37,8 @@ describe('De Anza College - Online Orientation Support', function() {
     let college = Colleges['deanza'];
 
     it('Should be able to lookup enrollments from the online orientation course', async function() {
-        // Lookup enrollments for the orientation course
-        let enrollments = await college.canvasApi.getCourseEnrollment(college.config.orientationCourseId);
-
-        // Refine results
-        enrollments = enrollments.reduce((result, enrollment) => {
-            if(enrollment.grades.final_score !== null && enrollment.sis_user_id !== null) {
-                result.push({
-                    grades: enrollment.grades,
-                    user: enrollment.user
-                });
-            }
-            return result;
-        }, []);
+        // Lookup final grades for the orientation course
+        let enrollments = await college.canvasApi.getFinalCourseGrades(college.config.orientationCourseId);
 
         console.log(enrollments);
     });
