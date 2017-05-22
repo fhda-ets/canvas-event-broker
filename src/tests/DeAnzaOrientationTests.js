@@ -31,6 +31,7 @@
 'use strict';
 let Colleges = require('../CollegeManager.js');
 let Logger = require('fhda-pubsub-logging')('test-suite');
+let OrientationJob = require('../scheduled-jobs/deanza/SyncOrientationResults');
 
 describe('De Anza College - Online Orientation Support', function() {
 
@@ -39,24 +40,9 @@ describe('De Anza College - Online Orientation Support', function() {
 
     let college = Colleges['deanza'];
 
-    it('Should be able to lookup enrollments from the online orientation course', async function() {
-        // Lookup final grades for the orientation course
-        let enrollments = await college.canvasApi.getFinalCourseGrades(college.config.orientationCourseId);
-
-        // Lookup custom data for each student
-        for(let enrollment of enrollments) {
-            let daooDateTaken = await college.canvasApi.getCustomData(
-                enrollment.user.id,
-                'edu.fhda.daoo',
-                'daoo_date_taken');
-
-            if(daooDateTaken === null) {
-                // TODO: Update Banner
-                // TODO: Update custom data for user indicating that they took the orientation exam
-            }
-
-            console.log(`${enrollment.user.sortable_name} ${(daooDateTaken === null) ? 'has not' : 'has'} completed the online orientation final exam`);
-        }
+    it('Can process enrollment records from the online orientation course', async function() {
+        // Run the orientation records processing job
+        await OrientationJob.bind(college)();
     });
 
 });

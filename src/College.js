@@ -48,13 +48,13 @@ class College {
 
         // Set up any defined scheduled jobs
         if(this.config.scheduledJobs) {
-            this.scheduledJobs = new Set();
+            this.scheduledJobs = new Map();
             
             // Iterate each job configuration
             for(let [cron, moduleName] of Object.entries(this.config.scheduledJobs)) {        
 
                 // Create cron job and add to internal collection
-                this.scheduledJobs.add(new CronJob({
+                this.scheduledJobs.set(moduleName, new CronJob({
                     cronTime: cron,
                     onTick: require(`./scheduled-jobs/${moduleName}`),
                     context: this,

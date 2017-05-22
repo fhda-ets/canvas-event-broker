@@ -495,8 +495,7 @@ class CanvasApiClient {
             qs: {
                 'per_page': `100`,
                 'type[]': type,
-                'state[]': state,
-                'type[]': 'StudentEnrollment'
+                'state[]': state
             }
         });
     }
@@ -551,7 +550,7 @@ class CanvasApiClient {
      * Drop a student from an existing Canvas section. Dropping a student means
      * inactivating their enrollment in Canvas. This leaves the door open for
      * a student to be re-enrolled in the class without losing any prior work.
-     * @param {Object} enrollment The Enrollment in Canvas to inactivate
+     * @param {Object} enrollment The enrollment in Canvas to inactivate
      * @returns {Promise} Resolved with now inactivated student Enrollment object
      */
     dropStudent(enrollment) {
@@ -573,7 +572,7 @@ class CanvasApiClient {
      * Delete a student from an existing Canvas section. Deleting a student
      * means any of record of them in the section, including prior work, is
      * completely removed and cannot be restored.
-     * @param {Object} enrollment The Enrollment in Canvas to delete
+     * @param {Object} enrollment The enrollment in Canvas to delete
      * @returns {Promise} Resolved with now deleted student Enrollment object
      */
     deleteStudent(enrollment) {
@@ -589,6 +588,25 @@ class CanvasApiClient {
         .tap(enrollment => {
             Logger.verbose(`Dropped student from Canvas section`, enrollment);
         });
+    }
+
+    /**
+     * Mark a student enrollment concluded in a Canvas course. Does not delete
+     * the student from the course, and puts their access to the course into
+     * read-only mode.
+     * @param {Object} enrollment The enrollment in Canvas to conclude
+     * @returns {Promise} Resolved when operation is complete
+     */
+    async concludeStudent(enrollment) {
+        await this.client({
+            method: 'DELETE',
+            uri: `/courses/${enrollment.course_id}/enrollments/${enrollment.id}`,
+            form: {
+                'task': 'conclude'
+            }
+        });
+
+        Logger.verbose(`Concluded student enrollment`, enrollment);
     }
 
     /**
@@ -634,18 +652,10 @@ class CanvasApiClient {
       */
     async getFinalCourseGrades(id) {
         // Get enrollment records
-        let enrollment = await this.getCourseEnrollment(id);
+        let enrollments = await this.getCourseEnrollment(id);
 
-        // Reduce to just campus IDs and grade data
-        return enrollment.reduce((result, enrollment) => {
-            if(enrollment.grades.final_score !== null && enrollment.sis_user_id !== null) {
-                result.push({
-                    grades: enrollment.grades,
-                    user: enrollment.user
-                });
-            }
-            return result;
-        }, []);
+        // Limit to only records that contain valid data
+        return enrollments.filter(enrollment => enrollment.grades.final_score !== null && enrollment.sis_user_id !== null);
     }
 
     async getFinalSectionGrades(id) {
