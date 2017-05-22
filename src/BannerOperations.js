@@ -13,8 +13,10 @@ let Logger = require('fhda-pubsub-logging')('banner-operations');
 
 // Load SQL statements
 const sqlAllEnrollmentsByTerm = Jetpack.read('src/sql/AllEnrollmentsByTerm.sql');
+const sqlCreateAdditionalId = Jetpack.read('src/sql/CreateAdditionalId.sql');
 const sqlCreateCanvasFacultyAttribute = Jetpack.read('src/sql/InsertCanvasFacultyAttribute.sql');
 const sqlCurrentTermsByCollege = Jetpack.read('src/sql/CurrentTermsByCollege.sql');
+const sqlDeleteAdditionalId = Jetpack.read('src/sql/DeleteAdditionalId.sql');
 const sqlDeleteEvent = Jetpack.read('src/sql/DeleteEvent.sql');
 const sqlEnrollmentHistoryByTerm = Jetpack.read('src/sql/EnrollmentHistoryByTerm.sql');
 const sqlGetBannerEnrollments = Jetpack.read('src/sql/BannerEnrollments.sql');
@@ -37,6 +39,22 @@ const sqlUntrackEnrollment = Jetpack.read('src/sql/UntrackEnrollment.sql');
 const sqlUntrackTeacherEnrollments = Jetpack.read('src/sql/UntrackTeacherEnrollments.sql');
 
 /**
+ * Create a record for an additional ID in the Banner GORADID table.
+ * @param {Number} pidm Banner PIDM identity for the user
+ * @param {String} adidCode ADID code to distinguish the type of ID
+ * @param {String} additionalId Value of the additional ID
+ */
+async function createAdditionalId(pidm, adidCode, additionalId) {
+    await Banner.sql(sqlCreateAdditionalId, {
+        pidm: pidm,
+        adidCode: adidCode,
+        additionalId: additionalId
+    });
+
+    Logger.info(`Created additional ID ${adidCode} -> ${additionalId} for PIDM ${pidm}`);
+}
+
+/**
  * Create a CANV attribute in the Banner baseline table SIRATTR to indicate
  * that the instructor has received college approved Canvas training.
  * @param  {Number} pidm Banner PIDM identity for the instructor
@@ -55,6 +73,21 @@ function createCanvasFacultyAttribute(pidm) {
             }
             return Promise.reject(error);
         });
+}
+
+/**
+ * Delete an additional ID record for a person by the ADID code from the
+ * Banner GORADID table.
+ * @param {any} pidm Banner PIDM identity for the user
+ * @param {any} adidCode ADID code to distinguish the type of ID
+ */
+async function deleteAdditionalId(pidm, adidCode) {
+    await Banner.sql(sqlDeleteAdditionalId, {
+        pidm: pidm,
+        adidCode: adidCode
+    });
+
+    Logger.info(`Deleted additional ID ${adidCode} for PIDM ${pidm}`);
 }
 
 /**
@@ -180,10 +213,15 @@ function getInstructorSchedule(term, instructorId) {
  * database statement is completed.
  */
 function getPerson(identity) {
-    Logger.debug('Preparing to query Banner for person identity', identity);
+    Logger.debug('Preparing to query Banner for person identity', {
+        identity: identity
+    });
     
     // Check the type of identity provided
-    if(Number.isInteger(identity)) {
+    if(identity === null || identity === undefined) {
+        throw new Error(`'${identity}' is an invalid person identity object -- cannot complete lookup in Banner`);
+    }
+    else if(Number.isInteger(identity)) {
         Logger.debug('Querying Banner identity by PIDM (Number.isInteger)');
 
         // Execute query using a Banner PIDM
@@ -459,7 +497,9 @@ function untrackTeacherEnrollments(course) {
 
 // Module exports
 module.exports = {
+    createAdditionalId: createAdditionalId,
     createCanvasFacultyAttribute: createCanvasFacultyAttribute,
+    deleteAdditionalId: deleteAdditionalId,
     deleteEvent: deleteEvent,
     enrollmentHistoryByTerm: enrollmentHistoryByTerm,
     getAllEnrollmentsByTerm: getAllEnrollmentsByTerm,
