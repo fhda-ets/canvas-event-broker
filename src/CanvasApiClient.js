@@ -655,7 +655,7 @@ class CanvasApiClient {
         let enrollments = await this.getCourseEnrollment(id);
 
         // Limit to only records that contain valid data
-        return enrollments.filter(enrollment => enrollment.grades.final_score !== null && enrollment.sis_user_id !== null);
+        return enrollments.filter(enrollment => enrollment.grades.final_score > 0 && enrollment.sis_user_id !== null);
     }
 
     async getFinalSectionGrades(id) {
