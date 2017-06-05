@@ -12,6 +12,12 @@ module.exports = async function() {
 
 	// Iterate each enrollment
 	for(let enrollment of enrollments) {
+		// Validate score - must be 5/7 or greater
+		if(enrollment.grades.final_score < 70) {
+			// Skip students who have a lower score
+			continue;
+		}
+		
 		// Lookup user in Banner
 		let bannerPerson = await BannerOperations.getPerson(enrollment.user.sis_login_id);
 
