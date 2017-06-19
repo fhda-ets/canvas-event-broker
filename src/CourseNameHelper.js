@@ -147,6 +147,10 @@ let fnLibrary = {
         return Case.capital(context.parentCourse.title);
     },
 
+    parentTitleUpper: function(context) {
+        return context.parentCourse.title.toUpperCase();
+    },
+
     sections: function(context) {
         // Get section numbers, sort, and join into one string
         return context.sections

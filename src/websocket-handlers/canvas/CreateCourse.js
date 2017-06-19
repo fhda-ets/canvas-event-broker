@@ -107,8 +107,16 @@ async function createCourseSite(context) {
     context.ws.emit('ui:progress:setText', {text: 'Creating course'});
 
     // Generate course name and code
-    let courseName = await CourseNameHelper.generateCourseName(context.parentTerm, context.parentCrn, context.sections);
-    let courseCode = await CourseNameHelper.generateCourseCode(context.parentTerm, context.parentCrn, context.sections);
+    let courseName = await CourseNameHelper.generateCourseName(
+        context.parentTerm,
+        context.parentCrn,
+        context.sections,
+        context.college.config.courseNameTemplate);
+
+    let courseCode = await CourseNameHelper.generateCourseCode(
+        context.parentTerm,
+        context.parentCrn,
+        context.sections);
 
     // Create course in Canvas
     context.canvasCourse = await context.canvasApi.createCourse({
