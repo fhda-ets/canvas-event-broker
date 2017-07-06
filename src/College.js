@@ -149,9 +149,12 @@ class College {
                 trackedSection = section;
 
                 // Lookup enrollments in Canvas
-                return college.canvasApi.getSectionEnrollment(section.sectionId);
+                return college.canvasApi.getSectionEnrollment(
+                    section.sectionId,
+                    ['StudentEnrollment', 'TeacherEnrollment'],
+                    []);
             })
-            .tap(enrollments => {
+            .tap(enrollments => {            
                 // Update progress monitor if provided
                 if(progress) {
                     progress.addTasks(enrollments.length);
@@ -169,7 +172,7 @@ class College {
                         progress.completeTask();
                     }
 
-                    college.logger.info(`Successfully deleted student from Canvas section`, [{term: term, crn: crn}, enrollment]);
+                    college.logger.debug(`Successfully deleted student from Canvas section`, [{term: term, crn: crn}, enrollment]);
                 });
             }, Common.concurrency.MULTI)
             .then(() => {
