@@ -7,7 +7,7 @@ select
     event_crn as "crn",
     event_timestamp as "timestamp"
 from
-    canvaslms_events,
+    etsis.canvaslms_events,
     spriden
 where
     event_term is not null

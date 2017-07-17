@@ -8,7 +8,7 @@ select
     section_id as "sectionId",
     course_id as "courseId"
 from
-    canvaslms_enrollments,
+    etsis.canvaslms_enrollments,
     spriden
 where
     term = :term

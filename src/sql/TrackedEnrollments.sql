@@ -9,7 +9,7 @@ select
     course_id as "courseId",
     url as "url"
 from
-    canvaslms_enrollments
+    etsis.canvaslms_enrollments
 where
     term = :term
     and pidm = :pidm

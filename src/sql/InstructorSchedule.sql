@@ -23,7 +23,7 @@ from
     ) instructor_assign,
     ssbsect,
     scbcrse,
-    canvaslms_sections
+    etsis.canvaslms_sections
 where
     instructor_assign.sirasgn_term_code = :term
     and ssbsect_term_code = instructor_assign.sirasgn_term_code

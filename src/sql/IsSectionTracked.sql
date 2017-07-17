@@ -4,7 +4,7 @@ select
     section_id as "sectionId",
     course_id as "courseId"
 from
-    canvaslms_sections
+    etsis.canvaslms_sections
 where
     term = :term
     and crn = :crn

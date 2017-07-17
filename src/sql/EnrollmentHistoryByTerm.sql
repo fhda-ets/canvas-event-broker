@@ -5,7 +5,7 @@ select
     s1.sfrstca_rsts_code as "registrationStatus"
 from
     sfrstca s1,
-    canvaslms_sections
+    etsis.canvaslms_sections
 where 
     s1.sfrstca_term_code = :term
     and (s1.sfrstca_rsts_code like 'R%' or s1.sfrstca_rsts_code like 'D%' or s1.sfrstca_rsts_code like 'I%' or s1.sfrstca_rsts_code like 'P%')
