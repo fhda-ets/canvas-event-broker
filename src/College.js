@@ -138,54 +138,52 @@ class College {
      * @param crn {String} Banner CRN for the section
      * @param progress {Function} Optional progress tracker for monitoring the job
      */
-    deleteSection(term, crn, progress) {
-        let college = this;
-        let trackedSection;
-
+    async deleteSection(term, crn, progress) {
         // Verify if the request refers to a tracked Banner course section
-        return BannerOperations.isSectionTracked(term, crn)
-            .then(section => {
-                // Retain section
-                trackedSection = section;
-
+        let section = await BannerOperations.isSectionTracked(term, crn);
+        if(section) {
+            // Isolate Canvas errors (in case the section did not created properly)
+            try {
                 // Lookup enrollments in Canvas
-                return college.canvasApi.getSectionEnrollment(
+                let canvasEnrollments = this.canvasApi.getSectionEnrollment(
                     section.sectionId,
                     ['StudentEnrollment', 'TeacherEnrollment'],
                     []);
-            })
-            .tap(enrollments => {            
+            
                 // Update progress monitor if provided
                 if(progress) {
-                    progress.addTasks(enrollments.length);
+                    progress.addTasks(canvasEnrollments.length);
                 }
-            })
-            .map(enrollment => {
+
                 // Delete each enrollment from Canvas, and untrack in Banner
-                return Promise.all([
-                    college.canvasApi.deleteStudent(enrollment),
-                    BannerOperations.untrackEnrollment(enrollment)
-                ])
-                .tap(() => {
+                await Promise.map(canvasEnrollments, async enrollment => {
+                    await Promise.all([
+                        this.canvasApi.deleteStudent(enrollment),
+                        BannerOperations.untrackEnrollment(enrollment)
+                    ]);
+
                     // Update progress monitor if provided
                     if(progress) {
                         progress.completeTask();
                     }
 
-                    college.logger.debug(`Successfully deleted student from Canvas section`, [{term: term, crn: crn}, enrollment]);
+                    this.logger.debug(`Successfully deleted student from Canvas section`,
+                        {term: term, crn: crn, enrollment: enrollment});
                 });
-            }, Common.concurrency.MULTI)
-            .then(() => {
+
                 // Delete the section from Canvas
-                return college.canvasApi.deleteSection(trackedSection.sectionId);
-            })
-            .then(formerSection => {
-                // Untrack section in Banner
-                return BannerOperations.untrackCourseSection(formerSection.id).return(formerSection);
-            })
-            .tap(formerSection => {
-                college.logger.info(`Successfully deleted section from Canvas course`, [{term: term, crn: crn}, formerSection]);
-            });
+                await this.canvasApi.deleteSection(section.sectionId);
+            }
+            catch(error) {
+                this.logger.warn(`Failed to delete section from Canvas`,
+                    { term: term, crn: crn, error: error });
+            }
+
+            // Untrack section in Banner
+            await BannerOperations.untrackCourseSection(section.sectionId);
+
+            this.logger.info(`Successfully deleted section from Canvas course`, section);
+        }
     }
 
     /**
