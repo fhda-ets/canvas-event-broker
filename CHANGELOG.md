@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.2.2 - July 20, 2017
+
+- **Improved:** Rewrote and simplified `College.deleteSection(...)` using async await syntax for easier debugging. Added try/catch block to prevent Canvas errors from halting entire process.
+
 ## 2.2.1 - May 2017
 
 - **Fixed:** Resolved several low level bugs and improved error handling around student sync
