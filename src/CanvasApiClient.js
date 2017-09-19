@@ -66,16 +66,21 @@ class CanvasApiClient {
      * @returns {Promise} Resolved with the Canvas user profile object
      */
     getUser(userId, type='sis_login_id:') {
-        return this.client
-            .get(`/users/${type}${userId}/profile`)
-            .promise()
-            .catch(error => {
-                if(error.statusCode === 404) {
-                    Logger.verbose(`Could not find user profile in Canvas`, {type: type, userId: userId});
-                    return null;
-                }
-                return Promise.reject(error);
-            });
+        return this.client({
+            method: `GET`,
+            uri: `/users/${type}${userId}/profile`,
+            headers: {
+                Accept: 'application/json+canvas-string-ids'
+            }
+        })
+        .promise()
+        .catch(error => {
+            if(error.statusCode === 404) {
+                Logger.verbose(`Could not find user profile in Canvas`, {type: type, userId: userId});
+                return null;
+            }
+            return Promise.reject(error);
+        });
     }
 
     /**
