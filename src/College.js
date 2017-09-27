@@ -417,10 +417,19 @@ class College {
                         let person = await BannerOperations.getPerson(bannerEnrollment.pidm);
 
                         // Enroll student in Canvas
-                        await this.enrollStudent(
-                            bannerEnrollment.term,
-                            bannerEnrollment.crn,
-                            person);
+                        try {
+                            await this.enrollStudent(
+                                bannerEnrollment.term,
+                                bannerEnrollment.crn,
+                                person);
+                         
+                            this.logger.info(`Completed reconcilation enroll of ${bannerEnrollment.campusId} in Canvas section ${bannerEnrollment.term}:${bannerEnrollment.crn}`, bannerEnrollment);
+                        }
+                        catch(error) {
+                            this.logger.error(
+                                `Failed to enroll (reconcile) student ${bannerEnrollment.campusId} in Canvas section ${bannerEnrollment.term}:${bannerEnrollment.crn}`,
+                                { bannerEnrollment: bannerEnrollment, error: error });
+                        }
 
                         report.enrollments.corrected++;
                     }
@@ -439,14 +448,24 @@ class College {
                     if(enrolledInBanner === false) {
                         report.drops.missing++;
 
-                        this.logger.info(`Reconcilation needed to drop ${canvasEnrollment.sis_user_id} from Canvas section ${canvasEnrollment.bannerTerm}:${canvasEnrollment.bannerCrn}`, canvasEnrollment);
+                        this.logger.info(`Reconcilation needed to drop ${canvasEnrollment.sis_user_id} from Canvas section ${canvasEnrollment.bannerTerm}:${canvasEnrollment.bannerCrn}`);
 
                         // Drop student from Canvas
-                        await this.dropStudent(
-                            canvasEnrollment.bannerTerm,
-                            canvasEnrollment.bannerCrn,
-                            null,
-                            canvasEnrollment);
+                        try {
+                            await this.dropStudent(
+                                canvasEnrollment.bannerTerm,
+                                canvasEnrollment.bannerCrn,
+                                null,
+                                canvasEnrollment);
+
+                            this.logger.info(`Completed reconcilation drop of ${canvasEnrollment.sis_user_id} from Canvas section ${canvasEnrollment.bannerTerm}:${canvasEnrollment.bannerCrn}`, canvasEnrollment);
+                        }
+                        catch(error) {
+                            this.logger.error(
+                                `Failed to drop (reconcile) student ${canvasEnrollment.sis_user_id} in Canvas section ${canvasEnrollment.bannerTerm}:${canvasEnrollment.bannerCrn}`,
+                                { canvasEnrollment: canvasEnrollment, error: error });
+                        }
+
 
                         report.drops.corrected++;
                     }
