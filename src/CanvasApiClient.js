@@ -1,5 +1,6 @@
 'use strict';
 let Common = require('./Common.js');
+let Email = require('isemail');
 let HttpLinkHeader = require('http-link-header');
 let Logger = require('fhda-pubsub-logging')('canvas-api-client');
 let LoggerHttp = require('fhda-pubsub-logging')('canvas-api-client-http');
@@ -94,29 +95,41 @@ class CanvasApiClient {
      * @param {String} email Contact e-mail address from Banner
      * @returns {Promise} Resolved with the Canvas user profile object after the update
      */
-    syncUser(sisLoginId, firstName, lastName, email) {
+    async syncUser(sisLoginId, firstName, lastName, email) {
         let parent = this;
 
+        // Email.validate(...)
+
         Logger.info(`Preparing to sync Canvas account`, {
-            campusId: sisLoginId
+            campusId: sisLoginId,
+            firstName: firstName,
+            lastName: lastName,
+            email: email
         });
 
-        return this.getUser(sisLoginId)
-            .then(profile => {
-                if(profile === null) {
-                    // Create new account
-                    return parent.createUser(sisLoginId, firstName, lastName, email);
-                }
-                else if(profile.name !== `${firstName} ${lastName}` || profile.sortable_name !== `${lastName}, ${firstName}`) {
-                    // Sync account due to name change
-                    return parent.updateUser(sisLoginId, firstName, lastName, email);
-                }
-                else if(profile.primary_email !== email) {
-                    // Sync account due to e-mail change
-                    return parent.updateUser(sisLoginId, firstName, lastName, email);
-                }
-                return profile;
-            });
+        // Validate the e-mail address (this can be sticky issue if
+        // the address appears corrupt)
+        if(Email.validate(email) === false) {
+            throw new Error(`Cannot synchronize ${sisLoginId} because e-mail address '${email}' failed to validate. Please verify the source SIS data is correct`);
+        }
+
+        // Fetch user profile from Canvas
+        let profile = await this.getUser(sisLoginId);
+
+        // Evaluate result to determine next action
+        if(profile === null) {
+            // Create new account
+            return parent.createUser(sisLoginId, firstName, lastName, email);
+        }
+        else if(profile.name !== `${firstName} ${lastName}` || profile.sortable_name !== `${lastName}, ${firstName}`) {
+            // Sync account due to name change
+            return parent.updateUser(sisLoginId, firstName, lastName, email);
+        }
+        else if(profile.primary_email !== email) {
+            // Sync account due to e-mail change
+            return parent.updateUser(sisLoginId, firstName, lastName, email);
+        }
+        return profile;
     }
 
     createUser(sisLoginId, firstName, lastName, email) {

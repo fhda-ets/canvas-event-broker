@@ -54,6 +54,8 @@ module.exports = async function (data, respond) {
             throw new Error(`Could not find ${data.identity.campusId} in Banner. Check to make sure that you used the correct campus ID, and that the intended person is set up correctly in Banner`);
         }
 
+        Logger.info(`Fetched Banner person object for ${data.identity.campusId}`, person);
+
         // Run student enrollment sync checks
         let syncOps = await college.syncStudent(data.term, person);
         respond({status: 'done', ops: syncOps});
