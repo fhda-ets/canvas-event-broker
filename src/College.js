@@ -358,7 +358,9 @@ class College {
                     .filter(courses, course => course.sis_course_id !== null)
                     .map(course => this.canvasApi.getCourseEnrollment(course.id), { concurrency: 16 })
                     .then(enrollmentGroups => Lodash.flattenDeep(enrollmentGroups))
-                    .filter(enrollment => enrollment.sis_section_id !== null)
+                    .filter(enrollment => 
+                        enrollment.sis_section_id !== null
+                        && /[0-9]{8}/.test(enrollment.user.sis_login_id))
                     .map(enrollment => {
                         let parsedSisId = enrollment.sis_section_id.split(/:/);
                         enrollment.bannerTerm = parsedSisId[0];
