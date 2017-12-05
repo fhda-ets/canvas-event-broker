@@ -147,6 +147,7 @@ async function enrollInstructors(context) {
     for(let instructor of instructors) {
         // Add instructor to context
         context.instructors.push(instructor);
+        Logger.info(`Preparing to enroll instructors`, instructors);
 
         // Sync Canvas account
         let profile = await context.canvasApi.syncUser(
@@ -170,6 +171,8 @@ async function enrollInstructors(context) {
             'TeacherEnrollment',
             enrollment.id,
             context.canvasCourse.id);
+
+        Logger.info(`Successfully enrolled instructor for course section ${context.parentTerm}:${context.parentCrn}`, instructor);
     }
 }
 
@@ -213,7 +216,7 @@ async function validateSectionsDoNotExist(context) {
         Logger.info(`Verifiying that course section ${section.term}:${section.crn} is not already provisioned in Canvas`);
 
         // Run database query to check section status
-        let sectioninBanner = (await BannerOperations.isSectionTracked(section.term, section.crn, false)) !== null;
+        let sectioninBanner = (await BannerOperations.isSectionTracked(section.term, section.crn, { rejectOnUntracked: false })) !== null;
 
         // Check result
         if(sectioninBanner) {

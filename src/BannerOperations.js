@@ -333,11 +333,20 @@ function isEnrollmentTracked(term, crn, pidm) {
  * tracked as being part of a Canvas course.
  * @param  {String} term Banner term code
  * @param  {String} crn Banner CRN
- * @param  {Boolean} [rejectOnUntracked=true] If true, function will return a
- * rejected promise if not found. If false, function will resolve with a null value;
+ * @param  {Object} [options={}] One or more options to tune the behavior of the 
+ * function. If the `rejectOnUntracked` property is to set to `true`, then an exception
+ * will be thrown if the section appears untracked. If the `rejectOnDuplicates`
+ * property is set to `true`, then an exception will be thrown if multiple records
+ * are found for the CRN.
  * @return {Promise} Resolved with database statement is completed
  */
-function isSectionTracked(term, crn, rejectOnUntracked=true) {
+function isSectionTracked(term, crn, options={}) {
+    // Apply option customizations to sensible default
+    let finalOpts = Object.assign({
+        rejectOnDuplicates: true,
+        rejectOnUntracked: true
+    }, options);
+
     return Banner
         .sql(sqlIsSectionTracked, {term: term, crn: crn})
         .then(Banner.unwrapRows)
@@ -349,10 +358,13 @@ function isSectionTracked(term, crn, rejectOnUntracked=true) {
             if(rows.length == 1){
                 return rows[0];
             }
-            else if(rows.length > 1) {
+            else if(finalOpts.rejectOnDuplicates === true && rows.length > 1) {
                 return Promise.reject(new Errors.DuplicateSections(`Cannot track a Canvas section that exists more than once in CANVASLMS_SECTIONS. This is likely an indicator of a serious problem`));
             }
-            return (rejectOnUntracked) ? Promise.reject(new Errors.UntrackedSection()) : null;
+            else if(finalOpts.rejectOnDuplicates === false && rows.length > 1) {
+                return rows[0];
+            }
+            return (finalOpts.rejectOnUntracked === true) ? Promise.reject(new Errors.UntrackedSection()) : null;
         });
 }
 

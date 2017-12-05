@@ -79,7 +79,7 @@ class College {
         let college = this;
 
         // Verify if the request refers to a tracked Banner course section
-        return BannerOperations.isSectionTracked(term, crn, false)
+        return BannerOperations.isSectionTracked(term, crn, { rejectOnUntracked: false })
             .then(() => {
                 // Query the Banner section and enrollment records
                 return [
@@ -139,8 +139,11 @@ class College {
      * @param progress {Function} Optional progress tracker for monitoring the job
      */
     async deleteSection(term, crn, progress) {
+        // Prepare options for the section check
+        let trackingOpts = { rejectOnDuplicates: false, rejectOnUntracked: false };
+
         // Verify if the request refers to a tracked Banner course section
-        let section = await BannerOperations.isSectionTracked(term, crn);
+        let section = await BannerOperations.isSectionTracked(term, crn, trackingOpts);
         if(section) {
             // Isolate Canvas errors (in case the section did not created properly)
             try {
