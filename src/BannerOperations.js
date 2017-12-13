@@ -35,6 +35,7 @@ const sqlTrackCourseSection = Jetpack.read('src/sql/TrackCourseSection.sql');
 const sqlTrackEnrollment = Jetpack.read('src/sql/TrackEnrollment.sql');
 const sqlUntrackCourse = Jetpack.read('src/sql/UntrackCourse.sql');
 const sqlUntrackCourseSection = Jetpack.read('src/sql/UntrackCourseSection.sql');
+const sqlUntrackCourseSectionByTermCrn = Jetpack.read('src/sql/UntrackCourseSectionByTermCrn.sql');
 const sqlUntrackEnrollment = Jetpack.read('src/sql/UntrackEnrollment.sql');
 const sqlUntrackTeacherEnrollments = Jetpack.read('src/sql/UntrackTeacherEnrollments.sql');
 
@@ -471,6 +472,22 @@ function untrackCourseSection(sectionId) {
 }
 
 /**
+ * Remove a record for a tracked section from the CANVASLMS_SECTIONS custom table
+ * @param  {String|Number} sectionId
+ * @return {Promise} Resolved when the delete is completed
+ */
+function untrackCourseSectionByTermCrn(term, crn) {
+    // Create parameter payload
+    let params = { term: term, crn: crn };
+
+    // Execute SQL
+    return Banner.sql(sqlUntrackCourseSectionByTermCrn, params)
+        .then(() => {
+            Logger.verbose('Removed tracked Canvas course section from Banner', params);
+        });
+}
+
+/**
  * Remove a record for a tracked enrollment from the CANVASLMS_ENROLLMENTS custom table
  * @param  {Object} enrollment Canvas enrollment object
  * @return {Promise} Resolved when the delete is completed
@@ -532,6 +549,7 @@ module.exports = {
     trackEnrollment: trackEnrollment,
     untrackCourse: untrackCourse,
     untrackCourseSection: untrackCourseSection,
+    untrackCourseSectionByTermCrn: untrackCourseSectionByTermCrn,
     untrackEnrollment: untrackEnrollment,
     untrackTeacherEnrollments: untrackTeacherEnrollments
 };

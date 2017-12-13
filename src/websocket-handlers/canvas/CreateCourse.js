@@ -85,6 +85,14 @@ module.exports = async function (data, respond) {
         return context;
     }
     catch(error) {
+        // Rollback the course
+        await context.canvasApi.deleteCourse(context.canvasCourse.id);
+        Logger.warn(`Rolled back course that failed its creation phase (id = ${context.canvasCourse.id})`);
+        for(let section of context.sections) {
+            await BannerOperations.untrackCourseSectionByTermCrn(section.term, section.crn);
+            Logger.warn(`Rolled back course section that failed its creation phase (term = ${section.term}, crn = ${section.crn})`);
+        }        
+
         // Log the error
         Logger.error('A serious error occurred while attempting to create a new Canvas course', {
             error: error,
