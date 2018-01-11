@@ -3,7 +3,7 @@ select
     spriden_pidm as "pidm",
     nvl(spbpers_pref_first_name, spriden_first_name) as "firstName",
     spriden_last_name as "lastName",
-    (select lower(goremal_email_address) from goremal where rownum = 1 and goremal_pidm = spriden_pidm and goremal_status_ind in ('A') and goremal_emal_code = 'PE') as "email"
+    (select lower(goremal_email_address) from goremal where goremal.rowid = baninst1.f_get_email_rowid(spriden_pidm, 'STDNEMAL', 'A', NULL)) as "email"
 from
     sfrstcr,
     spriden,
