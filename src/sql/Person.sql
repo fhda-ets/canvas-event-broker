@@ -8,10 +8,8 @@ select
             select lower(goremal_email_address)
             from goremal
             where
-                rownum = 1
-                and goremal_pidm = spriden_pidm
-                and goremal_status_ind in ('A')
-                and goremal_emal_code = 'PE')
+                goremal.rowid = baninst1.f_get_email_rowid(spriden_pidm, 'STDNEMAL', 'A', NULL)
+            )
         else
             coalesce((
                 select lower(goremal_email_address)
