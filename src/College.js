@@ -362,8 +362,7 @@ class College {
                     .map(course => this.canvasApi.getCourseEnrollment(course.id), { concurrency: 16 })
                     .then(enrollmentGroups => Lodash.flattenDeep(enrollmentGroups))
                     .filter(enrollment => 
-                        enrollment.sis_section_id !== null
-                        && /[0-9]{8}/.test(enrollment.user.sis_login_id))
+                        enrollment.sis_section_id !== null && /[0-9]{8}/.test(enrollment.user.sis_user_id))
                     .map(enrollment => {
                         let parsedSisId = enrollment.sis_section_id.split(/:/);
                         enrollment.bannerTerm = parsedSisId[0];
@@ -405,12 +404,17 @@ class College {
 
                 // Identify registered students who are missing from Canvas
                 for(let bannerEnrollment of bannerEnrollments) {
+
+                    this.logger.debug(`Checking if ${bannerEnrollment.campusId} is in Canvas course term=${bannerEnrollment.term} crn=${bannerEnrollment.crn}`);
+
                     // Search for enrollment match
-                    let enrolledInCanvas = Lodash.find(canvasEnrollments, {
-                        bannerTerm: bannerEnrollment.term,
-                        bannerCrn: bannerEnrollment.crn,
-                        sis_user_id: bannerEnrollment.campusId
+                    let enrolledInCanvas = Lodash.find(canvasEnrollments, canvasEnrollment => {
+                        return canvasEnrollment.bannerTerm === bannerEnrollment.term
+                            && canvasEnrollment.bannerCrn === bannerEnrollment.crn
+                            && canvasEnrollment.user.sis_user_id === bannerEnrollment.campusId;
                     }) !== undefined;
+
+                    this.logger.debug(`Result = ${enrolledInCanvas.toString().toUpperCase()}`);
 
                     // If the Canvas enrollment is not found, then the student should be marked for add
                     if(enrolledInCanvas === false) {
@@ -428,29 +432,35 @@ class College {
                                 bannerEnrollment.crn,
                                 person);
                          
+                            report.enrollments.corrected++;
+
                             this.logger.info(`Completed reconcilation enroll of ${bannerEnrollment.campusId} in Canvas section ${bannerEnrollment.term}:${bannerEnrollment.crn}`, bannerEnrollment);
                         }
                         catch(error) {
                             this.logger.error(
                                 `Failed to enroll (reconcile) student ${bannerEnrollment.campusId} in Canvas section ${bannerEnrollment.term}:${bannerEnrollment.crn}`,
                                 { bannerEnrollment: bannerEnrollment, error: error });
-                        }
-
-                        report.enrollments.corrected++;
+                        }                        
                     }
                 }
 
                 // Identify active Canvas students who are not registered students in the matching Banner section
                 for(let canvasEnrollment of canvasEnrollments) {
-                    // Search for enrollment match
-                    let enrolledInBanner = Lodash.find(bannerEnrollments, {
-                        term: canvasEnrollment.bannerTerm,
-                        crn: canvasEnrollment.bannerCrn,
-                        campusId: canvasEnrollment.sis_user_id
-                    }) !== undefined;
 
-                    // If the Banner enrollment is not found, then the student should be marked for drop
-                    if(enrolledInBanner === false) {
+                    this.logger.debug(`Checking if ${canvasEnrollment.user.sis_user_id} term=${canvasEnrollment.bannerTerm} crn=${canvasEnrollment.bannerCrn} is also registered in Banner`);
+
+                    // Search for enrollment match
+                    let enrolledInBanner = Lodash.find(bannerEnrollments, bannerEnrollment => {
+                        return (bannerEnrollment.term === canvasEnrollment.bannerTerm
+                            && bannerEnrollment.crn === canvasEnrollment.bannerCrn
+                            && bannerEnrollment.campusId === canvasEnrollment.user.sis_user_id);
+                    });
+
+                    this.logger.debug('Result', enrolledInBanner);
+
+                    // If the Banner enrollment is not found, then the student should be dropped
+                    if(enrolledInBanner === undefined) {
+                        
                         report.drops.missing++;
 
                         this.logger.info(`Reconcilation needed to drop ${canvasEnrollment.sis_user_id} from Canvas section ${canvasEnrollment.bannerTerm}:${canvasEnrollment.bannerCrn}`);
@@ -463,16 +473,15 @@ class College {
                                 null,
                                 canvasEnrollment);
 
+                            report.drops.corrected++;
+
                             this.logger.info(`Completed reconcilation drop of ${canvasEnrollment.sis_user_id} from Canvas section ${canvasEnrollment.bannerTerm}:${canvasEnrollment.bannerCrn}`, canvasEnrollment);
                         }
                         catch(error) {
                             this.logger.error(
                                 `Failed to drop (reconcile) student ${canvasEnrollment.sis_user_id} in Canvas section ${canvasEnrollment.bannerTerm}:${canvasEnrollment.bannerCrn}`,
                                 { canvasEnrollment: canvasEnrollment, error: error });
-                        }
-
-
-                        report.drops.corrected++;
+                        }                        
                     }
                 }
 
@@ -566,13 +575,13 @@ class College {
 
         // Iterate each Canvas enrollment
         for(let enrollment of canvasEnrollments) {
-            let hasMatchingBannerDrop = Lodash.find(bannerEnrollments, bannerEnrollment => {
+            let isEnrolledBanner = Lodash.find(bannerEnrollments, bannerEnrollment => {
                 return (bannerEnrollment.term === enrollment.bannerTerm
                     && bannerEnrollment.crn === enrollment.bannerCrn
-                    && (bannerEnrollment.registrationStatus[0] === 'D' || bannerEnrollment.registrationStatus[0] === 'I' || bannerEnrollment.registrationStatus[0] === 'P'));
-            });
+                    && bannerEnrollment.registrationStatus[0] === 'R');
+            }) !== undefined;
 
-            if(hasMatchingBannerDrop) {
+            if(isEnrolledBanner === false) {
                 // Drop student from Canvas course
                 await this.canvasApi.dropStudent(enrollment);
                 syncOps.push(`Dropped student from course (Canvas course = ${enrollment.course_id}, term = ${enrollment.bannerTerm}, crn = ${enrollment.bannerCrn})`);

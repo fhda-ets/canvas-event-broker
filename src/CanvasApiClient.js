@@ -66,7 +66,7 @@ class CanvasApiClient {
      * @param {String} sisLoginId Banner login identity for the person
      * @returns {Promise} Resolved with the Canvas user profile object
      */
-    getUser(userId, type='sis_login_id:') {
+    getUser(userId, type='sis_user_id:') {
         return this.client({
             method: `GET`,
             uri: `/users/${type}${userId}/profile`,
@@ -180,7 +180,7 @@ class CanvasApiClient {
 
         return this.client({
             method: `PUT`,
-            uri: `/users/sis_login_id:${sisLoginId}`,
+            uri: `/users/sis_user_id:${sisLoginId}`,
             form: {
                 'user[name]': firstName + ' ' + lastName,
                 'user[short_name]': firstName + ' ' + lastName,
@@ -271,7 +271,7 @@ class CanvasApiClient {
             this.getEnrollmentTermBySisId(termCode),
             this.client({
                 method: 'GET',
-                uri: `/users/sis_login_id:${sisLoginId}/courses`,
+                uri: `/users/sis_user_id:${sisLoginId}/courses`,
                 useQuerystring: true,
                 qs: {
                     'state[]': ['unpublished', 'available'],
@@ -375,7 +375,7 @@ class CanvasApiClient {
      */
     getEnrollmentsForUser(termCode, sisLoginId, state='active') {
         return this.client
-            .get(`/users/sis_login_id:${sisLoginId}/enrollments`)
+            .get(`/users/sis_user_id:${sisLoginId}/enrollments`)
             .promise()
             .map(enrollment => {
                 // If possible, parse Banner SIS section ID to get the term and CRN
@@ -733,7 +733,7 @@ class CanvasApiClient {
     listMigrationSources(sisLoginId) {
         return this.client({
             method: `GET`,
-            uri: `/users/sis_login_id:${sisLoginId}/courses`,
+            uri: `/users/sis_user_id:${sisLoginId}/courses`,
             qs: {
                 'include[]': 'term',
                 'state[]': ['unpublished', 'available'],
