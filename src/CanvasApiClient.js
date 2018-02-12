@@ -108,8 +108,12 @@ class CanvasApiClient {
         });
 
         // Validate the e-mail address (this can be sticky issue if
-        // the address appears corrupt)
-        if(Email.validate(email) === false) {
+        // the address appears corrupt)        
+        if(email === undefined) {
+            Logger.warn(`Cannot synchronize ${sisLoginId} because e-mail address is missing. Please verify the source SIS data is correct`);
+            return;
+        }
+        else if(Email.validate(email) === false) {
             throw new Error(`Cannot synchronize ${sisLoginId} because e-mail address '${email}' failed to validate. Please verify the source SIS data is correct`);
         }
 
