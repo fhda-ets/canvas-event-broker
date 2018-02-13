@@ -53,14 +53,15 @@ module.exports = async function(college, event) {
             person.firstName,
             person.lastName,
             person.email);
-
-        // Delete event from queue
-        await BannerOperations.deleteEvent(event);
     }
     catch(error) {
         Logger.error(`Failed to handle person sync request due to an error`, {
             error: error,
             event: event
         });
+    }
+    finally {
+        // Delete event from queue
+        await BannerOperations.deleteEvent(event);
     }
 };
