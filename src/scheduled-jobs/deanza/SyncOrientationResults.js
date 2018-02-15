@@ -12,17 +12,19 @@ module.exports = async function() {
 		
 		// Lookup final grades for the orientation course
 		let enrollments = await this.canvasApi.getFinalCourseGrades(this.config.orientationCourseId);
+		Debug(`Found ${enrollments.length} candidate enrollment records to sync`);
 
 		// Iterate each enrollment
 		for(let enrollment of enrollments) {
 			// Validate score - must be 5/7 or greater
 			if(enrollment.grades.final_score < 70) {
 				// Skip students who have a lower score
+				Debug(`Skipping student ${enrollment.sis_user_id} with non-passing score of ${enrollment.grades.final_score }`);
 				continue;
 			}
 			
 			// Lookup user in Banner
-			let bannerPerson = await BannerOperations.getPerson(enrollment.user.sis_login_id);
+			let bannerPerson = await BannerOperations.getPerson(enrollment.user.sis_user_id);
 
 			// Clear existing DAOO orientation record from Banner
 			await BannerOperations.deleteAdditionalId(bannerPerson.pidm, 'DAOO');
