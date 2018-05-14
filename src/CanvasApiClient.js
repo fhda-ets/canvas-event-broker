@@ -433,13 +433,15 @@ class CanvasApiClient {
      * @returns {Promise} Resolved with the newly created Section object
      */
     createSection(courseId, name, term, crn) {
+        let generatedSisId = `${term}:${crn}:${Random.number(4)}`;
+
         return this.client({
             method: `POST`,
             uri: `/courses/${courseId}/sections`,
             form: {
                 'course_section[name]': name,
-                'course_section[sis_section_id]': `${term}:${crn}:${Random.number(4)}`,
-                'course_section[integration_id]': `${term}:${crn}`
+                'course_section[sis_section_id]': generatedSisId,
+                'course_section[integration_id]': generatedSisId
             }
         })
         .promise()
@@ -679,9 +681,11 @@ class CanvasApiClient {
         return enrollments.filter(enrollment => enrollment.grades.final_score > 0 && enrollment.sis_user_id !== null);
     }
 
+    /*
     async getFinalSectionGrades(id) {
         // TODO: Develop later
     }
+    */
 
     /**
      * User custom data

@@ -56,6 +56,7 @@
     "pm2-status": "node_modules/pm2/bin/pm2 status --no-daemon",
     "pm2-stop": "node_modules/pm2/bin/pm2 stop --no-daemon Main",
     "start": "node src/Main.js",
+    "debug": "node --inspect src/Main.js",
     "test": "export NODE_APP_INSTANCE=mocha && node_modules/mocha/bin/mocha -R mocha-better-spec-reporter src/tests/Bootstrap.js src/tests/*Tests.js",
     "test-single": "export NODE_APP_INSTANCE=mocha && node_modules/mocha/bin/mocha -R mocha-better-spec-reporter src/tests/Bootstrap.js"
   }

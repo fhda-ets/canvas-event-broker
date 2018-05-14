@@ -404,7 +404,6 @@ class College {
 
                 // Identify registered students who are missing from Canvas
                 for(let bannerEnrollment of bannerEnrollments) {
-
                     this.logger.debug(`Checking if ${bannerEnrollment.campusId} is in Canvas course term=${bannerEnrollment.term} crn=${bannerEnrollment.crn}`);
 
                     // Search for enrollment match
