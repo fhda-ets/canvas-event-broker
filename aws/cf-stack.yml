@@ -1,0 +1,118 @@
+Description: Docker container configuration for Canvas Event Broker
+
+Parameters:
+  DockerImageTag:
+    Type: String
+    AllowedPattern: ".+"
+    Description: The Docker image tag to use for creating ECS task instances
+
+  GitBranch:
+    Type: String
+    AllowedPattern: ".+"
+    Description: Name of currently checked out Git branch
+
+Mappings:
+  AlbHostname:
+    master:
+      Name: canvasevtb.aws.fhda.edu
+    development:
+      Name: canvasevtb-test.aws.fhda.edu
+
+  AlbRulePriority:
+    master:
+      Priority: 90
+    development:
+      Priority: 92
+
+  AlbTargetPort:
+    master:
+      Port: 9100
+    development:
+      Port: 9102
+
+  EcsPlacementQuery:
+    master:
+      Query: attribute:environment == production
+    development:
+      Query: attribute:environment == test
+
+Resources:
+  TaskDefinition:
+    Type: "AWS::ECS::TaskDefinition"
+    Properties:
+      Family: !Sub "canvas-event-broker-${GitBranch}"
+      NetworkMode: bridge
+      ContainerDefinitions:
+        -
+          Name: nodejs
+          Image: !Ref DockerImageTag
+          MemoryReservation: 256
+          PortMappings:
+            - { HostPort: !FindInMap [AlbTargetPort, !Ref GitBranch, Port], ContainerPort: 8080 }
+
+  ServiceDefinition:
+    Type: "AWS::ECS::Service"
+    Properties:
+      Cluster: docker
+      DesiredCount: 1
+      DeploymentConfiguration:
+        # Note only increase this amount if the application requires rolling
+        # container replacement, AND more than one ECS worker instance is
+        # available
+        MinimumHealthyPercent: 0
+      TaskDefinition: !Ref TaskDefinition
+      PlacementStrategies:
+        - { Type: spread, Field: "attribute:ecs.availability-zone" }
+      PlacementConstraints:
+        - { Type: memberOf, Expression: !FindInMap [EcsPlacementQuery, !Ref GitBranch, Query] }
+
+  #
+  # Load balancer target group
+  #
+  LoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 10
+      HealthCheckProtocol: HTTP
+      Matcher:
+        HttpCode: 200,302
+      Name: !Sub "docker-canvas-eb-${GitBranch}"
+      Port: !FindInMap [AlbTargetPort, !Ref GitBranch, Port]
+      Protocol: HTTP
+      Tags:
+        - { Key: "fhda:asg:subscriber", Value: docker }
+      TargetGroupAttributes:
+        - { Key: deregistration_delay.timeout_seconds, Value: 60 }
+        - { Key: stickiness.enabled, Value: true }
+        - { Key: stickiness.type, Value: lb_cookie }
+        - { Key: stickiness.lb_cookie.duration_seconds, Value: 1800 }
+      VpcId: !ImportValue VpcId
+
+  #
+  # Primary load balancer rule to route requests .aws.fhda.edu hostname
+  #
+  LoadBalancerRulePrimary:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      Actions:
+        - { TargetGroupArn: !Ref LoadBalancerTargetGroup, Type: forward }
+      Conditions:
+        - { Field: host-header, Values: [ !FindInMap [AlbHostname, !Ref GitBranch, Name] ] }
+      ListenerArn: !ImportValue AlbDockerBlueListenerArn
+      Priority: !FindInMap [AlbRulePriority, !Ref GitBranch, Priority]
+
+  #
+  # Route53 DNS alias record to create name record that points to the ALB
+  #
+  DnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      AliasTarget:
+        DNSName: !ImportValue AlbDockerBlueDnsName
+        EvaluateTargetHealth: true
+        HostedZoneId: !ImportValue AlbDockerBlueHostedZoneId
+      Failover: PRIMARY
+      HostedZoneId: Z1GF8Q9S0I8X8L
+      Name: !FindInMap [AlbHostname, !Ref GitBranch, Name]
+      SetIdentifier: Primary
+      Type: A
