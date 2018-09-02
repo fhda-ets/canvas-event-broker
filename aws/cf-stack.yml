@@ -46,6 +46,8 @@ Resources:
         -
           Name: nodejs
           Image: !Ref DockerImageTag
+          Environment:
+            - { Name: NODE_APP_INSTANCE, Value: prod }
           MemoryReservation: 256
           PortMappings:
             - { HostPort: !FindInMap [AlbTargetPort, !Ref GitBranch, Port], ContainerPort: 8080 }
