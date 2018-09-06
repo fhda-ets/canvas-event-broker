@@ -76,6 +76,7 @@ Resources:
     Properties:
       HealthCheckIntervalSeconds: 10
       HealthCheckProtocol: HTTP
+      HealthCheckPath: /health
       Matcher:
         HttpCode: 200,302
       Name: !Sub "docker-canvas-eb-${GitBranch}"
