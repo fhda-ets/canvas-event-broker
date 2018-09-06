@@ -3,10 +3,9 @@ let BannerDatabase = require('../BannerDatabase.js');
 let Logger = require('fhda-pubsub-logging')('health-check');
 
 /**
- * Handle a Canvas grade submission payload. Canvas sends grades as a CSV
- * payloads to a designated public endpoint using POST request. It is the
- * responsibility of the implementator to provide endpoint security to prevent
- * tampering or unauthorized submissions.
+ * Provide a simple route as a health check to ensure that database
+ * connectivity is available. AWS can use this health check to decide
+ * which container instances are available to accept requests.
  * @license BSD-3-Clause
  * @module
  * @param  {Object} request Express HTTP request
