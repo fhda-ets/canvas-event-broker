@@ -169,7 +169,12 @@ class CanvasApiClient {
                 email: email
             }]);
 
-            return Promise.reject(error);
+            if(error.message.includes('ID already in use')) {
+                return Promise.reject(new Error(`Failed to create new Canvas account for ${sisLoginId}, ${lastName}, ${firstName}. An existing account was already found in Canvas with ${sisLoginId} for the username.`));
+            }
+            else {
+                return Promise.reject(error);
+            }
         });
     }
 
