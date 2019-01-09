@@ -6,12 +6,16 @@ select distinct
     (select lower(goremal_email_address) from goremal where rownum = 1 and goremal_pidm = spriden_pidm and goremal_status_ind in ('A') and goremal_emal_code = 'FHDA') as "email"
 from
     sirasgn,
+    sirattr,
     spriden,
     spbpers
 where
     sirasgn_term_code = :term
     and sirasgn_crn = :crn
+    and sirattr_pidm = sirasgn_pidm
+    and sirattr_fatt_code = 'CANV'
     and spriden_pidm = sirasgn_pidm
     and spriden_change_ind is null
     and spbpers_pidm = spriden_pidm
     and spriden_id not in ('66666666')
+/
