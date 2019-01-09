@@ -329,8 +329,8 @@ class College {
             let terms = await BannerOperations.getCurrentTermsByCollege(this.config.collegeId);
             this.logger.verbose('Query current academic terms', terms);
 
-            // Iterate over the current and next academic terms
-            for(let term of [terms.term, terms.nextTerm]) {
+            // Iterate over the previous, current and next academic terms
+            for(let term of [terms.prevTerm, terms.term, terms.nextTerm]) {
                 // Check to ensure the term is not blacklisted
                 if(this.config.reconciliation !== undefined) {
                     if(this.config.reconciliation.blacklistTerms !== undefined) {
