@@ -17,5 +17,5 @@ from
         lag(stvterm_code, 1) over (partition by substr(stvterm_code, 6, 1) order by stvterm_code asc) as stvterm_prev_code
     from stvterm)
 where
-    substr(stvterm_code, 6, 1) = '1'
+    substr(stvterm_code, 6, 1) = :collegeId
     and sysdate between stvterm_start_date and stvterm_end_date
