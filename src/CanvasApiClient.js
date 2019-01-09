@@ -310,7 +310,7 @@ class CanvasApiClient {
         });
     }
 
-    async getCoursesForEnrollmentTerm(enrollmentTermId) {
+    async getCoursesForEnrollmentTerm(enrollmentTermId, state=['created', 'claimed', 'available']) {
         // Execute request using internal pagination helper function
         return await this.requestWithPagination({
             method: 'GET',
@@ -318,8 +318,9 @@ class CanvasApiClient {
             useQuerystring: true,
             qs: {
                 'per_page': '100',
+                'completed': 'false',
                 'enrollment_term_id': enrollmentTermId,
-                'state[]': ['created', 'claimed', 'available']
+                'state[]': state
             }
         });
     }
