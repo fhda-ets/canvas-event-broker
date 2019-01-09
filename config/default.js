@@ -47,7 +47,7 @@ module.exports = {
     },
 
     logging: {
-        level: 'verbose',
+        level: 'info',
         source: 'canvas-event-broker',
         environment: 'test',
         transports: {
