@@ -40,9 +40,16 @@ let WebsocketUtils = require('../../WebsocketUtils.js');
  * @param  {Function} respond Callback function to send a response back to the client
  * @return {Promise} Resolved when the operation is complete
  */
-module.exports = function (data, respond) {
+module.exports = async function (data, respond) {
     // Create an alternate reference to the web socket
     let socket = this;
+
+    // Capture audit record
+    await BannerOperations.recordWebAudit(
+        socket.decoded_token.aud,
+        'canvas:deleteCourse',
+        data,
+        socket.conn.remoteAddress);
 
     // Lookup college configuration
     let college = CollegeManager[data.college];
@@ -50,7 +57,7 @@ module.exports = function (data, respond) {
     // Tell the client to display a progress bar
     socket.emit('ui:progress:show', {text: 'Deleting course'});
 
-    return college.canvasApi
+    await college.canvasApi
         .deleteCourse(data.canvasCourseId)
         .tap(BannerOperations.untrackTeacherEnrollments)
         .tap(BannerOperations.untrackCourse)

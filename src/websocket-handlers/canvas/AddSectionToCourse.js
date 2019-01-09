@@ -29,7 +29,7 @@
  */
 
 'use strict';
-// REM let BannerOperations = require('../../BannerOperations.js');
+let BannerOperations = require('../../BannerOperations.js');
 let CollegeManager = require('../../CollegeManager.js');
 let Logger = require('fhda-pubsub-logging')('ws-action-delete-sections');
 let ProgressMonitor = require('../../ProgressMonitor.js');
@@ -41,9 +41,16 @@ let WebsocketUtils = require('../../WebsocketUtils.js');
  * @param  {Function} respond Callback function to send a response back to the client
  * @return {Promise} Resolved when the operation is complete
  */
-module.exports = function (data, respond) {
+module.exports = async function (data, respond) {
     // Create an alternate reference to the web socket
     let socket = this;
+
+    // Capture audit record
+    await BannerOperations.recordWebAudit(
+        socket.decoded_token.aud,
+        'canvas:addSectionToCourse',
+        data,
+        socket.conn.remoteAddress);
 
     // Lookup college configuration
     let college = CollegeManager[data.college];
@@ -59,7 +66,7 @@ module.exports = function (data, respond) {
     // Tell the client to display a progress bar
     socket.emit('ui:progress:show', {text: `Adding new section to course (CRN ${data.crn})`});
 
-    return college.createSection(data.term, data.crn, data.canvasCourseId, progress)
+    await college.createSection(data.term, data.crn, data.canvasCourseId, progress)
         .then(() => {
             socket.emit('ui:progress:hide');
             respond({status: 'done'});

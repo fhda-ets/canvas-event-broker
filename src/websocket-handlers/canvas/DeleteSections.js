@@ -29,6 +29,7 @@
  */
 
 'use strict';
+let BannerOperations = require('../../BannerOperations.js');
 let CollegeManager = require('../../CollegeManager.js');
 let Logger = require('fhda-pubsub-logging')('ws-action-delete-sections');
 let ProgressMonitor = require('../../ProgressMonitor.js');
@@ -41,9 +42,16 @@ let WebsocketUtils = require('../../WebsocketUtils.js');
  * @param  {Function} respond Callback function to send a response back to the client
  * @return {Promise} Resolved when the operation is complete
  */
-module.exports = function (data, respond) {
+module.exports = async function (data, respond) {
     // Create an alternate reference to the web socket
     let socket = this;
+
+    // Capture audit record
+    await BannerOperations.recordWebAudit(
+        socket.decoded_token.aud,
+        'canvas:deleteSection',
+        data,
+        socket.conn.remoteAddress);
 
     // Lookup college configuration
     let college = CollegeManager[data.college];
@@ -59,7 +67,7 @@ module.exports = function (data, respond) {
     socket.emit('ui:progress:show', {text: 'Deleting sections'});
 
     // Step 1: Iterate each section in request
-    return Promise.each(data.sections, section => {
+    await Promise.each(data.sections, section => {
         socket.emit('ui:progress:setText', {text: `Deleting section with term ${section.term} and CRN ${section.crn}`});
 
         // Step 2: Delete the section including its enrollment

@@ -15,6 +15,7 @@ let Logger = require('fhda-pubsub-logging')('banner-operations');
 const sqlAllEnrollmentsByTerm = Jetpack.read('src/sql/AllEnrollmentsByTerm.sql');
 const sqlCreateAdditionalId = Jetpack.read('src/sql/CreateAdditionalId.sql');
 const sqlCreateCanvasFacultyAttribute = Jetpack.read('src/sql/InsertCanvasFacultyAttribute.sql');
+const sqlCreateWebAuditRecord = Jetpack.read('src/sql/CreateWebAudit.sql');
 const sqlCurrentTermsByCollege = Jetpack.read('src/sql/CurrentTermsByCollege.sql');
 const sqlDeleteAdditionalId = Jetpack.read('src/sql/DeleteAdditionalId.sql');
 const sqlDeleteEvent = Jetpack.read('src/sql/DeleteEvent.sql');
@@ -524,6 +525,15 @@ function untrackTeacherEnrollments(course) {
         });
 }
 
+function recordWebAudit(audience, action, payload, clientAddress) {
+    return Banner.sql(sqlCreateWebAuditRecord, {
+        audience: audience,
+        action: action,
+        payload: JSON.stringify(payload),
+        clientAddress
+    });
+}
+
 // Module exports
 module.exports = {
     createAdditionalId: createAdditionalId,
@@ -545,6 +555,7 @@ module.exports = {
     getTrackedSectionById: getTrackedSectionById,
     isEnrollmentTracked: isEnrollmentTracked,
     isSectionTracked: isSectionTracked,
+    recordWebAudit: recordWebAudit,
     trackCourseSection: trackCourseSection,
     trackEnrollment: trackEnrollment,
     untrackCourse: untrackCourse,

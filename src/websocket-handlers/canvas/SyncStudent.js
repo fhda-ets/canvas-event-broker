@@ -42,6 +42,13 @@ let WebsocketUtils = require('../../WebsocketUtils.js');
  * @return {Promise} Resolved when the operation is complete
  */
 module.exports = async function (data, respond) {
+    // Capture audit record
+    await BannerOperations.recordWebAudit(
+        this.decoded_token.aud,
+        'canvas:syncStudent',
+        data,
+        this.conn.remoteAddress);
+
     // Lookup college configuration
     let college = CollegeManager[data.college];
 

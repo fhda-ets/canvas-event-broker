@@ -40,8 +40,15 @@ let WebsocketUtils = require('../../WebsocketUtils.js');
  * @param  {Function} respond Callback function to send a response back to the client
  * @return {Promise} Resolved when the operation is complete
  */
-module.exports = function (data, respond) {
-    BannerOperations
+module.exports = async function (data, respond) {
+    // Capture audit record
+    await BannerOperations.recordWebAudit(
+        this.decoded_token.aud,
+        'banner:getInstructorSchedule',
+        data,
+        this.conn.remoteAddress);
+
+    await BannerOperations
         .getInstructorSchedule(data.termCode, this.decoded_token.aud)
         .then(respond)
         .catch(WebsocketUtils.handleError.bind(

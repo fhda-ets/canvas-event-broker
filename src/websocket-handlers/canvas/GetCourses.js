@@ -29,6 +29,7 @@
  */
 
 'use strict';
+let BannerOperations = require('../../BannerOperations.js');
 let CollegeManager = require('../../CollegeManager.js');
 let Logger = require('fhda-pubsub-logging')('ws-action-get-canv-courses');
 let WebsocketUtils = require('../../WebsocketUtils.js');
@@ -40,11 +41,18 @@ let WebsocketUtils = require('../../WebsocketUtils.js');
  * @param  {Function} respond Callback function to send a response back to the client
  * @return {Promise} Resolved when the operation is complete
  */
-module.exports = function (data, respond) {
+module.exports = async function (data, respond) {
+    // Capture audit record
+    await BannerOperations.recordWebAudit(
+        this.decoded_token.aud,
+        'canvas:getCourses',
+        data,
+        this.conn.remoteAddress);
+
     // Lookup college configuration
     let college = CollegeManager[data.college];
 
-    return college
+    await college
         .canvasApi.getCoursesForUser(data.term, this.decoded_token.aud, data.withSections)
         .map(course => {
             // Decorate course with promise to check on content migrations

@@ -29,6 +29,7 @@
  */
 
 'use strict';
+let BannerOperations = require('../../BannerOperations.js');
 let CollegeManager = require('../../CollegeManager.js');
 let Logger = require('fhda-pubsub-logging')('ws-action-get-enrollment-terms');
 let WebsocketUtils = require('../../WebsocketUtils.js');
@@ -39,8 +40,15 @@ let WebsocketUtils = require('../../WebsocketUtils.js');
  * @param  {Function} respond Callback function to send a response back to the client
  * @return {Promise} Resolved when the operation is complete
  */
-module.exports = function (data, respond) {
-    return CollegeManager[data.college]
+module.exports = async function (data, respond) {
+    // Capture audit record
+    await BannerOperations.recordWebAudit(
+        this.decoded_token.aud,
+        'canvas:getEnrollmentTerms',
+        data,
+        this.conn.remoteAddress);
+
+    await CollegeManager[data.college]
         .canvasApi
         .getEnrollmentTerms()
         .filter(term => {
