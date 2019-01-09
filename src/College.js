@@ -6,6 +6,7 @@ let CronJob = require('cron').CronJob;
 let Jetpack = require('fs-jetpack');
 let Lodash = require('lodash');
 let Moment = require('moment');
+let Retry = require('promise-retry');
 
 /**
  * College.js describes an object type (and really a framework) that associates
@@ -23,7 +24,7 @@ class College {
 
     /**
      * Create a new instance of college
-     @ @param {String} name Configured name of college
+     * @ @param {String} name Configured name of college
      */
     constructor(name) {
         // Load configuration by name
@@ -161,7 +162,7 @@ class College {
                 // Delete each enrollment from Canvas, and untrack in Banner
                 await Promise.map(canvasEnrollments, async enrollment => {
                     await Promise.all([
-                        this.canvasApi.deleteStudent(enrollment),
+                        Retry(retry => this.canvasApi.deleteStudent(enrollment).catch(retry), { maxTimeout: 10000 }),
                         BannerOperations.untrackEnrollment(enrollment)
                     ]);
 
@@ -220,7 +221,7 @@ class College {
                 canvasEnrollment = await college.canvasApi.getEnrollment(trackedEnrollment.enrollmentId);
 
                 // Drop the student
-                await college.canvasApi.dropStudent(canvasEnrollment);
+                await Retry(retry => college.canvasApi.dropStudent(canvasEnrollment).catch(retry), { maxTimeout: 10000 });
 
                 // Drop the enrollment record in Banner
                 await BannerOperations.untrackEnrollment(canvasEnrollment);
@@ -276,7 +277,7 @@ class College {
                 return [
                     section,
                     canvasProfile,
-                    college.canvasApi.enrollStudent(section.sectionId, canvasProfile.id)];
+                    Retry(retry => college.canvasApi.enrollStudent(section.sectionId, canvasProfile.id).catch(retry), { maxTimeout: 10000 })];
             })
             .spread((section, canvasProfile, enrollment) => {
                 // Add tracked enrollment in Banner
@@ -352,14 +353,16 @@ class College {
                 this.logger.verbose(`Found Canvas enrollment term ${enrollmentTerm.id} for ${term}`, enrollmentTerm);
                 
                 // Get Canvas courses
-                this.logger.verbose(`Querying available courses`, terms);
+                this.logger.verbose(`Querying available courses (term = ${term})`);
                 let courses = await this.canvasApi.getCoursesForEnrollmentTerm(enrollmentTerm.id);
                 this.logger.verbose(`Found ${courses.length} Canvas courses for reconciliation`);
 
                 // Run a huge transform to list all enrollments for Canvas in each course
                 let canvasEnrollments = await Promise
                     .filter(courses, course => course.sis_course_id !== null)
-                    .map(course => this.canvasApi.getCourseEnrollment(course.id), { concurrency: 16 })
+                    .map(course => Retry(retry => {
+                        return this.canvasApi.getCourseEnrollment(course.id).catch(retry);
+                    }, { maxTimeout: 10000 }), { concurrency: 16 })
                     .then(enrollmentGroups => Lodash.flattenDeep(enrollmentGroups))
                     .filter(enrollment => 
                         enrollment.sis_section_id !== null && /[0-9]{8}/.test(enrollment.user.sis_user_id))
@@ -430,7 +433,7 @@ class College {
                                 bannerEnrollment.term,
                                 bannerEnrollment.crn,
                                 person);
-                         
+
                             report.enrollments.corrected++;
 
                             this.logger.info(`Completed reconcilation enroll of ${bannerEnrollment.campusId} in Canvas section ${bannerEnrollment.term}:${bannerEnrollment.crn}`, bannerEnrollment);

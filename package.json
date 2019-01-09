@@ -26,6 +26,7 @@
     "nunjucks": "^3.0.0",
     "oracledb": "1.12.2",
     "promise-memoize": "^1.1.0",
+    "promise-retry": "^1.1.1",
     "random-gen": "^0.1.0",
     "random-item": "^1.0.0",
     "request": "^2.75.0",
