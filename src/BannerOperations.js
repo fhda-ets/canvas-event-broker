@@ -181,10 +181,15 @@ async function getCurrentTermsByCollege(collegeId) {
  * @param  {String} crn Banner CRN
  * @return {Promise} Resolved with database statement is completed
  */
-function getInstructors(term, crn) {
-    return Banner
-        .sql(sqlGetInstructors, {term: term, crn: crn})
-        .then(Banner.unwrapRows);
+async function getInstructors(term, crn) {
+    try {
+        let resultset = await Banner.sql(sqlGetInstructors, {term: term, crn: crn});
+        return resultset.rows;
+    }
+    catch(error) {
+        Logger.error(`Failed to get instructors for ${term}:${crn} - reason ${error.message}`);
+        throw error;
+    }
 }
 
 /**
