@@ -91,6 +91,17 @@ module.exports = async function (data, respond) {
         return context;
     }
     catch(error) {
+        // Log the error
+        Logger.error('A serious error occurred while attempting to create a new Canvas course', {
+            error: error.message,
+            parentTerm: context.parentTerm,
+            parentCrn: context.parentCrn,
+            sections: context.sections
+        });
+
+        // Tell websocket about the error
+        respond({status: 'error', message: error.message});        
+
         // Rollback the course
         await context.canvasApi.deleteCourse(context.canvasCourse.id);
         Logger.warn(`Rolled back course that failed its creation phase (id = ${context.canvasCourse.id})`);
@@ -98,17 +109,6 @@ module.exports = async function (data, respond) {
             await BannerOperations.untrackCourseSectionByTermCrn(section.term, section.crn);
             Logger.warn(`Rolled back course section that failed its creation phase (term = ${section.term}, crn = ${section.crn})`);
         }        
-
-        // Log the error
-        Logger.error('A serious error occurred while attempting to create a new Canvas course', {
-            error: error,
-            parentTerm: context.parentTerm,
-            parentCrn: context.parentCrn,
-            sections: context.sections
-        });
-
-        // Tell websocket about the error
-        respond({status: 'error', message: error.message});
     }
     finally {
         // Notify the UI that the creation is complete
@@ -126,11 +126,13 @@ async function createCourseSite(context) {
         context.parentCrn,
         context.sections,
         context.college.config.courseNameTemplate);
+    Logger.info(`Generated course name ${courseName}`);
 
     let courseCode = await CourseNameHelper.generateCourseCode(
         context.parentTerm,
         context.parentCrn,
         context.sections);
+    Logger.info(`Generated course code ${courseCode}`);
 
     // Create course in Canvas
     context.canvasCourse = await context.canvasApi.createCourse({
@@ -231,6 +233,7 @@ async function validateSectionsDoNotExist(context) {
 
         // Run database query to check section status
         let sectioninBanner = (await BannerOperations.isSectionTracked(section.term, section.crn, { rejectOnUntracked: false })) !== null;
+        Logger.info(`Validation of ${section.term}:${section.crn} completed`);
 
         // Check result
         if(sectioninBanner) {
