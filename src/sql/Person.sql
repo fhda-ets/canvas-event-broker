@@ -1,5 +1,6 @@
 select
     spriden_id as "campusId",
+    spriden_id as "sisLoginId",
     spriden_pidm as "pidm",
     nvl(spbpers_pref_first_name, spriden_first_name) as "firstName",
     spriden_last_name as "lastName",
@@ -26,7 +27,12 @@ select
                     and goremal_pidm = spriden_pidm
                     and goremal_status_ind in ('A')
                     and goremal_emal_code = 'PE'))
-    end as "email"
+    end as "email",
+    (
+        select goradid_additional_id
+        from goradid
+        where goradid_pidm = spriden_pidm and goradid_adid_code = 'CCC' and rownum = 1
+    ) as "cccId"
 from
     spriden, spbpers, pebempl
 where

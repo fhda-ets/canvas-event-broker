@@ -95,82 +95,83 @@ class CanvasApiClient {
      * @param {String} email Contact e-mail address from Banner
      * @returns {Promise} Resolved with the Canvas user profile object after the update
      */
-    async syncUser(sisLoginId, firstName, lastName, email) {
+    async syncUser(person) {
         let parent = this;
 
         // Email.validate(...)
 
         Logger.info(`Preparing to sync Canvas account`, {
-            campusId: sisLoginId,
-            firstName: firstName,
-            lastName: lastName,
-            email: email
+            campusId: person.sisLoginId,
+            firstName: person.firstName,
+            lastName: person.lastName,
+            email: person.email
         });
 
         // Validate the e-mail address (this can be sticky issue if
         // the address appears corrupt)        
-        if(email === undefined || email === null) {
-            throw new Error(`Cannot synchronize ${sisLoginId} because e-mail address is missing. Please verify the source SIS data is correct`);
+        if(person.email === undefined || person.email === null) {
+            throw new Error(`Cannot synchronize ${person.sisLoginId} because e-mail address is missing. Please verify the source SIS data is correct`);
         }
-        else if(Email.validate(email) === false) {
-            throw new Error(`Cannot synchronize ${sisLoginId} because e-mail address '${email}' failed to validate. Please verify the source SIS data is correct`);
+        else if(Email.validate(person.email) === false) {
+            throw new Error(`Cannot synchronize ${person.sisLoginId} because e-mail address '${person.email}' failed to validate. Please verify the source SIS data is correct`);
         }
 
         // Fetch user profile from Canvas
-        let profile = await this.getUser(sisLoginId);
+        let profile = await this.getUser(person.sisLoginId);
 
         // Evaluate result to determine next action
         if(profile === null) {
             // Create new account
-            return parent.createUser(sisLoginId, firstName, lastName, email);
+            return parent.createUser(person);
         }
-        else if(profile.name !== `${firstName} ${lastName}` || profile.sortable_name !== `${lastName}, ${firstName}`) {
+        else if(profile.name !== `${person.firstName} ${person.lastName}` || profile.sortable_name !== `${person.lastName}, ${person.firstName}`) {
             // Sync account due to name change
-            return parent.updateUser(sisLoginId, firstName, lastName, email);
+            return parent.updateUser(person);
         }
-        else if(profile.primary_email !== email) {
+        else if(profile.primary_email !== person.email) {
             // Sync account due to e-mail change
-            return parent.updateUser(sisLoginId, firstName, lastName, email);
+            return parent.updateUser(person);
         }
         return profile;
     }
 
-    createUser(sisLoginId, firstName, lastName, email) {
+    createUser(person) {
         Logger.info(`Creating new Canvas account`, {
-            sisLoginId: sisLoginId,
-            firstName: firstName,
-            lastName: lastName,
-            email: email
+            sisLoginId: person.sisLoginId,
+            firstName: person.firstName,
+            lastName: person.lastName,
+            email: person.email
         });
 
         return this.client({
             method: `POST`,
             uri: `/accounts/1/users`,
             form: {
-                'user[name]': `${firstName} ${lastName}`,
-                'user[short_name]': `${firstName} ${lastName}`,
-                'user[sortable_name]': `${lastName}, ${firstName}`,
+                'user[name]': `${person.firstName} ${person.lastName}`,
+                'user[short_name]': `${person.firstName} ${person.lastName}`,
+                'user[sortable_name]': `${person.lastName}, ${person.firstName}`,
                 'user[skip_registration]': 'true',
                 'user[terms_of_use]': 'true',
-                'pseudonym[unique_id]': sisLoginId,
-                'pseudonym[sis_user_id]': sisLoginId,
+                'pseudonym[unique_id]': person.sisLoginId,
+                'pseudonym[sis_user_id]': person.sisLoginId,
                 'pseudonym[skip_confirmation]': 'true',
+                'pseudonym[integration_id]': (person.cccId) ? person.cccId : undefined,
                 'enable_sis_reactivation': 'true',
-                'communication_channel[address]': (email) ? email : 'missingemail@fhda.edu',
+                'communication_channel[address]': (person.email) ? person.email : 'missingemail@fhda.edu',
                 'communication_channel[type]': 'email',
                 'communication_channel[skip_confirmation]': 'true'
             }
         })
         .catch(error => {
             Logger.error(`Failed to create new Canvas account`, [error, {
-                sisLoginId: sisLoginId,
-                firstName: firstName,
-                lastName: lastName,
-                email: email
+                sisLoginId: person.sisLoginId,
+                firstName: person.firstName,
+                lastName: person.lastName,
+                email: person.email
             }]);
 
             if(error.message.includes('ID already in use')) {
-                return Promise.reject(new Error(`Failed to create new Canvas account for ${sisLoginId}, ${lastName}, ${firstName}. An existing account was already found in Canvas with ${sisLoginId} for the username.`));
+                return Promise.reject(new Error(`Failed to create new Canvas account for ${person.sisLoginId}, ${person.lastName}, ${person.firstName}. An existing account was already found in Canvas with ${person.sisLoginId} for the username.`));
             }
             else {
                 return Promise.reject(error);
@@ -178,30 +179,30 @@ class CanvasApiClient {
         });
     }
 
-    updateUser(sisLoginId, firstName, lastName, email) {
+    updateUser(person) {
         Logger.info(`Updating existing Canvas accont`, {
-            sisLoginId: sisLoginId,
-            firstName: firstName,
-            lastName: lastName,
-            email: email
+            sisLoginId: person.sisLoginId,
+            firstName: person.firstName,
+            lastName: person.lastName,
+            email: person.email
         });
 
         return this.client({
             method: `PUT`,
-            uri: `/users/sis_user_id:${sisLoginId}`,
+            uri: `/users/sis_user_id:${person.sisLoginId}`,
             form: {
-                'user[name]': firstName + ' ' + lastName,
-                'user[short_name]': firstName + ' ' + lastName,
-                'user[sortable_name]': lastName + ', ' + firstName,
-                'user[email]': (email) ? email : 'missingemail@fhda.edu'
+                'user[name]': person.firstName + ' ' + person.lastName,
+                'user[short_name]': person.firstName + ' ' + person.lastName,
+                'user[sortable_name]': person.lastName + ', ' + person.firstName,
+                'user[email]': (person.email) ? person.email : 'missingemail@fhda.edu'
             }
         })
         .catch(error => {
             Logger.error(`Failed to update existing Canvas account` [error, {
-                sisLoginId: sisLoginId,
-                firstName: firstName,
-                lastName: lastName,
-                email: email
+                sisLoginId: person.sisLoginId,
+                firstName: person.firstName,
+                lastName: person.lastName,
+                email: person.email
             }]);
 
             return Promise.reject(error);

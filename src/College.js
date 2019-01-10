@@ -259,11 +259,7 @@ class College {
         return BannerOperations.isSectionTracked(term, crn)
             .then(section => {
                 // Sync Canvas user profile
-                return [section, college.canvasApi.syncUser(
-                    person.campusId,
-                    person.firstName,
-                    person.lastName,
-                    person.email)];
+                return [section, college.canvasApi.syncUser(person)];
             })
             .spread((section, canvasProfile) => {
                 college.logger.verbose('Validated requested section is in Canvas', {
@@ -535,11 +531,7 @@ class College {
         });  
 
         // Ensure Canvas account is exists and is synchronized
-        await this.canvasApi.syncUser(
-            person.campusId,
-            person.firstName,
-            person.lastName,
-            person.email);
+        await this.canvasApi.syncUser(person);
 
         // Lookup enrollments from Banner
         // Filter enrollments to only registered students

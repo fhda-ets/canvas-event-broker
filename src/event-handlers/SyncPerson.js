@@ -48,11 +48,7 @@ module.exports = async function(college, event) {
         let person = await BannerOperations.getPerson(event.pidm);
 
         // Sync Canvas user profile with latest data from Banner
-        await college.canvasApi.syncUser(
-            person.campusId,
-            person.firstName,
-            person.lastName,
-            person.email);
+        await college.canvasApi.syncUser(person);
     }
     catch(error) {
         Logger.error(`Failed to handle person sync request due to an error`, {

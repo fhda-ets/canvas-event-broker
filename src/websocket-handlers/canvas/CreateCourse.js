@@ -166,11 +166,7 @@ async function enrollInstructors(context) {
         Logger.info(`Preparing to enroll instructors`, instructors);
 
         // Sync Canvas account
-        let profile = await context.canvasApi.syncUser(
-            instructor.campusId,
-            instructor.firstName,
-            instructor.lastName,
-            instructor.email);
+        let profile = await context.canvasApi.syncUser(instructor);
 
         // Enroll in course
         let enrollment = await context.canvasApi.enrollInstructor(
