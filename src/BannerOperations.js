@@ -525,12 +525,11 @@ function untrackTeacherEnrollments(course) {
         });
 }
 
-function recordWebAudit(audience, action, payload, clientAddress) {
+function recordWebAudit(audience, action, payload) {
     return Banner.sql(sqlCreateWebAuditRecord, {
         audience: audience,
         action: action,
-        payload: JSON.stringify(payload),
-        clientAddress
+        payload: JSON.stringify(payload)
     });
 }
 

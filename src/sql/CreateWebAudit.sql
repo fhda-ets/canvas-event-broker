@@ -1,4 +1,4 @@
 insert into etsis.canvaslms_web_audit
-(audience, action, event_timestamp, payload_json, client_address)
+(audience, action, event_timestamp, payload_json)
 values
-(:audience, :action, systimestamp, :payload, :clientAddress)
+(:audience, :action, systimestamp, :payload)
