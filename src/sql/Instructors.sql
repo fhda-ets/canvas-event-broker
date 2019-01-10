@@ -18,4 +18,3 @@ where
     and spriden_change_ind is null
     and spbpers_pidm = spriden_pidm
     and spriden_id not in ('66666666')
-/
