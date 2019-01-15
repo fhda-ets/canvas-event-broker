@@ -327,7 +327,7 @@ class College {
             this.logger.verbose('Query current academic terms', terms);
 
             // Iterate over the previous, current and next academic terms
-            for(let term of [terms.prevTerm, terms.term, terms.nextTerm]) {
+            for(let term of [/*terms.prevTerm,*/ terms.term, terms.nextTerm]) {
                 // Check to ensure the term is not blacklisted
                 if(this.config.reconciliation !== undefined) {
                     if(this.config.reconciliation.blacklistTerms !== undefined) {
