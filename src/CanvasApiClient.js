@@ -273,18 +273,19 @@ class CanvasApiClient {
      * @returns {Promise} Resolved with an array of Course objects
      *
      */
-    getCoursesForUser(termCode, sisLoginId, withSections=false) {
+    getCoursesForUser(termCode, sisLoginId, withSections=false, enrollmentType=['student']) {
         let parent = this;
 
         return Promise.all([
             this.getEnrollmentTermBySisId(termCode),
-            this.client({
+            this.requestWithPagination({
                 method: 'GET',
                 uri: `/users/sis_user_id:${sisLoginId}/courses`,
                 useQuerystring: true,
                 qs: {
                     'state[]': ['unpublished', 'available'],
-                    'per_page': '250',
+                    'enrollment_type': enrollmentType,
+                    'per_page': '100'
                 }
             })])
         .spread((enrollmentTerm, courses) => {

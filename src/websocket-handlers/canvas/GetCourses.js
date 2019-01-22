@@ -53,7 +53,11 @@ module.exports = async function (data, respond) {
     let college = CollegeManager[data.college];
 
     await college
-        .canvasApi.getCoursesForUser(data.term, this.decoded_token.aud, data.withSections)
+        .canvasApi.getCoursesForUser(
+            data.term,
+            this.decoded_token.aud,
+            data.withSections,
+            ['teacher'])
         .map(course => {
             // Decorate course with promise to check on content migrations
             course.migrations = college.canvasApi.listActiveMigrations(course.id);
@@ -61,7 +65,10 @@ module.exports = async function (data, respond) {
             // Resolve
             return Promise.props(course);
         })
-        .tap(respond)
+        .tap(result => {
+            Logger.info('Result of getting courses from Canvas', result);
+            respond(result);
+        })
         .catch(WebsocketUtils.handleError.bind(
             this,
             'A serious error occurred while attempting to lookup course memberships in Canvas',
