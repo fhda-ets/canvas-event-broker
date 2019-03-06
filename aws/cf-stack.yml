@@ -56,7 +56,7 @@ Resources:
             - { Name: NODE_APP_INSTANCE, Value: !FindInMap [NodeAppInstance, !Ref GitBranch, Name] }
           MemoryReservation: 256
           PortMappings:
-            - { HostPort: !FindInMap [AlbTargetPort, !Ref GitBranch, Port], ContainerPort: 8080 }
+            - { HostPort: !FindInMap [AlbTargetPort, !Ref GitBranch, Port], ContainerPort: 9080 }
 
   ServiceDefinition:
     Type: "AWS::ECS::Service"
@@ -68,7 +68,7 @@ Resources:
       LoadBalancers:
         - TargetGroupArn: !Ref LoadBalancerTargetGroup
           ContainerName: nodejs
-          ContainerPort: 8080
+          ContainerPort: 9080
       HealthCheckGracePeriodSeconds: 120
       DeploymentConfiguration:
         MinimumHealthyPercent: 0
@@ -93,7 +93,7 @@ Resources:
       Port: !FindInMap [AlbTargetPort, !Ref GitBranch, Port]
       Protocol: HTTP
       TargetGroupAttributes:
-        - { Key: deregistration_delay.timeout_seconds, Value: 60 }
+        - { Key: deregistration_delay.timeout_seconds, Value: 15 }
         - { Key: stickiness.enabled, Value: true }
         - { Key: stickiness.type, Value: lb_cookie }
         - { Key: stickiness.lb_cookie.duration_seconds, Value: 1800 }
