@@ -15,25 +15,32 @@ Mappings:
   AlbHostname:
     master:
       Name: canvasevtb.aws.fhda.edu
-    development:
+    test:
       Name: canvasevtb-test.aws.fhda.edu
 
   AlbRulePriority:
     master:
       Priority: 90
-    development:
+    test:
       Priority: 92
 
   AlbTargetPort:
     master:
       Port: 9100
-    development:
+    test:
       Port: 9102
+
+  NodeAppInstance:
+    master:
+      Name: prod
+    test:
+      Name: test
+
 
   EcsPlacementQuery:
     master:
       Query: attribute:environment == production
-    development:
+    test:
       Query: attribute:environment == test
 
 Resources:
@@ -47,7 +54,7 @@ Resources:
           Name: nodejs
           Image: !Ref DockerImageTag
           Environment:
-            - { Name: NODE_APP_INSTANCE, Value: prod }
+            - { Name: NODE_APP_INSTANCE, Value: !FindInMap [NodeAppInstance, !Ref GitBranch, Name] }
           MemoryReservation: 256
           PortMappings:
             - { HostPort: !FindInMap [AlbTargetPort, !Ref GitBranch, Port], ContainerPort: 8080 }
