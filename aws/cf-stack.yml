@@ -36,7 +36,6 @@ Mappings:
     test:
       Name: test
 
-
   EcsPlacementQuery:
     master:
       Query: attribute:environment == production
@@ -61,6 +60,8 @@ Resources:
 
   ServiceDefinition:
     Type: "AWS::ECS::Service"
+    DependsOn:
+      - LoadBalancerRulePrimary
     Properties:
       Cluster: docker
       DesiredCount: 1
