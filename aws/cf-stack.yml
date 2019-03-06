@@ -57,11 +57,14 @@ Resources:
     Properties:
       Cluster: docker
       DesiredCount: 1
+      LoadBalancers:
+        - TargetGroupArn: !Ref LoadBalancerTargetGroup
+          ContainerName: nodejs
+          ContainerPort: 8080
+      HealthCheckGracePeriodSeconds: 120
       DeploymentConfiguration:
-        # Note only increase this amount if the application requires rolling
-        # container replacement, AND more than one ECS worker instance is
-        # available
         MinimumHealthyPercent: 0
+        MaximumPercent: 100
       TaskDefinition: !Ref TaskDefinition
       PlacementStrategies:
         - { Type: spread, Field: "attribute:ecs.availability-zone" }
@@ -79,11 +82,8 @@ Resources:
       HealthCheckPath: /health
       Matcher:
         HttpCode: 200,302
-      Name: !Sub "docker-canvas-eb-${GitBranch}"
       Port: !FindInMap [AlbTargetPort, !Ref GitBranch, Port]
       Protocol: HTTP
-      Tags:
-        - { Key: "fhda:asg:subscriber", Value: docker }
       TargetGroupAttributes:
         - { Key: deregistration_delay.timeout_seconds, Value: 60 }
         - { Key: stickiness.enabled, Value: true }
