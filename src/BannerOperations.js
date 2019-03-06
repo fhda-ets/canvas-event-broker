@@ -530,11 +530,22 @@ function untrackTeacherEnrollments(course) {
         });
 }
 
+let circuitBreakerWebAudit = false;
+
 function recordWebAudit(audience, action, payload) {
+    if(circuitBreakerWebAudit) {
+        // Do nothing because the circuit breaker was tripped
+        return;
+    }
+
     return Banner.sql(sqlCreateWebAuditRecord, {
         audience: audience,
         action: action,
         payload: JSON.stringify(payload)
+    })
+    .catch(error => {
+        Logger.error(`Failed to record web audit record - ${error.message}`);
+        circuitBreakerWebAudit = true;
     });
 }
 
