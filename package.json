@@ -52,6 +52,7 @@
   "scripts": {
     "docs": "rm -Rf docs && node_modules/.bin/jsdoc -c jsdoc.json",
     "start": "node src/Main.js",
+    "start-test": "NODE_APP_INSTANCE=test node src/Main.js",
     "debug": "node --inspect src/Main.js",
     "test": "export NODE_APP_INSTANCE=mocha && node_modules/mocha/bin/mocha -R mocha-better-spec-reporter src/tests/Bootstrap.js src/tests/*Tests.js",
     "test-single": "export NODE_APP_INSTANCE=mocha && node_modules/mocha/bin/mocha -R mocha-better-spec-reporter src/tests/Bootstrap.js"
