@@ -12,7 +12,7 @@ where
     sfrstcr_term_code = :term
     and sfrstcr_crn = :crn
     and sfrstcr_rsts_code like 'R%'
+    and sfrstcr_user not like ('NICXCHNGUSER')
     and spriden_pidm = sfrstcr_pidm
     and spriden_change_ind is null
     and spbpers_pidm = spriden_pidm
-    and spriden_pidm not in (select goradid_pidm from goradid where goradid_adid_code = 'COEI')
