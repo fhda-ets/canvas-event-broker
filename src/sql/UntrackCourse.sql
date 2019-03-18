@@ -1,3 +1,3 @@
 delete etsis.canvaslms_sections
 where
-    course_id = :courseId
+    term = :term and course_id = :courseId

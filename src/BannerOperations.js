@@ -449,7 +449,8 @@ function trackEnrollment(college, term, crn, pidm, userId, enrollmentType, enrol
 function untrackCourse(course) {
     // Create parameter payload
     let params = {
-        courseId: course.id
+        courseId: course.id,
+        term: course.sis_course_id.split(':')[0]
     };
 
     // Execute SQL
