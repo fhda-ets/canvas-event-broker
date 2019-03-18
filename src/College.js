@@ -184,7 +184,7 @@ class College {
             }
 
             // Untrack section in Banner
-            await BannerOperations.untrackCourseSection(section.sectionId);
+            await BannerOperations.untrackCourseSectionByTermCrn(term, crn);
 
             this.logger.info(`Successfully deleted section from Canvas course`, section);
         }
