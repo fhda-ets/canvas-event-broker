@@ -75,15 +75,15 @@ async function handleEvent(event) {
         case TYPE_SYNC_PERSON:
             await handleIfCollegeValid(getCollegeForTerm(event.term), event, SyncPerson);
             break;
-        case TYPE_ENROLL_STUDENT:
-            await handleIfCollegeValid(getCollegeForTerm(event.term), event, EnrollStudent);
-            break;
-        case TYPE_DROP_STUDENT:
-            await handleIfCollegeValid(getCollegeForTerm(event.term), event, DropStudent);
-            break;
-        case TYPE_CANCEL_SECTION:
-            await handleIfCollegeValid(getCollegeForTerm(event.term), event, CancelCourseSection);
-            break;
+        // case TYPE_ENROLL_STUDENT:
+        //     await handleIfCollegeValid(getCollegeForTerm(event.term), event, EnrollStudent);
+        //     break;
+        // case TYPE_DROP_STUDENT:
+        //     await handleIfCollegeValid(getCollegeForTerm(event.term), event, DropStudent);
+        //     break;
+        // case TYPE_CANCEL_SECTION:
+        //     await handleIfCollegeValid(getCollegeForTerm(event.term), event, CancelCourseSection);
+        //     break;
         default:
             Logger.warn(`Ignoring event due to an unsupported type`, event);
             await BannerOperations.deleteEvent(event);
