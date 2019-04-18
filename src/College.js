@@ -112,7 +112,9 @@ class College {
                         term,
                         crn,
                         canvasSection.course_id,
-                        canvasSection.id)
+                        canvasSection.id,
+                        canvasSection.sis_course_id,
+                        canvasSection.sis_section_id)
                     .return(bannerEnrollment);
             })
             .map(student => {

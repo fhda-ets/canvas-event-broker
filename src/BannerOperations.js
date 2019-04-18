@@ -383,13 +383,15 @@ function isSectionTracked(term, crn, options={}) {
  * @param  {Number} sectionId Canvas section ID
  * @return {Promise} Resolved when the insert is completed
  */
-function trackCourseSection(term, crn, courseId, sectionId) {
+function trackCourseSection(term, crn, courseId, sectionId, sisCourseId=null, sisSectionId=null) {
     // Create parameter payload
     let params = {
         term: term,
         crn: crn,
         sectionId: sectionId,
-        courseId: courseId
+        courseId: courseId,
+        sisCourseId: sisCourseId,
+        sisSectionId: sisSectionId
     };
 
     // Execute SQL
