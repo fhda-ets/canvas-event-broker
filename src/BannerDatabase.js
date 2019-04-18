@@ -5,7 +5,6 @@
  * @module
  */
 
-'use strict';
 let Config = require('config');
 let Logger = require('fhda-pubsub-logging')('banner');
 let Oracle = require('oracledb');
@@ -74,7 +73,7 @@ Oracle.maxRows = 100000;
 Oracle.outFormat = Oracle.OBJECT;
 
 // Create a connection pool to Banner
-let oraclePool = Oracle.createPool(Config.oracle.banner)
+let oraclePool = Oracle.createPool(Object.assign({}, Config.oracle.banner))
     .then(() => {
         Logger.info(`Created Oracle connection pool to Banner`, {
             instance: Config.oracle.banner.connectString
