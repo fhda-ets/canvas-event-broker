@@ -554,6 +554,23 @@ class CanvasApiClient {
         });
     }
 
+    enrollInstructorSection(sectionId, userId) {
+        return this.client({
+            method: `POST`,
+            uri: `/sections/${sectionId}/enrollments`,
+            form: {
+                'enrollment[user_id]': userId,
+                'enrollment[type]': 'TeacherEnrollment',
+                'enrollment[enrollment_state]': 'active',
+                'enrollment[notify]': 'false'
+            }
+        })
+        .promise()
+        .tap(enrollment => {
+            Logger.verbose(`Enrolled instructor into Canvas section`, enrollment);
+        });
+    }
+
     /**
      * Enroll a student into an existing Canvas section.
      * @param {String|Number} sectionId Canvas section ID

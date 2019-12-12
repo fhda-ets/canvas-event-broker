@@ -76,63 +76,56 @@ class College {
      * @param canvasCourseId {String} Canvas course ID for the site
      * @param progress {Function} Optional progress tracker for monitoring the job
      */
-    createSection(term, crn, canvasCourseId, progress) {
+    async createSection(term, crn, canvasCourseId, progress) {
         let college = this;
 
         // Verify if the request refers to a tracked Banner course section
-        return BannerOperations.isSectionTracked(term, crn, { rejectOnUntracked: false })
-            .then(() => {
-                // Query the Banner section and enrollment records
-                return [
-                    BannerOperations.getCourseSection(term, crn),
-                    BannerOperations.getSectionEnrollment(term, crn)];
-            })
-            .spread((bannerSection, bannerEnrollment) => {
-                // Generate components for section name
-                let sanitizedSubject = Common.sanitizeSubjectCode(bannerSection.subjectCode);
-                let sanitizedCourseNumber = Common.sanitizeCourseNumber(bannerSection.courseNumber);
+        await BannerOperations.isSectionTracked(term, crn, { rejectOnUntracked: false });
+        let bannerSection = await BannerOperations.getCourseSection(term, crn);
+        let bannerEnrollment = await BannerOperations.getSectionEnrollment(term, crn);
 
-                // Update progress monitor if provided
-                if(progress) {
-                    progress.addTasks(bannerEnrollment.length);
-                }
+        // Generate components for section name
+        let sanitizedSubject = Common.sanitizeSubjectCode(bannerSection.subjectCode);
+        let sanitizedCourseNumber = Common.sanitizeCourseNumber(bannerSection.courseNumber);
 
-                // Create section in Canvas
-                return [
-                    bannerEnrollment,
-                    college.canvasApi.createSection(
-                        canvasCourseId,
-                        `${sanitizedSubject} ${sanitizedCourseNumber}.${bannerSection.sectionNumber}`,
-                        term,
-                        crn)];
-            })
-            .spread((bannerEnrollment, canvasSection) => {
-                // Track the Canvas section in Banner
-                return BannerOperations.trackCourseSection(
-                        term,
-                        crn,
-                        canvasSection.course_id,
-                        canvasSection.id,
-                        canvasSection.sis_course_id,
-                        canvasSection.sis_section_id)
-                    .return(bannerEnrollment);
-            })
-            .map(student => {
-                // Update progress monitor if provided
-                if(progress) {
-                    progress.completeTask();
-                }
+        // Update progress monitor if provided
+        if(progress) {
+            progress.addTasks(bannerEnrollment.length);
+        }
 
-                // Lookup student profile from Banner
-                return BannerOperations.getPerson(student.pidm)
-                    .then(person => {
-                        // Enroll in Canvas, and track the student enrollment in Banner
-                        return college.enrollStudent(term, crn, person);
-                    });
-            }, Common.concurrency.MULTI)
-            .tap(() => {
-                college.logger.info(`Successfully created and added section to Canvas course`, {term: term, crn: crn});
-            });
+        // Create section in Canvas
+        let section = await college.canvasApi.createSection(
+            canvasCourseId,
+            `${sanitizedSubject} ${sanitizedCourseNumber}.${bannerSection.sectionNumber}`,
+            term,
+            crn);
+
+        // Track the Canvas section in Banner
+        await BannerOperations.trackCourseSection(
+            term,
+            crn,
+            section.course_id,
+            section.id,
+            section.sis_course_id,
+            section.sis_section_id);
+
+        // Enroll students
+        for(let student of bannerEnrollment) {
+            // Lookup student profile
+            let person = BannerOperations.getPerson(student.pidm);
+
+            // Enroll in Canvas, and track the student enrollment in Banner
+            await college.enrollStudent(term, crn, person);
+
+            // Update progress monitor if provided
+            if(progress) {
+                progress.completeTask();
+            }
+        }
+
+        college.logger.info(`Successfully created and added section to Canvas course`, {term: term, crn: crn});
+
+        return section;
     }
 
     /**
