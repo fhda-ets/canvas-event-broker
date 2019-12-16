@@ -163,8 +163,7 @@ async function enrollInstructors(context) {
     for(let instructor of instructors) {
         // Add instructor to context
         context.instructors.push(instructor);
-        Logger.info(`Preparing to enroll instructors`, instructors);
-        Logger.info(`Enrollment contexts`, context.enrollment);
+        Logger.info(`Preparing to enroll instructor`, instructor);
 
         // Sync Canvas account
         let profile = await context.canvasApi.syncUser(instructor);
