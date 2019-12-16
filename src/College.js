@@ -112,7 +112,7 @@ class College {
         // Enroll students
         for(let student of bannerEnrollment) {
             // Lookup student profile
-            let person = BannerOperations.getPerson(student.pidm);
+            let person = await BannerOperations.getPerson(student.pidm);
 
             // Enroll in Canvas, and track the student enrollment in Banner
             await college.enrollStudent(term, crn, person);
