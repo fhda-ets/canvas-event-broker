@@ -164,6 +164,7 @@ async function enrollInstructors(context) {
         // Add instructor to context
         context.instructors.push(instructor);
         Logger.info(`Preparing to enroll instructors`, instructors);
+        Logger.info(`Enrollment contexts`, context.enrollment);
 
         // Sync Canvas account
         let profile = await context.canvasApi.syncUser(instructor);
@@ -172,6 +173,13 @@ async function enrollInstructors(context) {
         let enrollment = await context.canvasApi.enrollInstructor(
             context.canvasCourse.id,
             profile.id);
+
+        // Enroll instructor in each section
+        for(let section of Object.values(context.enrollment)) {
+            await context.canvasApi.enrollInstructorSection(
+                section.id,
+                profile.id);
+        }
 
         // Add tracked enrollment to Banner
         await BannerOperations.trackEnrollment(
