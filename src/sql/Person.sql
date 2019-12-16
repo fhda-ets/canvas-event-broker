@@ -12,21 +12,28 @@ select
                 goremal.rowid = baninst1.f_get_email_rowid(spriden_pidm, 'STDNEMAL', 'A', NULL)
             )
         else
-            coalesce((
-                select lower(goremal_email_address)
+            coalesce(
+                (select lower(goremal_email_address)
                 from goremal
                 where
                     rownum = 1
                     and goremal_pidm = spriden_pidm
                     and goremal_status_ind in ('A')
-                    and goremal_emal_code = 'FHDA'), (
-
-                select lower(goremal_email_address)
+                    and goremal_emal_code = 'FHDA'),
+                    
+                (select lower(goremal_email_address)
                 from goremal
                     where rownum = 1
                     and goremal_pidm = spriden_pidm
                     and goremal_status_ind in ('A')
-                    and goremal_emal_code = 'PE'))
+                    and goremal_emal_code = 'PE'),
+                    
+                (select lower(goremal_email_address)
+                from goremal
+                    where rownum = 1
+                    and goremal_pidm = spriden_pidm
+                    and goremal_status_ind in ('A')
+                    and goremal_emal_code = 'FA'))
     end as "email",
     (
         select goradid_additional_id
