@@ -98,8 +98,6 @@ class CanvasApiClient {
     async syncUser(person) {
         let parent = this;
 
-        // Email.validate(...)
-
         Logger.info(`Preparing to sync Canvas account`, {
             campusId: person.sisLoginId,
             firstName: person.firstName,
