@@ -98,8 +98,6 @@ class CanvasApiClient {
     async syncUser(person) {
         let parent = this;
 
-        // Email.validate(...)
-
         Logger.info(`Preparing to sync Canvas account`, {
             campusId: person.sisLoginId,
             firstName: person.firstName,
@@ -551,6 +549,23 @@ class CanvasApiClient {
         .promise()
         .tap(enrollment => {
             Logger.verbose(`Enrolled instructor into Canvas course`, enrollment);
+        });
+    }
+
+    enrollInstructorSection(sectionId, userId) {
+        return this.client({
+            method: `POST`,
+            uri: `/sections/${sectionId}/enrollments`,
+            form: {
+                'enrollment[user_id]': userId,
+                'enrollment[type]': 'TeacherEnrollment',
+                'enrollment[enrollment_state]': 'active',
+                'enrollment[notify]': 'false'
+            }
+        })
+        .promise()
+        .tap(enrollment => {
+            Logger.verbose(`Enrolled instructor into Canvas section`, enrollment);
         });
     }
 
