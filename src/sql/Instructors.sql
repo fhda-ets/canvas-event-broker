@@ -19,3 +19,8 @@ where
     and spriden_change_ind is null
     and spbpers_pidm = spriden_pidm
     and spriden_id not in ('66666666')
+-- ETS Help Desk #53725
+-- Add stable sort to prioritize primary instructor of record
+order by
+    sirasgn_category asc,
+    decode(sirasgn_primary_ind, 'Y', 1, '2')
