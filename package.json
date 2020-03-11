@@ -23,7 +23,7 @@
     "moment": "2.24.0",
     "nodemailer": "^2.7.0",
     "nunjucks": "3.2.0",
-    "oracledb": "^3.1.2",
+    "oracledb": "4.2.0",
     "promise-memoize": "1.2.1",
     "promise-retry": "^1.1.1",
     "random-gen": "^0.1.0",
