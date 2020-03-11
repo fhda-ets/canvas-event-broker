@@ -27,11 +27,14 @@ cf-deploy:
 		--parameter-overrides DockerImageTag="`cat .lastimage`" GitBranch="$(CURRENT_BRANCH)"
 	@echo Deployment completed successfully
 
-docker-image:
-	# Build Docker image
+docker-image-build:
+# Build Docker image
 	@echo "$(IMAGE_TAG)" > .lastimage
 	@docker build -f docker/Dockerfile -t $(IMAGE_TAG) .
-	@docker push $(IMAGE_TAG)
+
+docker-image: docker-image-build
+# Build Docker image
+	@docker push `cat .lastimage`
 
 ecr-repository:
 	@aws ecr create-repository --repository-name $(ECR_REPO_NAME)

@@ -8,27 +8,20 @@ ENV LD_LIBRARY_PATH=/usr/local/lib
 COPY --from=oracle /usr/local/lib/* /usr/local/lib/
 
 # Set user and working directory
-USER docker
-WORKDIR /home/docker
+USER node
+WORKDIR /home/node
 
-# Copy NPM configuration
-COPY package.json /home/docker/
+# Copy package configuration
+COPY --chown=node local-packages ./local-packages
+COPY --chown=node package.json ./
 
-# Fetch latest Github host key
-RUN ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-
-# Install Node.js packages
+# Install packages
 RUN npm install
 
 # Copy application source
-COPY config config/
-COPY src src/
-COPY *.js *.json /home/docker/
-
-# Fix file permissions
-USER root
-RUN chown -R docker:docker /home/docker
-USER docker
+COPY --chown=node config ./config/
+COPY --chown=node src ./src/
+COPY --chown=node *.js *.json ./
 
 # Set default run command
-CMD npm start
+CMD npm start 
