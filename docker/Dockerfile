@@ -3,8 +3,9 @@ FROM 794167933507.dkr.ecr.us-west-2.amazonaws.com/oracle-instant-client-libs:201
 FROM node:12.16.1-buster
 LABEL maintainer "Matt Rapczynski <rapczynskimatthew@fhda.edu>"
 
-# Set environment variables
+# Configure Oracle Instant Client
 ENV LD_LIBRARY_PATH=/usr/local/lib
+COPY --from=oracle /usr/local/lib/* /usr/local/lib/
 
 # Set user and working directory
 USER docker
