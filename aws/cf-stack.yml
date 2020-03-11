@@ -64,15 +64,15 @@ Resources:
       - LoadBalancerRulePrimary
     Properties:
       Cluster: docker
-      DesiredCount: 1
+      DesiredCount: 4
       LoadBalancers:
         - TargetGroupArn: !Ref LoadBalancerTargetGroup
           ContainerName: nodejs
           ContainerPort: 9080
       HealthCheckGracePeriodSeconds: 120
       DeploymentConfiguration:
-        MinimumHealthyPercent: 0
-        MaximumPercent: 100
+        MinimumHealthyPercent: 50
+        MaximumPercent: 200
       TaskDefinition: !Ref TaskDefinition
       PlacementStrategies:
         - { Type: spread, Field: "attribute:ecs.availability-zone" }
