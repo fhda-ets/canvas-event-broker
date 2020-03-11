@@ -100,7 +100,7 @@ module.exports = async function (data, respond) {
         });
 
         // Tell websocket about the error
-        respond({status: 'error', message: error.message});        
+        respond({status: 'error', message: error.message});
 
         // Rollback the course
         await context.canvasApi.deleteCourse(context.canvasCourse.id);
