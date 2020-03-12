@@ -4,7 +4,7 @@ select
     spriden_pidm as "pidm",
     nvl(spbpers_pref_first_name, spriden_first_name) as "firstName",
     spriden_last_name as "lastName",
-    case
+    nvl(case
         when pebempl_ecls_code like 'S%' then (
             select lower(goremal_email_address)
             from goremal
@@ -34,7 +34,7 @@ select
                     and goremal_pidm = spriden_pidm
                     and goremal_status_ind in ('A')
                     and goremal_emal_code = 'FA'))
-    end as "email",
+    end, 'noemail@fhda.edu') as "email",
     (
         select goradid_additional_id
         from goradid
