@@ -42,6 +42,16 @@ Mappings:
     test:
       Query: attribute:environment == test
 
+  EcsScaling:
+    master:
+      DesiredCount: 2
+      MinimumPercent: 50
+      MaximumPercent: 100
+    test:
+      DesiredCount: 1
+      MinimumPercent: 0
+      MaximumPercent: 100
+
 Resources:
   TaskDefinition:
     Type: "AWS::ECS::TaskDefinition"
@@ -64,15 +74,15 @@ Resources:
       - LoadBalancerRulePrimary
     Properties:
       Cluster: docker
-      DesiredCount: 1
+      DesiredCount: !FindInMap [EcsScaling, !Ref GitBranch, DesiredCount]
       LoadBalancers:
         - TargetGroupArn: !Ref LoadBalancerTargetGroup
           ContainerName: nodejs
           ContainerPort: 9080
       HealthCheckGracePeriodSeconds: 120
       DeploymentConfiguration:
-        MinimumHealthyPercent: 0
-        MaximumPercent: 100
+        MinimumHealthyPercent: !FindInMap [EcsScaling, !Ref GitBranch, MinimumPercent]
+        MaximumPercent: !FindInMap [EcsScaling, !Ref GitBranch, MaximumPercent]
       TaskDefinition: !Ref TaskDefinition
       PlacementStrategies:
         - { Type: spread, Field: "attribute:ecs.availability-zone" }
