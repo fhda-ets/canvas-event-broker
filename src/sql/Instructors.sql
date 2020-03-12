@@ -9,14 +9,14 @@ select distinct
     decode(sirasgn_primary_ind, 'Y', 1, '2') as "primary"
 from
     sirasgn,
-    sirattr,
+    --sirattr,
     spriden,
     spbpers
 where
     sirasgn_term_code = :term
     and sirasgn_crn = :crn
-    and sirattr_pidm = sirasgn_pidm
-    and sirattr_fatt_code = 'CANV'
+    --and sirattr_pidm = sirasgn_pidm
+    --and sirattr_fatt_code = 'CANV'
     and spriden_pidm = sirasgn_pidm
     and spriden_change_ind is null
     and spbpers_pidm = spriden_pidm
