@@ -72,7 +72,7 @@ module.exports = async function (data, respond) {
     });
 
     try {
-        // Execute a pipline of coordinating course creation tasks
+        // Execute a pipeline of coordinating course creation tasks
         // (each function is passed the context for the operation where data and
         // objects are shared across the request)
         await getEnrollmentTerm(context);
@@ -156,42 +156,59 @@ async function createSections(context) {
 }
 
 async function enrollInstructors(context) {
-    // Get instructors for parent course
-    let instructors = await BannerOperations.getInstructors(context.parentTerm, context.parentCrn);
+    // Get instructors for parent section
+    let parentSectionInstructors = await BannerOperations.getInstructors(context.parentTerm, context.parentCrn);
 
-    // Iterate each instructor to sync account and enroll in course
-    for(let instructor of instructors) {
-        // Add instructor to context
-        context.instructors.push(instructor);
-        Logger.info(`Preparing to enroll instructor`, instructor);
+    // Enroll the primary instructor
+    let primaryInstructorProfile = await context.canvasApi.syncUser(parentSectionInstructors[0]);
 
-        // Sync Canvas account
-        let profile = await context.canvasApi.syncUser(instructor);
+    let primaryInstructorEnrollment = await context.canvasApi.enrollInstructor(
+        context.canvasCourse.id,
+        primaryInstructorProfile.id);
 
-        // Enroll in course
-        let enrollment = await context.canvasApi.enrollInstructor(
-            context.canvasCourse.id,
-            profile.id);
+    await BannerOperations.trackEnrollment(
+        context.college,
+        context.parentTerm,
+        context.parentCrn,
+        parentSectionInstructors[0].pidm,
+        primaryInstructorProfile.id,
+        'TeacherEnrollment',
+        primaryInstructorEnrollment.id,
+        context.canvasCourse.id);
 
-        // Enroll instructor in each section
-        for(let section of Object.values(context.enrollment)) {
-            await context.canvasApi.enrollInstructorSection(
-                section.id,
+    Logger.info(`Successfully enrolled primary instructor for course section ${context.parentTerm}:${context.parentCrn}`, primaryInstructorProfile);
+
+    // Iterate each section and enroll instructors
+    for(let section of context.sections) {
+        // Query assigned instructors
+        let sectionInstructors = await BannerOperations.getInstructors(section.term, section.crn);
+
+        // Lookup Canvas section object
+        let canvasSection = context.enrollment[section.crn];
+
+        // Iterate each instructor and enroll in Canvas
+        for(let instructor of sectionInstructors) {
+            // Sync Canvas account
+            let profile = await context.canvasApi.syncUser(instructor);
+
+            // Add enrollment in each section
+            let enrollment = await context.canvasApi.enrollInstructorSection(
+                canvasSection.id,
                 profile.id);
+
+            // Add tracked enrollment to Banner
+            await BannerOperations.trackEnrollment(
+                context.college,
+                section.term,
+                section.crn,
+                instructor.pidm,
+                profile.id,
+                'TeacherEnrollment',
+                enrollment.id,
+                context.canvasCourse.id);
+
+            Logger.info(`Successfully enrolled instructor for course section ${section.term}:${section.crn}`, instructor);
         }
-
-        // Add tracked enrollment to Banner
-        await BannerOperations.trackEnrollment(
-            context.college,
-            context.parentTerm,
-            context.parentCrn,
-            instructor.pidm,
-            profile.id,
-            'TeacherEnrollment',
-            enrollment.id,
-            context.canvasCourse.id);
-
-        Logger.info(`Successfully enrolled instructor for course section ${context.parentTerm}:${context.parentCrn}`, instructor);
     }
 }
 
