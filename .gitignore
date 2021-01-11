@@ -6,3 +6,4 @@ reconciliation-reports
 *.log
 *.log.gz
 .lastimage
+.DS_Store
