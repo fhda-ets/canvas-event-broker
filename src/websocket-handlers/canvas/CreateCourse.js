@@ -139,7 +139,10 @@ async function createCourseSite(context) {
         'course[name]': courseName,
         'course[course_code]': courseCode,
         'course[term_id]': context.enrollmentTerm.id,
-        'course[sis_course_id]': `${context.parentTerm}:${context.sanitizedSubject}${context.sanitizedCourseNumber}:${Random.number(4)}`
+        'course[sis_course_id]': `${context.parentTerm}:${context.sanitizedSubject}${context.sanitizedCourseNumber}:${Random.number(4)}`,
+
+        // Jan-11-2021: Set a grading standard configured by the college (avoid issues such as C- grades)
+        'course[grading_standard_id]': context.college.gradingStandardId
     });
 }
 
