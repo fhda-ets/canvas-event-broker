@@ -134,6 +134,8 @@ async function createCourseSite(context) {
         context.sections);
     Logger.info(`Generated course code ${courseCode}`);
 
+    Logger.info(`Using grading standard ${context.college.config.gradingStandardId}`);
+
     // Create course in Canvas
     context.canvasCourse = await context.canvasApi.createCourse({
         'course[name]': courseName,
@@ -142,7 +144,7 @@ async function createCourseSite(context) {
         'course[sis_course_id]': `${context.parentTerm}:${context.sanitizedSubject}${context.sanitizedCourseNumber}:${Random.number(4)}`,
 
         // Jan-11-2021: Set a grading standard configured by the college (avoid issues such as C- grades)
-        'course[grading_standard_id]': context.college.gradingStandardId
+        'course[grading_standard_id]': context.college.config.gradingStandardId
     });
 }
 
